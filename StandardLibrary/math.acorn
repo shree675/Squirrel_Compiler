@@ -6,7 +6,7 @@
     else{
         return b;
     }
-}
+}#
 
 ``floatMax``
 @floatMax(float a, float b){
@@ -16,7 +16,7 @@
     else{
         return b;
     }
-}
+}#
 
 ``intMin``
 @intMin(int a, int b){
@@ -26,7 +26,7 @@
     else{
         return b;
     }
-}
+}#
 
 ``floatMin``
 @floatMin(float a, float b){
@@ -36,7 +36,7 @@
     else{
         return b;
     }
-}
+}#
 
 ``intAbs``
 @intAbs(int a){
@@ -46,7 +46,7 @@
     else{
         return a;
     }
-}
+}#
 
 ``floatAbs``
 @floatAbs(float a){
@@ -56,14 +56,14 @@
     else{
         return a;
     }
-}
+}#
 
 ``intSum``
 @intSum(int a, int b){
     return a+b;
-}
+}#
 
 ``floatSum``
 @floatSum(float a, float b){
     return a+b;
-}
+}#
