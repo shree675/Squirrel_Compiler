@@ -2,6 +2,10 @@ from sly import Lexer
 
 
 class Lexer(Lexer):
+
+    def __init__(self):
+        self.prev = 'NONE'
+
     tokens = {PLUS, MINUS, MULT, DIVIDE, MOD, ASSIGN, LPAREN, RPAREN, LSQB, RSQB, COMMA, INTVAL, FLOATVAL, CHARVAL, STRINGVAL, BOOLVAL,
               LBRACE, RBRACE, SEMICOL, VARNAME, IF, ELSE, WHILE, FOR, ELIF, RETURN, BREAK, FUNCNAME, DATATYPE, RELOP, LOGOP}
 
