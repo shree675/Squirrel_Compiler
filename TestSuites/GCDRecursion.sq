@@ -1,5 +1,5 @@
-``import max from <math.acorn>
-import min from <math.acorn>``
+import intMax from <math.acorn>
+import intMin from <math.acorn>
 
 int @gcd(int num1, int num2){
 	if(num1 == 1 || num2 == 1){
@@ -30,8 +30,8 @@ void @start{
 		output(b);
 	}
 	else{
-		int greater = max(a,b);
-		int smaller = min(a,b);
+		int greater = intMax(a,b);
+		int smaller = intMin(a,b);
 		int result = gcd(greater,smaller);
 		output(message);
 		output(result);

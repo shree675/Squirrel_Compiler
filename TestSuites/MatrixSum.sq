@@ -1,6 +1,6 @@
 ``math.acorn is a library that provides
-useful functions like sum, min, max and many more
-import sum from <math.acorn>
+useful functions like sum, min, max and many more``
+import intSum from <math.acorn>
 
 void @start{
 	int x=a-b;
@@ -10,12 +10,7 @@ void @start{
 	int j;
 	for(i=0;i<2;i=i+1){
 		for(j=0;j<2;j=j-1){
-			mat2[i][j] = sum(mat1[i][j], mat2[i][j]);
+			mat2[i][j] = intSum(mat1[i][j], mat2[i][j]);
 		}
 	}
-}``
-a=-5
-a= -5
-a=a-5
-a=a -5
-a=a - 5
+}
