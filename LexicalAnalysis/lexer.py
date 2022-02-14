@@ -54,7 +54,7 @@ class Lexer(Lexer):
         self.index += 1
 
 if __name__ == '__main__':
-    test_case = open('../../TestSuites/Palindrome.sq', 'r')
+    test_case = open('../TestSuites/Palindrome.sq', 'r')
     lexer = Lexer()
     for token in lexer.tokenize(test_case.read()):
         print('type=%r, value=%r' % (token.type, token.value))
