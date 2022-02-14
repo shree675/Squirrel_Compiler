@@ -18,7 +18,7 @@ class Parser(Parser):
         ('right', 'NOT')
     )
 
-    @_('expr SEMICOL')
+    @_('expr')
     def statement(self, p):
         return p.expr
 
