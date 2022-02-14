@@ -24,15 +24,23 @@ class Parser(Parser):
 
     @_('expr PLUS expr')
     def expr(self, p):
-        return str(p.expr0+'+'+p.expr1)
+        return str('('+p.expr0+'+'+p.expr1+')')
 
     @_('expr MINUS expr')
     def expr(self, p):
-        return str(p.expr0+'-'+p.expr1)
+        return str('('+p.expr0+'-'+p.expr1+')')
+
+    @_('expr MULT expr')
+    def expr(self, p):
+        return str('('+p.expr0+'*'+p.expr1+')')
+
+    @_('expr DIVIDE expr')
+    def expr(self, p):
+        return str('('+p.expr0+'/'+p.expr1+')')
 
     @_('MINUS expr %prec UMINUS')
     def expr(self, p):
-        return str('unary-'+p.expr)
+        return str('(-'+p.expr+')')
 
     @_('INTVAL')
     def expr(self, p):
