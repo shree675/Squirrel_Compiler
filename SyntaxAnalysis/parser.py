@@ -1,10 +1,10 @@
-from sly import Parser
+from sly import Parser as SlyParser
 import sys
 import os
 sys.path.append(os.path.abspath('../LexicalAnalysis'))
 import lexer
 
-class Parser(Parser):
+class Parser(SlyParser):
 
     tokens = lexer.Lexer.tokens
 
@@ -14,10 +14,11 @@ class Parser(Parser):
         ('left', 'RELOP'),
         ('left', 'PLUS', 'MINUS'),
         ('left', 'MULT', 'DIVIDE', 'MOD'),
-        ('right', 'UMINUS'),        # fictitious token
-        ('right', 'NOT')
+        ('right', 'NOT'),
+        ('right', 'UMINUS')        # fictitious token
     )
 
+    # statement -> expr {return expr}
     @_('expr')
     def statement(self, p):
         return p.expr
