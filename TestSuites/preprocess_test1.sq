@@ -1,17 +1,12 @@
-
 replace big_int (1000007)
-
 import floatMin from math.acorn
-
-replace MAX(x,y) ((x>y)?x:y)
-
+replace AREA(x,y) (x*y)
 import intMax from math.acorn
-
 
 void @start() {
 
     int a = 4;
     int b = big_int;
-    int c = MAX(a,b);
+    int c = AREA(x,y);
 
 }

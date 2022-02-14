@@ -1,48 +1,56 @@
 import re
-
 class Preprocessor():
     
     def preprocess(self, filename, file, save = False):
-        print ("preprocessing", file)
-        print(save)
+        #print ("preprocessing", file)
+        #print("Save the preprocessed file?", save)
+        output = ""
 
         #------------------------------------------------------------------------------
-        # replace implementation of preprocessor
-        """ for line in file.splitlines():
-            line = line.strip()
-            #print(line)
-            print("-------------------------------------------------------")
-            if re.match("replace", line):
-                line = line.split(" ")
-                print(line) """
-        #------------------------------------------------------------------------------
-        # import implementation of preprocessor
+        # 'replace' implementation of preprocessor
+        # Supports chain macros just like in C
+        # macros must be single line
         for line in file.splitlines():
             line = line.strip()
-            #print(line)
-            print("-------------------------------------------------------")
+            if re.match("replace", line):
+                line = line.split(" ",2)
+                #print(line)
+                file = file.replace(line[1], line[2])
+        #------------------------------------------------------------------------------
+        # 'import' implementation of preprocessor
+        # At the end of this for loop, the modified file is available in output
+        for line in file.splitlines():
+            line = line.strip()
             if re.match("import", line):
                 tokens = line.split(" ")
-                print(tokens)
+                #print(tokens)
                 import_file_name = tokens[3]
                 function_name = tokens[1]
-                print("importing file", import_file_name)
+                #print("importing file", import_file_name)
                 try:
                     import_file_handle = open("./StandardLibrary/"+import_file_name, "r")
                     import_file = import_file_handle.read()
-                    #print(import_file)
                     import_file_handle.close()
-                    pattern = "@"+function_name+".*$"
-                    pattern = r'@'+function_name+r'(.|\n)*'
-                    print(pattern)
-                    #"^The.*Spain$"
-                    function = re.findall(pattern, import_file)
-                    print(function)
+                    pattern = "@"+function_name
+                    start_index = import_file.find(pattern)
+                    #print(start_index)
+                    end_index = import_file.find("#", start_index+1)
+                    #print(end_index)
+                    imported_function = import_file[start_index:end_index]
+                    output = imported_function + "\n" + output
                 except: 
-                    print("Error")
+                    print("Error in opening Standard Library file")
+            elif re.match("replace", line):
+                pass
+            else:
+                output = output + "\n" + line
         #------------------------------------------------------------------------------
+        #print("Preprocessed file:")
+        #print(output)
 
         if save:
             preprocessed_file = open("./Output/preprocessed_"+filename, "w")
-            preprocessed_file.write(file)
+            preprocessed_file.write(output)
             preprocessed_file.close()
+
+        return output

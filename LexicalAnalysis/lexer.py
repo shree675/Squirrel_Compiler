@@ -1,6 +1,6 @@
-from sly import Lexer
+from sly import Lexer as SlyLexer
 
-class Lexer(Lexer):
+class Lexer(SlyLexer):
 
     tokens = {PLUS, MINUS, MULT, DIVIDE, MOD, ASSIGN, LPAREN, RPAREN, LSQB, RSQB, COMMA, INTVAL, FLOATVAL, CHARVAL, STRINGVAL, BOOLVAL,
               LBRACE, RBRACE, SEMICOL, VARNAME, IF, ELSE, WHILE, FOR, ELIF, RETURN, BREAK, FUNCNAME, DATATYPE, RELOP, LOGOP, NOT}
@@ -48,6 +48,8 @@ class Lexer(Lexer):
     VARNAME['void'] = DATATYPE
     VARNAME['true'] = BOOLVAL
     VARNAME['false'] = BOOLVAL
+
+    # TODO: @Shreetesh switch-case lexing
 
     def error(self, t):
         print("----Illegal character '%s'----" % t.value[0])

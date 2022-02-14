@@ -1,0 +1,25 @@
+@intMax(int a, int b){
+    if(a>=b){
+        return a;
+    }
+    else{
+        return b;
+    }
+}
+@floatMin(float a, float b){
+    if(a<b){
+        return a;
+    }
+    else{
+        return b;
+    }
+}
+
+
+void @start() {
+
+int a = 4;
+int b = (1000007);
+int c = (x*y);
+
+}
