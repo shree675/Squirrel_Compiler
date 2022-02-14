@@ -1,22 +1,21 @@
 from sly import Lexer
 
-
 class Lexer(Lexer):
 
-    def __init__(self):
-        self.prev = 'NONE'
-
     tokens = {PLUS, MINUS, MULT, DIVIDE, MOD, ASSIGN, LPAREN, RPAREN, LSQB, RSQB, COMMA, INTVAL, FLOATVAL, CHARVAL, STRINGVAL, BOOLVAL,
-              LBRACE, RBRACE, SEMICOL, VARNAME, IF, ELSE, WHILE, FOR, ELIF, RETURN, BREAK, FUNCNAME, DATATYPE, RELOP, LOGOP}
+              LBRACE, RBRACE, SEMICOL, VARNAME, IF, ELSE, WHILE, FOR, ELIF, RETURN, BREAK, FUNCNAME, DATATYPE, RELOP, LOGOP, NOT}
 
     ignore = ' \t'
     ignore_comment = r'``(.|\n)[^``]*``'
     ignore_newline = r'\n+'
 
     # Tokens
+    PLUS = r'\+'
+    MINUS = r'-'
     MULT = r'\*'
     DIVIDE = r'/'
     MOD = r'%'
+    NOT = r'!'
     LPAREN = r'\('
     RPAREN = r'\)'
     LBRACE = r'{'
@@ -28,10 +27,8 @@ class Lexer(Lexer):
     LOGOP = r'&&|\|\|'
     COMMA = r','
     SEMICOL = r';'
-    FLOATVAL = r'(\d+\.\d+)|(\d+\.)|(-|\+)(\d+\.\d+)|(-|\+)(\d+\.)'
-    INTVAL = r'\d+|(-|\+)\d+'
-    PLUS = r'\+'
-    MINUS = r'-'
+    FLOATVAL = r'(\d+\.\d+)|(\d+\.)'
+    INTVAL = r'\d+'
     CHARVAL = r'\'\w\''
     STRINGVAL = r'\"[^\"]*\"'
     VARNAME = r'[a-zA-Z][a-zA-Z0-9_]*'
@@ -56,9 +53,8 @@ class Lexer(Lexer):
         print("----Illegal character '%s'----" % t.value[0])
         self.index += 1
 
-
 if __name__ == '__main__':
-    test_case = open('../TestSuites/MatrixSum.sq', 'r')
+    test_case = open('../../TestSuites/Palindrome.sq', 'r')
     lexer = Lexer()
     for token in lexer.tokenize(test_case.read()):
         print('type=%r, value=%r' % (token.type, token.value))

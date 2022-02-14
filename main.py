@@ -12,25 +12,27 @@ Flags:
 5. -O3 : To optimize compilation on level 3 (default)"""
 
 
+
+
 import sys
 import re
 from LexicalAnalysis import lexer
 from Preprocessing import preprocessor
-
 def compile(filename, optimization_level, save_preprocessed_file, save_intermediate_code):
     print("Compiling", filename, optimization_level)
     try:
-        #open .sq code file in read mode
+        # open .sq code file in read mode
         file_handle = open("./TestSuites/"+filename, "r")
-        #read whole file to a string
+        # read whole file to a string
         file = file_handle.read()
-        #close file
+        # close file
         file_handle.close()
-        #print(data)
+        # print(data)
         pre = preprocessor.Preprocessor()
-        file = pre.preprocess(filename, file, save = save_preprocessed_file)
+        file = pre.preprocess(filename, file, save=save_preprocessed_file)
     except:
         print("Error reading file")
+
 
 def main(*argv):
     print('Arguments:', argv[0])
@@ -57,11 +59,11 @@ def main(*argv):
         if arg.endswith('.sq'):
             filename = arg
             print("Name of the file being compiled = ", filename)
-            #print("Compiling...")
-            compile(filename, optimization_level, save_preprocessed_file, save_intermediate_code)
-            
+            # print("Compiling...")
+            compile(filename, optimization_level,
+                    save_preprocessed_file, save_intermediate_code)
+
 
 if __name__ == "__main__":
     #print("printing sys.argv", sys.argv)
     main(sys.argv)
-

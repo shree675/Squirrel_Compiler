@@ -14,10 +14,10 @@ void @start(){
 		i = i + 1;
 		j = j - 1;
 	}
-	if(is_palindrome){
-		output("It's a palindrome");
+	if(!is_palindrome){
+		output("It's not a palindrome");
 	}
 	else{
-		output("It's not a palindrome");
+		output("It's a palindrome");
 	}
 }
