@@ -32,7 +32,13 @@ class Preprocessor():
                     import_file = import_file_handle.read()
                     import_file_handle.close()
                     pattern = "@"+function_name
-                    start_index = import_file.find(pattern)
+                    pattern1 = "int "+pattern
+                    pattern2 = "float "+pattern
+                    pattern3 = "void "+pattern
+                    pattern4 = "char "+pattern
+                    pattern5 = "string "+pattern
+                    pattern6 = "bool "+pattern
+                    start_index = max(import_file.find(pattern1), import_file.find(pattern2), import_file.find(pattern3), import_file.find(pattern4), import_file.find(pattern5), import_file.find(pattern6))
                     #print(start_index)
                     end_index = import_file.find("#", start_index+1)
                     #print(end_index)

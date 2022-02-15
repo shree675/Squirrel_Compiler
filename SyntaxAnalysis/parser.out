@@ -1,0 +1,278 @@
+Grammar:
+
+Rule 0     S' -> statement
+Rule 1     statement -> expr
+Rule 2     expr -> INTVAL
+Rule 3     expr -> MINUS expr  [precedence=right, level=7]
+Rule 4     expr -> expr DIVIDE expr  [precedence=left, level=5]
+Rule 5     expr -> expr MULT expr  [precedence=left, level=5]
+Rule 6     expr -> expr MINUS expr  [precedence=left, level=4]
+Rule 7     expr -> expr PLUS expr  [precedence=left, level=4]
+
+Unused terminals:
+
+    SEMICOL
+    INPUT
+    DATATYPE
+    RETURN
+    RBRACE
+    OUTPUT
+    RPAREN
+    ASSIGN
+    BOOLVAL
+    IF
+    BREAK
+    FLOATVAL
+    FUNCNAME
+    LBRACE
+    LPAREN
+    MOD
+    WHILE
+    DEFAULT
+    COLON
+    RSQB
+    ELSE
+    COMMA
+    FOR
+    LSQB
+    CASE
+    CHARVAL
+    RELOP
+    LOGOP
+    SWITCH
+    STRINGVAL
+    VARNAME
+    NOT
+    ELIF
+
+Terminals, with rules where they appear:
+
+ASSIGN               : 
+BOOLVAL              : 
+BREAK                : 
+CASE                 : 
+CHARVAL              : 
+COLON                : 
+COMMA                : 
+DATATYPE             : 
+DEFAULT              : 
+DIVIDE               : 4
+ELIF                 : 
+ELSE                 : 
+FLOATVAL             : 
+FOR                  : 
+FUNCNAME             : 
+IF                   : 
+INPUT                : 
+INTVAL               : 2
+LBRACE               : 
+LOGOP                : 
+LPAREN               : 
+LSQB                 : 
+MINUS                : 3 6
+MOD                  : 
+MULT                 : 5
+NOT                  : 
+OUTPUT               : 
+PLUS                 : 7
+RBRACE               : 
+RELOP                : 
+RETURN               : 
+RPAREN               : 
+RSQB                 : 
+SEMICOL              : 
+STRINGVAL            : 
+SWITCH               : 
+VARNAME              : 
+WHILE                : 
+error                : 
+
+Nonterminals, with rules where they appear:
+
+expr                 : 1 3 4 4 5 5 6 6 7 7
+statement            : 0
+
+
+state 0
+
+    (0) S' -> . statement
+    (1) statement -> . expr
+    (2) expr -> . INTVAL
+    (3) expr -> . MINUS expr
+    (4) expr -> . expr DIVIDE expr
+    (5) expr -> . expr MULT expr
+    (6) expr -> . expr MINUS expr
+    (7) expr -> . expr PLUS expr
+    INTVAL          shift and go to state 3
+    MINUS           shift and go to state 4
+
+    statement                      shift and go to state 1
+    expr                           shift and go to state 2
+
+state 1
+
+    (0) S' -> statement .
+
+
+state 2
+
+    (1) statement -> expr .
+    (4) expr -> expr . DIVIDE expr
+    (5) expr -> expr . MULT expr
+    (6) expr -> expr . MINUS expr
+    (7) expr -> expr . PLUS expr
+    $end            reduce using rule 1 (statement -> expr .)
+    DIVIDE          shift and go to state 5
+    MULT            shift and go to state 6
+    MINUS           shift and go to state 7
+    PLUS            shift and go to state 8
+
+
+state 3
+
+    (2) expr -> INTVAL .
+    DIVIDE          reduce using rule 2 (expr -> INTVAL .)
+    MULT            reduce using rule 2 (expr -> INTVAL .)
+    MINUS           reduce using rule 2 (expr -> INTVAL .)
+    PLUS            reduce using rule 2 (expr -> INTVAL .)
+    $end            reduce using rule 2 (expr -> INTVAL .)
+
+
+state 4
+
+    (3) expr -> MINUS . expr
+    (2) expr -> . INTVAL
+    (3) expr -> . MINUS expr
+    (4) expr -> . expr DIVIDE expr
+    (5) expr -> . expr MULT expr
+    (6) expr -> . expr MINUS expr
+    (7) expr -> . expr PLUS expr
+    INTVAL          shift and go to state 3
+    MINUS           shift and go to state 4
+
+    expr                           shift and go to state 9
+
+state 5
+
+    (4) expr -> expr DIVIDE . expr
+    (2) expr -> . INTVAL
+    (3) expr -> . MINUS expr
+    (4) expr -> . expr DIVIDE expr
+    (5) expr -> . expr MULT expr
+    (6) expr -> . expr MINUS expr
+    (7) expr -> . expr PLUS expr
+    INTVAL          shift and go to state 3
+    MINUS           shift and go to state 4
+
+    expr                           shift and go to state 10
+
+state 6
+
+    (5) expr -> expr MULT . expr
+    (2) expr -> . INTVAL
+    (3) expr -> . MINUS expr
+    (4) expr -> . expr DIVIDE expr
+    (5) expr -> . expr MULT expr
+    (6) expr -> . expr MINUS expr
+    (7) expr -> . expr PLUS expr
+    INTVAL          shift and go to state 3
+    MINUS           shift and go to state 4
+
+    expr                           shift and go to state 11
+
+state 7
+
+    (6) expr -> expr MINUS . expr
+    (2) expr -> . INTVAL
+    (3) expr -> . MINUS expr
+    (4) expr -> . expr DIVIDE expr
+    (5) expr -> . expr MULT expr
+    (6) expr -> . expr MINUS expr
+    (7) expr -> . expr PLUS expr
+    INTVAL          shift and go to state 3
+    MINUS           shift and go to state 4
+
+    expr                           shift and go to state 12
+
+state 8
+
+    (7) expr -> expr PLUS . expr
+    (2) expr -> . INTVAL
+    (3) expr -> . MINUS expr
+    (4) expr -> . expr DIVIDE expr
+    (5) expr -> . expr MULT expr
+    (6) expr -> . expr MINUS expr
+    (7) expr -> . expr PLUS expr
+    INTVAL          shift and go to state 3
+    MINUS           shift and go to state 4
+
+    expr                           shift and go to state 13
+
+state 9
+
+    (3) expr -> MINUS expr .
+    (4) expr -> expr . DIVIDE expr
+    (5) expr -> expr . MULT expr
+    (6) expr -> expr . MINUS expr
+    (7) expr -> expr . PLUS expr
+    DIVIDE          reduce using rule 3 (expr -> MINUS expr .)
+    MULT            reduce using rule 3 (expr -> MINUS expr .)
+    MINUS           reduce using rule 3 (expr -> MINUS expr .)
+    PLUS            reduce using rule 3 (expr -> MINUS expr .)
+    $end            reduce using rule 3 (expr -> MINUS expr .)
+
+
+state 10
+
+    (4) expr -> expr DIVIDE expr .
+    (4) expr -> expr . DIVIDE expr
+    (5) expr -> expr . MULT expr
+    (6) expr -> expr . MINUS expr
+    (7) expr -> expr . PLUS expr
+    DIVIDE          reduce using rule 4 (expr -> expr DIVIDE expr .)
+    MULT            reduce using rule 4 (expr -> expr DIVIDE expr .)
+    MINUS           reduce using rule 4 (expr -> expr DIVIDE expr .)
+    PLUS            reduce using rule 4 (expr -> expr DIVIDE expr .)
+    $end            reduce using rule 4 (expr -> expr DIVIDE expr .)
+
+
+state 11
+
+    (5) expr -> expr MULT expr .
+    (4) expr -> expr . DIVIDE expr
+    (5) expr -> expr . MULT expr
+    (6) expr -> expr . MINUS expr
+    (7) expr -> expr . PLUS expr
+    DIVIDE          reduce using rule 5 (expr -> expr MULT expr .)
+    MULT            reduce using rule 5 (expr -> expr MULT expr .)
+    MINUS           reduce using rule 5 (expr -> expr MULT expr .)
+    PLUS            reduce using rule 5 (expr -> expr MULT expr .)
+    $end            reduce using rule 5 (expr -> expr MULT expr .)
+
+
+state 12
+
+    (6) expr -> expr MINUS expr .
+    (4) expr -> expr . DIVIDE expr
+    (5) expr -> expr . MULT expr
+    (6) expr -> expr . MINUS expr
+    (7) expr -> expr . PLUS expr
+    MINUS           reduce using rule 6 (expr -> expr MINUS expr .)
+    PLUS            reduce using rule 6 (expr -> expr MINUS expr .)
+    $end            reduce using rule 6 (expr -> expr MINUS expr .)
+    DIVIDE          shift and go to state 5
+    MULT            shift and go to state 6
+
+
+state 13
+
+    (7) expr -> expr PLUS expr .
+    (4) expr -> expr . DIVIDE expr
+    (5) expr -> expr . MULT expr
+    (6) expr -> expr . MINUS expr
+    (7) expr -> expr . PLUS expr
+    MINUS           reduce using rule 7 (expr -> expr PLUS expr .)
+    PLUS            reduce using rule 7 (expr -> expr PLUS expr .)
+    $end            reduce using rule 7 (expr -> expr PLUS expr .)
+    DIVIDE          shift and go to state 5
+    MULT            shift and go to state 6

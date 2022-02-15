@@ -3,7 +3,7 @@ from sly import Lexer as SlyLexer
 class Lexer(SlyLexer):
 
     tokens = {PLUS, MINUS, MULT, DIVIDE, MOD, ASSIGN, LPAREN, RPAREN, LSQB, RSQB, COMMA, INTVAL, FLOATVAL, CHARVAL, STRINGVAL, BOOLVAL,
-              LBRACE, RBRACE, SEMICOL, COLON, VARNAME, IF, ELSE, WHILE, FOR, ELIF, RETURN, BREAK, FUNCNAME, DATATYPE, RELOP, LOGOP, NOT, INPUT, OUTPUT, SWITCH, CASE, DEFAULT}
+              LBRACE, RBRACE, SEMICOL, COLON, VARNAME, IF, ELSE, WHILE, FOR, ELIF, RETURN, BREAK, FUNCNAME, DATATYPE, RELOP1, RELOP2, AND, OR, NOT, INPUT, OUTPUT, SWITCH, CASE, DEFAULT, FUZZY}
 
     ignore = ' \t'
     ignore_comment = r'``(.|\n)[^``]*``'
@@ -22,9 +22,11 @@ class Lexer(SlyLexer):
     RBRACE = r'}'
     LSQB = r'\['
     RSQB = r'\]'
-    RELOP = r'<=|>=|<|>|==|!='
+    RELOP1 = r'<=|>=|<|>'
+    RELOP2 = r'==|!='
     ASSIGN = r'='
-    LOGOP = r'&&|\|\|'
+    AND = r'&&'
+    OR = r'\|\|'
     COMMA = r','
     SEMICOL = r';'
     COLON = r':'
@@ -54,6 +56,7 @@ class Lexer(SlyLexer):
     VARNAME['switch'] = SWITCH
     VARNAME['case'] = CASE
     VARNAME['default'] = DEFAULT
+    VARNAME['fuzzy'] = FUZZY
 
     # TODO: @Shreetesh switch-case lexing
 

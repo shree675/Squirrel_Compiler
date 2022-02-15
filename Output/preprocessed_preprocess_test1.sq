@@ -1,4 +1,4 @@
-@intMax(int a, int b){
+int @intMax(int a, int b){
     if(a>=b){
         return a;
     }
@@ -6,7 +6,7 @@
         return b;
     }
 }
-@floatMin(float a, float b){
+float @floatMin(float a, float b){
     if(a<b){
         return a;
     }

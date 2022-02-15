@@ -5,6 +5,7 @@ sys.path.append(os.path.abspath('../LexicalAnalysis'))
 import lexer
 
 class Parser(SlyParser):
+    debugfile = 'parser.out'
 
     tokens = lexer.Lexer.tokens
 

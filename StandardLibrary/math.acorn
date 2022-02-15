@@ -1,5 +1,5 @@
 ``intMax``
-@intMax(int a, int b){
+int @intMax(int a, int b){
     if(a>=b){
         return a;
     }
@@ -9,7 +9,7 @@
 }#
 
 ``floatMax``
-@floatMax(float a, float b){
+float @floatMax(float a, float b){
     if(a>=b){
         return a;
     }
@@ -19,7 +19,7 @@
 }#
 
 ``intMin``
-@intMin(int a, int b){
+int @intMin(int a, int b){
     if(a<b){
         return a;
     }
@@ -29,7 +29,7 @@
 }#
 
 ``floatMin``
-@floatMin(float a, float b){
+float @floatMin(float a, float b){
     if(a<b){
         return a;
     }
@@ -39,7 +39,7 @@
 }#
 
 ``intAbs``
-@intAbs(int a){
+int @intAbs(int a){
     if(a<0){
         return a*-1;
     }
@@ -49,7 +49,7 @@
 }#
 
 ``floatAbs``
-@floatAbs(float a){
+float @floatAbs(float a){
     if(a<0){
         return a*-1;
     }
@@ -59,11 +59,11 @@
 }#
 
 ``intSum``
-@intSum(int a, int b){
+int @intSum(int a, int b){
     return a+b;
 }#
 
 ``floatSum``
-@floatSum(float a, float b){
+float @floatSum(float a, float b){
     return a+b;
 }#
