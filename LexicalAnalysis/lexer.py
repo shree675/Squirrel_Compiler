@@ -3,7 +3,7 @@ from sly import Lexer as SlyLexer
 class Lexer(SlyLexer):
 
     tokens = {PLUS, MINUS, MULT, DIVIDE, MOD, ASSIGN, LPAREN, RPAREN, LSQB, RSQB, COMMA, INTVAL, FLOATVAL, CHARVAL, STRINGVAL, BOOLVAL,
-              LBRACE, RBRACE, SEMICOL, VARNAME, IF, ELSE, WHILE, FOR, ELIF, RETURN, BREAK, FUNCNAME, DATATYPE, RELOP, LOGOP, NOT}
+              LBRACE, RBRACE, SEMICOL, COLON, VARNAME, IF, ELSE, WHILE, FOR, ELIF, RETURN, BREAK, FUNCNAME, DATATYPE, RELOP, LOGOP, NOT, INPUT, OUTPUT, SWITCH, CASE, DEFAULT}
 
     ignore = ' \t'
     ignore_comment = r'``(.|\n)[^``]*``'
@@ -27,6 +27,7 @@ class Lexer(SlyLexer):
     LOGOP = r'&&|\|\|'
     COMMA = r','
     SEMICOL = r';'
+    COLON = r':'
     FLOATVAL = r'(\d+\.\d+)|(\d+\.)'
     INTVAL = r'\d+'
     CHARVAL = r'\'\w\''
@@ -48,6 +49,11 @@ class Lexer(SlyLexer):
     VARNAME['void'] = DATATYPE
     VARNAME['true'] = BOOLVAL
     VARNAME['false'] = BOOLVAL
+    VARNAME['input'] = INPUT
+    VARNAME['output'] = OUTPUT
+    VARNAME['switch'] = SWITCH
+    VARNAME['case'] = CASE
+    VARNAME['default'] = DEFAULT
 
     # TODO: @Shreetesh switch-case lexing
 
