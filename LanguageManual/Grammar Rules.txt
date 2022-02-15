@@ -5,7 +5,7 @@ method -> DATATYPE FUNCNAME ( params ) { statements }
 statements -> statement; statements | e //not sure if this epsilon will cause issues - this leads to empty blocks
 params -> DATATYPE VARNAME, params | DATATYPE VARNAME
 
-statement -> declaration_statement | assignment_statement | io_statement | selection_statement | iteration_statement | jump_statement
+✓ statement -> declaration_statement | assignment_statement | io_statement | selection_statement | iteration_statement | jump_statement
 
 declaration_statement -> simple_init | array_init
 simple_init -> DATATYPE VARNAME | DATATYPE VARNAME = expr
@@ -13,15 +13,15 @@ simple_init -> DATATYPE VARNAME | DATATYPE VARNAME = expr
 array_init -> DATATYPE VARNAME [INTVAL] = { array_list } | DATATYPE VARNAME [INTVAL? ] [INTVAL] = { array_list } 
 array_list = constant, array_list | constant
 
-constant -> INTVAL | FLOATVAL | CHARVAL | STRINGVAL | BOOLVAL
+✓ constant -> INTVAL | FLOATVAL | CHARVAL | STRINGVAL | BOOLVAL
 
-arr_variable -> VARNAME [INTVAL] |VARNAME [INTVAL][INTVAL] 
-assignment_statement -> left_value = expr
-left_value -> VARNAME | array_variable
+✓ arr_variable -> VARNAME [INTVAL] | VARNAME [INTVAL][INTVAL] | VARNAME [VARNAME] | VARNAME [VARNAME][VARNAME] | VARNAME [INTVAL][VARNAME] | VARNAME [VARNAME][INTVAL]
+✓ assignment_statement -> left_value = expr
+✓ left_value -> VARNAME | array_variable
 
-io_statement -> input_statement | output_statement
-input_statement -> INPUT ( left_value )
-output_statement -> OUTPUT ( left_value ) | OUTPUT ( constant )
+✓ io_statement -> input_statement | output_statement
+✓ input_statement -> INPUT ( left_value )
+✓ output_statement -> OUTPUT ( left_value ) | OUTPUT ( constant )
 
 selection_statement -> if_statement | switch_statement
 if_statement -> IF ( expr ) { statements } | IF ( expr ) { statements} ELSE { statements} | IF ( expr ) { statements} elif | IF ( expr ) { statements} elif ELSE { statements}
@@ -37,11 +37,16 @@ while_statement -> WHILE ( expr ) { statements }
 for_statement -> FOR ( for_init ; expr ; assignment_statement ) { statements }
 for_init -> DATATYPE VARNAME = expr | VARNAME = expr
 
-jump_statement -> BREAK | return_statement 
-return_statement -> RETURN expr | RETURN
+✓ jump_statement -> BREAK | return_statement
+✓ return_statement -> RETURN expr | RETURN
 
+✓ expr -> expr PLUS expr | expr MINUS expr | expr MULT expr | expr DIVIDE expr | expr MOD expr | MINUS expr %prec UMINUS
+        | (expr) %prec PAREN | function_call | expr RELOP1 expr | expr RELOP2 expr | expr AND expr | expr OR expr | NOT expr | VARNAME
+        | array_variable | constant | (DATATYPE) expr %prec TYPECASTING
 
-expr -> expr PLUS expr | expr MINUS expr | expr MULT expr | expr DIVIDE expr | expr MOD expr | MINUS expr %prec UMINUS | (expr) | function_call | expr RELOP1 expr | expr RELOP2 expr | expr AND expr | expr OR expr | NOT expr | VARNAME | array_variable | constant | (DATATYPE)expr %prec TYPECASTING
+✓ function_call -> VARNAME ( argument_list )
+✓ argument_list -> argument, argument_list | argument
+✓ argument -> VARNAME | constant | array_variable
 
 TODO:
 Look into symbol table implementation 

@@ -58,8 +58,6 @@ class Lexer(SlyLexer):
     VARNAME['default'] = DEFAULT
     VARNAME['fuzzy'] = FUZZY
 
-    # TODO: @Shreetesh switch-case lexing
-
     def error(self, t):
         print("----Illegal character '%s'----" % t.value[0])
         self.index += 1
