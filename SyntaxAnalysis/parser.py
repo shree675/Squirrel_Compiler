@@ -4,7 +4,94 @@ import os
 sys.path.append(os.path.abspath('../LexicalAnalysis'))
 import lexer
 
+'''
+symbol_table : {
+    'identifier_name' : {
+        'type' : 'int',
+        'size' : 4,
+        'line_no' : 1,
+        'scope' : 'global',
+    }
+}
+
+{ id -> 1
+    
+    int age = 0;
+
+    { id -> 2
+
+        int age = 1;
+
+        { id -> 3
+
+        }
+
+        { id -> 4
+
+        int a;
+
+        }
+      
+    }
+}
+
+symbol_table : [
+    {
+        identifier_name : 'age',
+        ....details,
+        scope: 1
+        parent_scope: 0
+    },
+    {
+        identifier_name : 'age',
+        ....details,
+        scope: 2
+        parent_scope: 1
+    }
+]
+
+
+global = {
+
+    variable : {
+        "age" :{ info about age}
+        "name" : { info about name}
+    }
+
+    sub_scopes : {
+        "sub_scope_1" : {
+            parent_scope : global
+            variable : {
+                "age" :{ info about age}
+                "name" : { info about name}
+            }
+            sub_scopes : {
+            
+            }
+        }
+
+        "sub_scope_2" : {
+            parent_scope : global
+            variable : {
+                "age" :{ info about age}
+                "name" : { info about name}
+            }
+            sub_scopes : {
+            
+            }
+        }
+    }
+}
+
+'''
+
+
 class Parser(SlyParser):
+
+    def __init__(self):
+        self.symbol_table = []
+        self.id = 2
+        self.scope_id_stack = [0, 1]
     
     debugfile = 'parser.out'
     tokens = lexer.Lexer.tokens
@@ -23,22 +110,37 @@ class Parser(SlyParser):
         ('right', 'PAREN')                # fictitious token
     )
 
+
+    
+    # statements -> statement; statements | e 
+    @_("statement statements")
+    def statements(self, p):
+        return p[0]
+
+    @_("")
+    def statements(self, p):
+        return None
+
     # temporary
     # statement -> expr
     @_('expr')
     def statement(self, p):
         return p.expr
-
+    
     # statement -> declaration_statement | assignment_statement | io_statement | selection_statement | iteration_statement | jump_statement
-    # @_('declaration_statement')
-    # def statement(self, p):
-    #     return p.[0]
-
-    @_('assignment_statement')
+    @_('declaration_statement SEMICOL')
     def statement(self, p):
         return p[0]
 
-    @_('io_statement')
+    @_('assignment_statement SEMICOL')
+    def statement(self, p):
+        return p[0]
+
+    @_('io_statement SEMICOL')
+    def statement(self, p):
+        return p[0]
+
+    @_('if_statement')
     def statement(self, p):
         return p[0]
 
@@ -53,6 +155,43 @@ class Parser(SlyParser):
     # @_('jump_statement')
     # def statement(self, p):
     #     return p.[0]
+
+    # declaration_statement -> simple_init | array_init
+    @_("simple_init")
+    def declaration_statement(self, p):
+        return 0
+
+    # simple_init -> DATATYPE VARNAME | DATATYPE VARNAME = expr
+    @_("DATATYPE VARNAME")
+    def simple_init(self, p):
+        cur_scope_vars = filter(lambda e : e["scope"] == self.scope_id_stack[-1] ,self.symbol_table)
+        for var in cur_scope_vars:
+            if var["identifier_name"] == p[1]:
+                print("Error: Variable already declared in current scope")
+                raise Exception(f"Error : variable \"{p[1]}\" already declared in current scope")
+
+        self.symbol_table.append({
+            "identifier_name" : p[1],
+            "type" : p[0],
+            "scope" : self.scope_id_stack[-1],
+            "parent_scope": self.scope_id_stack[-2]
+        })
+
+
+    # if_statement -> IF ( expr ) { statements if_close }
+    @_("IF LPAREN expr RPAREN LBRACE if_open statements if_close RBRACE")
+    def if_statement(self, p):
+        return p[0]
+
+    @_("")
+    def if_open(self, p):
+        self.scope_id_stack.append(self.id)
+        self.id += 1
+
+    @_("")
+    def if_close(self, p):
+        self.scope_id_stack.pop()
+        
 
     # io_statement -> input_statement | output_statement
     @_('input_statement')
@@ -252,15 +391,23 @@ class Parser(SlyParser):
             print("Syntax error at EOF")
         raise Exception('Syntax error')
 
+
 if __name__ == '__main__':
+
+
     lex = lexer.Lexer()
     parser = Parser()
 
+
     while True:
-        try:
-            text = input('calc > ')
+        # try:
+            # text = input('calc > ')
+            file = open("../TestSuites/SDTtest.sq", 'r')
+            text = file.read()
             result = parser.parse(lex.tokenize(text))
-            print(result)
-        except:
-            print('Error')
+            # print(result)
+            print(parser.symbol_table)
             break
+        # except:
+            # print('Error')
+            # break
