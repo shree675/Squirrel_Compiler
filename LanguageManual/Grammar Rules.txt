@@ -3,7 +3,7 @@ methods -> methods method | method
 
 method -> DATATYPE FUNCNAME ( params ) { statements }
 statements -> statement; statements | e //not sure if this epsilon will cause issues - this leads to empty blocks
-params -> DATATYPE VARNAME, params | DATATYPE VARNAME
+params -> DATATYPE VARNAME, params | e
 
 ✓ statement -> declaration_statement | assignment_statement | io_statement | selection_statement | iteration_statement | jump_statement
 
@@ -45,10 +45,31 @@ for_init -> DATATYPE VARNAME = expr | VARNAME = expr
         | array_variable | constant | (DATATYPE) expr %prec TYPECASTING
 
 ✓ function_call -> VARNAME ( argument_list )
-✓ argument_list -> argument, argument_list | argument
-✓ argument -> VARNAME | constant | array_variable
+argument_list -> expr, argument_list | e
 
 TODO:
 Look into symbol table implementation 
 Let us all write exhaustive unit test cases for theoretical testing
 Testing for ambiguity with empty function bodies
+
+Left factor it?
+We'll have more rules - but we wont have any ambiguity in the
+
+
+int i = 5;
+if(i>4)
+{ 
+        
+        for(int j-0; j<10; j++)
+        { statements}
+        if(i>1)
+        { int i = 8;
+          print(i); //8
+        }
+        else
+        { print(i); //5
+        }
+        print(i); //5
+
+}
+
