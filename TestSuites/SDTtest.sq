@@ -1,0 +1,20 @@
+
+int a;
+
+if (z) {
+
+    int b;
+
+    if(z) {
+        int c;
+
+        if(z) {
+            int d;
+        }
+    }
+    
+    if(z) {
+        int d;
+    }
+    
+}
