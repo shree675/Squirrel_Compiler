@@ -2,10 +2,10 @@ program -> methods
 methods -> methods method | method
 
 method -> DATATYPE FUNCNAME ( params ) { statements }
-statements -> statement; statements | e //not sure if this epsilon will cause issues - this leads to empty blocks
+statements -> statement statements | e //not sure if this epsilon will cause issues - this leads to empty blocks
 params -> DATATYPE VARNAME, params | e
 
-✓ statement -> declaration_statement | assignment_statement | io_statement | selection_statement | iteration_statement | jump_statement
+✓ statement -> declaration_statement SEMICOL | assignment_statement SEMICOL | io_statement SEMICOL | jump_statement SEMICOL | selection_statement | iteration_statement
 
 declaration_statement -> simple_init | array_init
 simple_init -> DATATYPE VARNAME | DATATYPE VARNAME = expr
@@ -73,3 +73,7 @@ if(i>4)
 
 }
 
+#  -----------------------------
+
+problems :
+1. Grammar requires semicolon after if block
