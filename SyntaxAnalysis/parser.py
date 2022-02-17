@@ -92,6 +92,7 @@ class Parser(SlyParser):
         self.symbol_table = []
         self.id = 2
         self.scope_id_stack = [0, 1]
+        self.t = 0
     
     debugfile = 'parser.out'
     tokens = lexer.Lexer.tokens
@@ -123,9 +124,9 @@ class Parser(SlyParser):
 
     # temporary
     # statement -> expr
-    @_('expr')
-    def statement(self, p):
-        return p.expr
+    #@_('expr')
+    #def statement(self, p):
+        #return p.expr
     
     # statement -> declaration_statement | assignment_statement | io_statement | selection_statement | iteration_statement | jump_statement
     @_('declaration_statement SEMICOL')
@@ -236,31 +237,82 @@ class Parser(SlyParser):
 
     @_('expr PLUS expr')
     def expr(self, p):
-        return str('('+p.expr0+'+'+p.expr1+')')
+        '''
+            expr0.code
+            expr1.code
+            t = expr0.addr + expr1.addr
+        '''
+        addr = 't'+str(self.t)
+        self.t += 1
+
+        return {
+            "addr" : addr,
+            "code" : p.expr0["code"] + p.expr1["code"] + f"{addr} = {p.expr0['addr']} + {p.expr1['addr']}" + "\n"
+        }
 
     @_('expr MINUS expr')
     def expr(self, p):
+
+        addr = 't'+str(self.t)
+        self.t += 1
+
+        return {
+            "addr" : addr,
+            "code" : p.expr0["code"] + p.expr1["code"] + f"{addr} = {p.expr0['addr']} - {p.expr1['addr']}" + "\n"
+        }
+
         return str('('+p.expr0+'-'+p.expr1+')')
 
     @_('expr MULT expr')
     def expr(self, p):
-        return str('('+p.expr0+'*'+p.expr1+')')
+
+        addr = 't'+str(self.t)
+        self.t += 1
+
+        return {
+            "addr" : addr,
+            "code" : p.expr0["code"] + p.expr1["code"] + f"{addr} = {p.expr0['addr']} * {p.expr1['addr']}" + "\n"
+        }
 
     @_('expr DIVIDE expr')
     def expr(self, p):
-        return str('('+p.expr0+'/'+p.expr1+')')
+
+        addr = 't'+str(self.t)
+        self.t += 1
+
+        return {
+            "addr" : addr,
+            "code" : p.expr0["code"] + p.expr1["code"] + f"{addr} = {p.expr0['addr']} / {p.expr1['addr']}" + "\n"
+        }
 
     @_('expr MOD expr')
     def expr(self, p):
-        return str('('+p.expr0+'%'+p.expr1+')')
+
+        addr = 't'+str(self.t)
+        self.t += 1
+
+        return {
+            "addr" : addr,
+            "code" : p.expr0["code"] + p.expr1["code"] + f"{addr} = {p.expr0['addr']} % {p.expr1['addr']}" + "\n"
+        }
+
 
     @_('MINUS expr %prec UMINUS')
     def expr(self, p):
-        return str('(-'+p.expr+')')
+
+        addr = 't'+str(self.t)
+        self.t += 1
+
+        return {
+            "addr" : addr,
+            "code": p.expr["code"] + f"{addr} = -{p.expr['addr']}" + "\n"
+        }
 
     @_('LPAREN expr RPAREN %prec PAREN')
     def expr(self, p):
-        return str('('+p.expr+')')
+        return p.expr
+    
+ 
     
     @_('expr RELOP1 expr')
     def expr(self, p):
@@ -269,6 +321,7 @@ class Parser(SlyParser):
     @_('expr RELOP2 expr')
     def expr(self, p):
         return str('('+p.expr0+p[1]+p.expr1+')')
+
 
     @_('expr AND expr')
     def expr(self, p):
@@ -284,11 +337,36 @@ class Parser(SlyParser):
 
     @_('VARNAME')
     def expr(self, p):
-        return str(p[0])
+        return {
+            "addr" : str(p[0]),
+            "code" : ""
+        }
+
+    # expr -> constant
+    @_('constant')
+    def expr(self, p):
+        return {
+            "addr" : str(p[0]),
+            "code" : ""
+        }
+
+    # expr -> (DATATYPE) expr
+    @_('LPAREN DATATYPE RPAREN expr %prec TYPECASTING')
+    def expr(self, p):
+        return str('('+p[0]+p[1]+p[2]+p[3]+')')
+
+# -----------------------------------------------------------------------------------------
 
     # arr_variable -> VARNAME [INTVAL] | VARNAME [INTVAL][INTVAL] | VARNAME [VARNAME] | VARNAME [VARNAME][VARNAME] | VARNAME [INTVAL][VARNAME] | VARNAME [VARNAME][INTVAL]
     @_('VARNAME LSQB INTVAL RSQB')
     def array_variable(self, p):
+
+        '''return {
+            "code"
+            "addr"
+            "rows"
+            "columns"
+        }'''
         return str('('+p[0]+'['+p[2]+']'+')')
 
     @_('VARNAME LSQB INTVAL RSQB LSQB INTVAL RSQB')
@@ -314,7 +392,7 @@ class Parser(SlyParser):
     # assignment_statement -> left_value = expr
     @_('left_value ASSIGN expr')
     def assignment_statement(self, p):
-        return str(p.left_value + '=' + p.expr)
+        return p.expr["code"] + str(p.left_value + '=' + p.expr["addr"]) + "\n"
 
     # left_value -> VARNAME | array_variable
     @_('VARNAME')
@@ -325,15 +403,6 @@ class Parser(SlyParser):
     def left_value(self, p):
         return str(p[0])
 
-    # expr -> constant
-    @_('constant')
-    def expr(self, p):
-        return str(p[0])
-
-    # expr -> (DATATYPE) expr
-    @_('LPAREN DATATYPE RPAREN expr %prec TYPECASTING')
-    def expr(self, p):
-        return str('('+p[0]+p[1]+p[2]+p[3]+')')
 
     # constant -> INTVAL | FLOATVAL | CHARVAL | STRINGVAL | BOOLVAL
     @_('INTVAL')
@@ -402,11 +471,11 @@ if __name__ == '__main__':
     while True:
         # try:
             # text = input('calc > ')
-            file = open("../TestSuites/SDTtest.sq", 'r')
+            file = open("../TestSuites/TACtest.sq", 'r')
             text = file.read()
             result = parser.parse(lex.tokenize(text))
-            # print(result)
-            print(parser.symbol_table)
+            print(result)
+            # print(parser.symbol_table)
             break
         # except:
             # print('Error')
