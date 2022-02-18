@@ -19,6 +19,7 @@ array_list = constant, array_list | constant
 ✓ assignment_statement -> left_value = expr
 ✓ left_value -> VARNAME | array_variable
 
+
 ✓ io_statement -> input_statement | output_statement
 ✓ input_statement -> INPUT ( left_value )
 ✓ output_statement -> OUTPUT ( left_value ) | OUTPUT ( constant )
@@ -43,6 +44,7 @@ for_init -> DATATYPE VARNAME = expr | VARNAME = expr
 ✓ expr -> expr PLUS expr | expr MINUS expr | expr MULT expr | expr DIVIDE expr | expr MOD expr | MINUS expr %prec UMINUS
         | (expr) %prec PAREN | function_call | expr RELOP1 expr | expr RELOP2 expr | expr AND expr | expr OR expr | NOT expr | VARNAME
         | array_variable | constant | (DATATYPE) expr %prec TYPECASTING
+
 
 ✓ function_call -> VARNAME ( argument_list )
 argument_list -> expr, argument_list | e
@@ -79,7 +81,8 @@ Problems :
 1. Grammar requires semicolon after if block     (solved)
 2. expr -> -(expr) instead of expr -> - expr     (working fine)
 3. expr -> expr AND expr : TAC for this
-4. When used expr && expr , throws Sysntax error
+4. When used expr -> expr && expr , throws Sysntax error
+5. change INTVAL to expr in array_variable
 
 
 TAC generation:
@@ -101,6 +104,6 @@ t0 = a+b
 t1 = t0+c
 c = t1
 
-E -> E + T
+
 
 
