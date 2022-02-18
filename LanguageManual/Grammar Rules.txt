@@ -75,5 +75,32 @@ if(i>4)
 
 #  -----------------------------
 
-problems :
-1. Grammar requires semicolon after if block
+Problems :
+1. Grammar requires semicolon after if block     (solved)
+2. expr -> -(expr) instead of expr -> - expr     (working fine)
+3. expr -> expr AND expr : TAC for this
+4. When used expr && expr , throws Sysntax error
+
+
+TAC generation:
+for expr
+variable usage
+
+c = (a+b)+(c+d)
+
+t0 = c+d
+t1 = a+b
+t2 = t0 + t1
+c = t2
+
+c = a+b+c
+
+
+
+t0 = a+b
+t1 = t0+c
+c = t1
+
+E -> E + T
+
+
