@@ -212,15 +212,57 @@ class Parser(SlyParser):
             "parent_scope": self.scope_id_stack[-2]
         })
 
+    # @_("IF LPAREN if_paren_open_and expr AND expr RPAREN LBRACE if_open statements if_close RBRACE")
+    # def if_statement(self, p):
+        # return {
+            # # "code" : p.expr["code"] + p.statements["code"],
+            # "code" : ""
+        # }
+
+    # @_("IF LPAREN if_paren_open_or expr OR expr RPAREN LBRACE if_open statements if_close RBRACE")
+    # def if_statement(self, p):
+        # return {
+            # # "code" : p.expr["code"] + p.statements["code"],
+            # "code" : ""
+        # }
+    
+    # @_("")
+    # def if_paren_open_and(self, p):
+        # self.cond_label_stack.append({"true" : self.gen_label(), "false" : self.next_label_stack[-1]})
+        # print("b1_open")
+        # self.cond_label_stack.append({"true" : self.gen_label(), "false" : self.cond_label_stack[-1]["false"]})
+        # return {
+            # "true" : self.cond_label_stack[-1]["true"],
+            # "false" : self.cond_label_stack[-1]["false"]
+        # }
+
+    # @_("")
+    # def if_paren_open_or(self, p):
+        # self.cond_label_stack.append({"true" : self.gen_label(), "false" : self.next_label_stack[-1]})
+
 
     # if_statement -> IF ( expr ) { statements if_close }
-    @_("IF LPAREN if_paren_open expr RPAREN LBRACE if_open statements if_close RBRACE")
+    @_("IF if_paren_open LPAREN expr RPAREN LBRACE if_open statements if_close RBRACE")
     def if_statement(self, p):
         print("if_statement")
         return {
-            # "code" : p.expr["code"] + p.expr["true"] + p.statements["code"],
-            "code" : ""
+            "code" : p.expr["code"] + self.cond_label_stack[-1]["true"] + "\n" + p.statements["code"],
+            # "code" : ""
         }
+    
+    @_("bool_expr PLUS expr")
+    def bool_expr(self, p):
+
+        addr = self.gen_temp()
+
+        return {
+            "addr" : addr,
+            "code" : p.bool_expr["code"] + p.expr["code"] + f"{addr} = {p.bool_expr['addr']} + {p.expr['addr']}" + "\n"
+        }
+    
+    @_("constant")
+    def bool_expr(self, p):
+        return p.constant
 
     @_("")
     def if_open(self, p):
@@ -235,6 +277,13 @@ class Parser(SlyParser):
     @_("")
     def if_paren_open(self, p):
         self.cond_label_stack.append({"true" : self.gen_label(), "false" : self.next_label_stack[-1]})
+
+        # print("b1_open")
+        # self.cond_label_stack.append({"true" : self.gen_label(), "false" : self.cond_label_stack[-1]["false"]})
+        # return {
+            # "true" : self.cond_label_stack[-1]["true"],
+            # "false" : self.cond_label_stack[-1]["false"]
+        # }
         
 
     # io_statement -> input_statement | output_statement
@@ -358,20 +407,19 @@ class Parser(SlyParser):
     def expr(self, p):
         return str('('+p.expr0+p[1]+p.expr1+')')
 
-    # @_('expr AND expr %prec AND')
-    # def expr(self, p):
-        # return {
-            # "code" : p.expr0["code"] + "\n" + p.expr1["code"]
-        # } 
+  
 
-    @_('b1_open expr b2_open AND expr %prec AND')
+    @_('b1_open expr b2_open AND expr')
     def expr(self, p):
+        print("b1_open expr b2_open OR expr")
         return {
             "code" : p.expr0["code"] + p.b1_open["true"] + "\n" + p.expr1["code"]
+            # "code" : p.expr1["code"]
         } 
     
-    @_('')
+    @_("COMMA")
     def b1_open(self, p):
+        print("b1_open")
         self.cond_label_stack.append({"true" : self.gen_label(), "false" : self.cond_label_stack[-1]["false"]})
         return {
             "true" : self.cond_label_stack[-1]["true"],
@@ -380,30 +428,35 @@ class Parser(SlyParser):
 
     @_('')
     def b2_open(self, p):
-        # self.cond_label_stack.pop()
+        print("b2_open")
+        self.cond_label_stack.pop()
         self.cond_label_stack.append({"true" : self.cond_label_stack[-1]["true"], "false" : self.cond_label_stack[-1]["false"]})
 
-    @_('expr OR expr')
-    def expr(self, p):
-        return str('('+p.expr0+p[1]+p.expr1+')')
+    # @_('expr OR expr')
+    # def expr(self, p):
+        # print('expr OR expr')
+        # return str('('+p.expr0+p[1]+p.expr1+')')
 
     @_('NOT expr %prec NOT')
     def expr(self, p):
+        print('NOT expr %prec NOT')
         return str('(!'+p.expr+')')
 
     @_('VARNAME')
     def expr(self, p):
+        print("varname : " + p.VARNAME)
         return {
-            "addr" : str(p[0]),
+            "addr" : p.VARNAME,
             "code" : ""
         }
 
     # expr -> constant
     @_('constant')
     def expr(self, p):
+        print("constant " + p.constant["val"])
         return {
-            "addr" : str(p[0]),
-            "code" : ""
+            "addr" : p.constant["val"],
+            "code" : p.constant["code"]
         }
 
     # expr -> (DATATYPE) expr
@@ -483,6 +536,7 @@ class Parser(SlyParser):
     @_('BOOLVAL')
     def constant(self, p):
         return {
+            "val" : p.BOOLVAL,
             "code" : "goto " + self.cond_label_stack[-1][p.BOOLVAL] + "\n"
         }
 
