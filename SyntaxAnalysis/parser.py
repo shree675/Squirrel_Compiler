@@ -92,7 +92,21 @@ class Parser(SlyParser):
         self.symbol_table = []
         self.id = 2
         self.scope_id_stack = [0, 1]
-        self.t = 0
+        self.temp = -1
+        self.label = -1
+        self.next_label_stack = []
+        self.cond_label_stack = []
+
+    
+    def gen_temp(self):
+        self.temp += 1
+        return "t"+str(self.temp)
+
+    def gen_label(self):
+        self.label += 1
+        return "L"+str(self.label)
+        
+
     
     debugfile = 'parser.out'
     tokens = lexer.Lexer.tokens
@@ -116,11 +130,16 @@ class Parser(SlyParser):
     # statements -> statement; statements | e 
     @_("statement statements")
     def statements(self, p):
-        return p[0]
+        print("statements")
+        return {
+            "code" : p.statement["code"] + p.statements["code"],
+        }
 
     @_("")
     def statements(self, p):
-        return None
+        return {
+            "code" : "",
+        }
 
     # temporary
     # statement -> expr
@@ -135,19 +154,34 @@ class Parser(SlyParser):
 
     @_('assignment_statement SEMICOL')
     def statement(self, p):
-        return p[0]
+        return {
+            "code" : p.assignment_statement["code"]
+        }
 
     @_('io_statement SEMICOL')
     def statement(self, p):
         return p[0]
 
-    @_('if_statement')
-    def statement(self, p):
-        return p[0]
 
-    # @_('selection_statement')
-    # def statement(self, p):
-    #     return p.[0]
+    @_('start_selection selection_statement')
+    def statement(self, p):
+        self.next_label_stack.pop()
+        print("statement")
+        return {
+            "code" : p.selection_statement["code"] + p.selection_statement["next"] + "\n",
+        }
+    
+    @_("")
+    def start_selection(self, p):
+        self.next_label_stack.append(self.gen_label())
+    
+    @_("if_statement")
+    def selection_statement(self, p):
+        print("selection_statement")
+        return {
+            "code" : p.if_statement["code"],
+            "next" : self.next_label_stack[-1],
+        }
 
     # @_('iteration_statement')
     # def statement(self, p):
@@ -180,9 +214,13 @@ class Parser(SlyParser):
 
 
     # if_statement -> IF ( expr ) { statements if_close }
-    @_("IF LPAREN expr RPAREN LBRACE if_open statements if_close RBRACE")
+    @_("IF LPAREN if_paren_open expr RPAREN LBRACE if_open statements if_close RBRACE")
     def if_statement(self, p):
-        return p[0]
+        print("if_statement")
+        return {
+            # "code" : p.expr["code"] + p.expr["true"] + p.statements["code"],
+            "code" : ""
+        }
 
     @_("")
     def if_open(self, p):
@@ -192,6 +230,11 @@ class Parser(SlyParser):
     @_("")
     def if_close(self, p):
         self.scope_id_stack.pop()
+        self.cond_label_stack.pop()
+    
+    @_("")
+    def if_paren_open(self, p):
+        self.cond_label_stack.append({"true" : self.gen_label(), "false" : self.next_label_stack[-1]})
         
 
     # io_statement -> input_statement | output_statement
@@ -242,8 +285,7 @@ class Parser(SlyParser):
             expr1.code
             t = expr0.addr + expr1.addr
         '''
-        addr = 't'+str(self.t)
-        self.t += 1
+        addr = self.gen_temp()
 
         return {
             "addr" : addr,
@@ -253,21 +295,18 @@ class Parser(SlyParser):
     @_('expr MINUS expr')
     def expr(self, p):
 
-        addr = 't'+str(self.t)
-        self.t += 1
+        addr = self.gen_temp()
 
         return {
             "addr" : addr,
             "code" : p.expr0["code"] + p.expr1["code"] + f"{addr} = {p.expr0['addr']} - {p.expr1['addr']}" + "\n"
         }
 
-        return str('('+p.expr0+'-'+p.expr1+')')
 
     @_('expr MULT expr')
     def expr(self, p):
 
-        addr = 't'+str(self.t)
-        self.t += 1
+        addr = self.gen_temp()
 
         return {
             "addr" : addr,
@@ -277,8 +316,7 @@ class Parser(SlyParser):
     @_('expr DIVIDE expr')
     def expr(self, p):
 
-        addr = 't'+str(self.t)
-        self.t += 1
+        addr = self.gen_temp()
 
         return {
             "addr" : addr,
@@ -288,8 +326,7 @@ class Parser(SlyParser):
     @_('expr MOD expr')
     def expr(self, p):
 
-        addr = 't'+str(self.t)
-        self.t += 1
+        addr = self.gen_temp()
 
         return {
             "addr" : addr,
@@ -300,9 +337,8 @@ class Parser(SlyParser):
     @_('MINUS expr %prec UMINUS')
     def expr(self, p):
 
-        addr = 't'+str(self.t)
-        self.t += 1
-
+        addr = self.gen_temp()
+        
         return {
             "addr" : addr,
             "code": p.expr["code"] + f"{addr} = -{p.expr['addr']}" + "\n"
@@ -322,10 +358,30 @@ class Parser(SlyParser):
     def expr(self, p):
         return str('('+p.expr0+p[1]+p.expr1+')')
 
+    # @_('expr AND expr %prec AND')
+    # def expr(self, p):
+        # return {
+            # "code" : p.expr0["code"] + "\n" + p.expr1["code"]
+        # } 
 
-    @_('expr AND expr')
+    @_('b1_open expr b2_open AND expr %prec AND')
     def expr(self, p):
-        return str('('+p.expr0+p[1]+p.expr1+')')
+        return {
+            "code" : p.expr0["code"] + p.b1_open["true"] + "\n" + p.expr1["code"]
+        } 
+    
+    @_('')
+    def b1_open(self, p):
+        self.cond_label_stack.append({"true" : self.gen_label(), "false" : self.cond_label_stack[-1]["false"]})
+        return {
+            "true" : self.cond_label_stack[-1]["true"],
+            "false" : self.cond_label_stack[-1]["false"]
+        }
+
+    @_('')
+    def b2_open(self, p):
+        # self.cond_label_stack.pop()
+        self.cond_label_stack.append({"true" : self.cond_label_stack[-1]["true"], "false" : self.cond_label_stack[-1]["false"]})
 
     @_('expr OR expr')
     def expr(self, p):
@@ -392,7 +448,10 @@ class Parser(SlyParser):
     # assignment_statement -> left_value = expr
     @_('left_value ASSIGN expr')
     def assignment_statement(self, p):
-        return p.expr["code"] + str(p.left_value + '=' + p.expr["addr"]) + "\n"
+        return {
+            "code" : p.expr["code"] + str(p.left_value + '=' + p.expr["addr"]) + "\n"
+        }
+        
 
     # left_value -> VARNAME | array_variable
     @_('VARNAME')
@@ -423,7 +482,9 @@ class Parser(SlyParser):
 
     @_('BOOLVAL')
     def constant(self, p):
-        return str(p[0]) 
+        return {
+            "code" : "goto " + self.cond_label_stack[-1][p.BOOLVAL] + "\n"
+        }
 
     # expr -> function_call
     @_('function_call')
@@ -452,13 +513,13 @@ class Parser(SlyParser):
     def argument(self, p):
         return str(p[0])
 
-    def error(self, p):
-        if p:
-            print("Syntax error at line", p.lineno, "| TOKEN:", p.value)
-            self.errok()
-        else:
-            print("Syntax error at EOF")
-        raise Exception('Syntax error')
+    #def error(self, p):
+        #if p:
+            #print("Syntax error at line", p.lineno, "| TOKEN:", p.value)
+            #self.errok()
+        #else:
+            #print("Syntax error at EOF")
+        #raise Exception('Syntax error')
 
 
 if __name__ == '__main__':
@@ -474,7 +535,7 @@ if __name__ == '__main__':
             file = open("../TestSuites/TACtest.sq", 'r')
             text = file.read()
             result = parser.parse(lex.tokenize(text))
-            print(result)
+            print(result["code"])
             # print(parser.symbol_table)
             break
         # except:
