@@ -11,138 +11,141 @@ Rule 7     start_selection -> <empty>
 Rule 8     selection_statement -> if_statement
 Rule 9     declaration_statement -> simple_init
 Rule 10    simple_init -> DATATYPE VARNAME
-Rule 11    if_statement -> IF LPAREN if_paren_open expr RPAREN LBRACE if_open statements if_close RBRACE
-Rule 12    if_open -> <empty>
-Rule 13    if_close -> <empty>
-Rule 14    if_paren_open -> <empty>
-Rule 15    io_statement -> output_statement
-Rule 16    io_statement -> input_statement
-Rule 17    input_statement -> INPUT LPAREN left_value RPAREN
-Rule 18    output_statement -> OUTPUT LPAREN constant RPAREN
-Rule 19    output_statement -> OUTPUT LPAREN left_value RPAREN
-Rule 20    jump_statement -> return_statement
-Rule 21    jump_statement -> BREAK
-Rule 22    return_statement -> RETURN
-Rule 23    return_statement -> RETURN expr
-Rule 24    expr -> function_call
-Rule 25    expr -> LPAREN DATATYPE RPAREN expr  [precedence=right, level=9]
-Rule 26    expr -> constant
-Rule 27    expr -> VARNAME
-Rule 28    expr -> NOT expr  [precedence=right, level=10]
-Rule 29    expr -> expr OR expr  [precedence=left, level=3]
-Rule 30    expr -> b1_open expr b2_open AND expr  [precedence=left, level=4]
-Rule 31    expr -> expr RELOP2 expr  [precedence=left, level=5]
-Rule 32    expr -> expr RELOP1 expr  [precedence=left, level=6]
-Rule 33    expr -> LPAREN expr RPAREN  [precedence=right, level=11]
-Rule 34    expr -> MINUS expr  [precedence=right, level=10]
-Rule 35    expr -> expr MOD expr  [precedence=left, level=8]
-Rule 36    expr -> expr DIVIDE expr  [precedence=left, level=8]
-Rule 37    expr -> expr MULT expr  [precedence=left, level=8]
-Rule 38    expr -> expr MINUS expr  [precedence=left, level=7]
-Rule 39    expr -> expr PLUS expr  [precedence=left, level=7]
-Rule 40    b1_open -> <empty>
-Rule 41    b2_open -> <empty>
-Rule 42    array_variable -> VARNAME LSQB VARNAME RSQB LSQB VARNAME RSQB
-Rule 43    array_variable -> VARNAME LSQB INTVAL RSQB LSQB VARNAME RSQB
-Rule 44    array_variable -> VARNAME LSQB VARNAME RSQB LSQB INTVAL RSQB
-Rule 45    array_variable -> VARNAME LSQB VARNAME RSQB
-Rule 46    array_variable -> VARNAME LSQB INTVAL RSQB LSQB INTVAL RSQB
-Rule 47    array_variable -> VARNAME LSQB INTVAL RSQB
-Rule 48    assignment_statement -> left_value ASSIGN expr  [precedence=right, level=2]
-Rule 49    left_value -> array_variable
-Rule 50    left_value -> VARNAME
-Rule 51    constant -> BOOLVAL
-Rule 52    constant -> STRINGVAL
-Rule 53    constant -> CHARVAL
-Rule 54    constant -> FLOATVAL
-Rule 55    constant -> INTVAL
-Rule 56    function_call -> VARNAME LPAREN argument_list RPAREN
-Rule 57    argument_list -> argument
-Rule 58    argument_list -> argument COMMA argument_list  [precedence=left, level=1]
-Rule 59    argument -> array_variable
-Rule 60    argument -> constant
-Rule 61    argument -> VARNAME
+Rule 11    if_statement -> IF if_paren_open LPAREN expr RPAREN LBRACE if_open statements if_close RBRACE
+Rule 12    bool_expr -> constant
+Rule 13    bool_expr -> bool_expr PLUS expr  [precedence=left, level=7]
+Rule 14    if_open -> <empty>
+Rule 15    if_close -> <empty>
+Rule 16    if_paren_open -> <empty>
+Rule 17    io_statement -> output_statement
+Rule 18    io_statement -> input_statement
+Rule 19    input_statement -> INPUT LPAREN left_value RPAREN
+Rule 20    output_statement -> OUTPUT LPAREN constant RPAREN
+Rule 21    output_statement -> OUTPUT LPAREN left_value RPAREN
+Rule 22    jump_statement -> return_statement
+Rule 23    jump_statement -> BREAK
+Rule 24    return_statement -> RETURN
+Rule 25    return_statement -> RETURN expr
+Rule 26    expr -> function_call
+Rule 27    expr -> LPAREN DATATYPE RPAREN expr  [precedence=right, level=9]
+Rule 28    expr -> constant
+Rule 29    expr -> VARNAME
+Rule 30    expr -> NOT expr  [precedence=right, level=10]
+Rule 31    expr -> b1_open expr b2_open AND expr  [precedence=left, level=4]
+Rule 32    expr -> expr RELOP2 expr  [precedence=left, level=5]
+Rule 33    expr -> expr RELOP1 expr  [precedence=left, level=6]
+Rule 34    expr -> LPAREN expr RPAREN  [precedence=right, level=11]
+Rule 35    expr -> MINUS expr  [precedence=right, level=10]
+Rule 36    expr -> expr MOD expr  [precedence=left, level=8]
+Rule 37    expr -> expr DIVIDE expr  [precedence=left, level=8]
+Rule 38    expr -> expr MULT expr  [precedence=left, level=8]
+Rule 39    expr -> expr MINUS expr  [precedence=left, level=7]
+Rule 40    expr -> expr PLUS expr  [precedence=left, level=7]
+Rule 41    b1_open -> COMMA  [precedence=left, level=1]
+Rule 42    b2_open -> <empty>
+Rule 43    array_variable -> VARNAME LSQB VARNAME RSQB LSQB VARNAME RSQB
+Rule 44    array_variable -> VARNAME LSQB INTVAL RSQB LSQB VARNAME RSQB
+Rule 45    array_variable -> VARNAME LSQB VARNAME RSQB LSQB INTVAL RSQB
+Rule 46    array_variable -> VARNAME LSQB VARNAME RSQB
+Rule 47    array_variable -> VARNAME LSQB INTVAL RSQB LSQB INTVAL RSQB
+Rule 48    array_variable -> VARNAME LSQB INTVAL RSQB
+Rule 49    assignment_statement -> left_value ASSIGN expr  [precedence=right, level=2]
+Rule 50    left_value -> array_variable
+Rule 51    left_value -> VARNAME
+Rule 52    constant -> BOOLVAL
+Rule 53    constant -> STRINGVAL
+Rule 54    constant -> CHARVAL
+Rule 55    constant -> FLOATVAL
+Rule 56    constant -> INTVAL
+Rule 57    function_call -> VARNAME LPAREN argument_list RPAREN
+Rule 58    argument_list -> argument
+Rule 59    argument_list -> argument COMMA argument_list  [precedence=left, level=1]
+Rule 60    argument -> array_variable
+Rule 61    argument -> constant
+Rule 62    argument -> VARNAME
 
 Unused terminals:
 
     CASE
-    FUNCNAME
-    FOR
-    SWITCH
     ELIF
+    DEFAULT
     WHILE
     COLON
-    ELSE
+    OR
+    SWITCH
     FUZZY
-    DEFAULT
+    ELSE
+    FUNCNAME
+    FOR
 
 Terminals, with rules where they appear:
 
-AND                  : 30
-ASSIGN               : 48
-BOOLVAL              : 51
-BREAK                : 21
+AND                  : 31
+ASSIGN               : 49
+BOOLVAL              : 52
+BREAK                : 23
 CASE                 : 
-CHARVAL              : 53
+CHARVAL              : 54
 COLON                : 
-COMMA                : 58
-DATATYPE             : 10 25
+COMMA                : 41 59
+DATATYPE             : 10 27
 DEFAULT              : 
-DIVIDE               : 36
+DIVIDE               : 37
 ELIF                 : 
 ELSE                 : 
-FLOATVAL             : 54
+FLOATVAL             : 55
 FOR                  : 
 FUNCNAME             : 
 FUZZY                : 
 IF                   : 11
-INPUT                : 17
-INTVAL               : 43 44 46 46 47 55
+INPUT                : 19
+INTVAL               : 44 45 47 47 48 56
 LBRACE               : 11
-LPAREN               : 11 17 18 19 25 33 56
-LSQB                 : 42 42 43 43 44 44 45 46 46 47
-MINUS                : 34 38
-MOD                  : 35
-MULT                 : 37
-NOT                  : 28
-OR                   : 29
-OUTPUT               : 18 19
-PLUS                 : 39
+LPAREN               : 11 19 20 21 27 34 57
+LSQB                 : 43 43 44 44 45 45 46 47 47 48
+MINUS                : 35 39
+MOD                  : 36
+MULT                 : 38
+NOT                  : 30
+OR                   : 
+OUTPUT               : 20 21
+PLUS                 : 13 40
 RBRACE               : 11
-RELOP1               : 32
-RELOP2               : 31
-RETURN               : 22 23
-RPAREN               : 11 17 18 19 25 33 56
-RSQB                 : 42 42 43 43 44 44 45 46 46 47
+RELOP1               : 33
+RELOP2               : 32
+RETURN               : 24 25
+RPAREN               : 11 19 20 21 27 34 57
+RSQB                 : 43 43 44 44 45 45 46 47 47 48
 SEMICOL              : 4 5 6
-STRINGVAL            : 52
+STRINGVAL            : 53
 SWITCH               : 
-VARNAME              : 10 27 42 42 42 43 43 44 44 45 45 46 47 50 56 61
+VARNAME              : 10 29 43 43 43 44 44 45 45 46 46 47 48 51 57 62
 WHILE                : 
 error                : 
 
 Nonterminals, with rules where they appear:
 
-argument             : 57 58
-argument_list        : 56 58
-array_variable       : 49 59
+argument             : 58 59
+argument_list        : 57 59
+array_variable       : 50 60
 assignment_statement : 5
-b1_open              : 30
-b2_open              : 30
-constant             : 18 26 60
+b1_open              : 31
+b2_open              : 31
+bool_expr            : 13
+constant             : 12 20 28 61
 declaration_statement : 6
-expr                 : 11 23 25 28 29 29 30 30 31 31 32 32 33 34 35 35 36 36 37 37 38 38 39 39 48
-function_call        : 24
+expr                 : 11 13 25 27 30 31 31 32 32 33 33 34 35 36 36 37 37 38 38 39 39 40 40 49
+function_call        : 26
 if_close             : 11
 if_open              : 11
 if_paren_open        : 11
 if_statement         : 8
-input_statement      : 16
+input_statement      : 18
 io_statement         : 4
 jump_statement       : 
-left_value           : 17 19 48
-output_statement     : 15
-return_statement     : 20
+left_value           : 19 21 49
+output_statement     : 17
+return_statement     : 22
 selection_statement  : 3
 simple_init          : 9
 start_selection      : 3
@@ -160,22 +163,22 @@ state 0
     (5) statement -> . assignment_statement SEMICOL
     (6) statement -> . declaration_statement SEMICOL
     (7) start_selection -> .
-    (15) io_statement -> . output_statement
-    (16) io_statement -> . input_statement
-    (48) assignment_statement -> . left_value ASSIGN expr
+    (17) io_statement -> . output_statement
+    (18) io_statement -> . input_statement
+    (49) assignment_statement -> . left_value ASSIGN expr
     (9) declaration_statement -> . simple_init
-    (18) output_statement -> . OUTPUT LPAREN constant RPAREN
-    (19) output_statement -> . OUTPUT LPAREN left_value RPAREN
-    (17) input_statement -> . INPUT LPAREN left_value RPAREN
-    (49) left_value -> . array_variable
-    (50) left_value -> . VARNAME
+    (20) output_statement -> . OUTPUT LPAREN constant RPAREN
+    (21) output_statement -> . OUTPUT LPAREN left_value RPAREN
+    (19) input_statement -> . INPUT LPAREN left_value RPAREN
+    (50) left_value -> . array_variable
+    (51) left_value -> . VARNAME
     (10) simple_init -> . DATATYPE VARNAME
-    (42) array_variable -> . VARNAME LSQB VARNAME RSQB LSQB VARNAME RSQB
-    (43) array_variable -> . VARNAME LSQB INTVAL RSQB LSQB VARNAME RSQB
-    (44) array_variable -> . VARNAME LSQB VARNAME RSQB LSQB INTVAL RSQB
-    (45) array_variable -> . VARNAME LSQB VARNAME RSQB
-    (46) array_variable -> . VARNAME LSQB INTVAL RSQB LSQB INTVAL RSQB
-    (47) array_variable -> . VARNAME LSQB INTVAL RSQB
+    (43) array_variable -> . VARNAME LSQB VARNAME RSQB LSQB VARNAME RSQB
+    (44) array_variable -> . VARNAME LSQB INTVAL RSQB LSQB VARNAME RSQB
+    (45) array_variable -> . VARNAME LSQB VARNAME RSQB LSQB INTVAL RSQB
+    (46) array_variable -> . VARNAME LSQB VARNAME RSQB
+    (47) array_variable -> . VARNAME LSQB INTVAL RSQB LSQB INTVAL RSQB
+    (48) array_variable -> . VARNAME LSQB INTVAL RSQB
     $end            reduce using rule 1 (statements -> .)
     IF              reduce using rule 7 (start_selection -> .)
     OUTPUT          shift and go to state 11
@@ -210,22 +213,22 @@ state 2
     (5) statement -> . assignment_statement SEMICOL
     (6) statement -> . declaration_statement SEMICOL
     (7) start_selection -> .
-    (15) io_statement -> . output_statement
-    (16) io_statement -> . input_statement
-    (48) assignment_statement -> . left_value ASSIGN expr
+    (17) io_statement -> . output_statement
+    (18) io_statement -> . input_statement
+    (49) assignment_statement -> . left_value ASSIGN expr
     (9) declaration_statement -> . simple_init
-    (18) output_statement -> . OUTPUT LPAREN constant RPAREN
-    (19) output_statement -> . OUTPUT LPAREN left_value RPAREN
-    (17) input_statement -> . INPUT LPAREN left_value RPAREN
-    (49) left_value -> . array_variable
-    (50) left_value -> . VARNAME
+    (20) output_statement -> . OUTPUT LPAREN constant RPAREN
+    (21) output_statement -> . OUTPUT LPAREN left_value RPAREN
+    (19) input_statement -> . INPUT LPAREN left_value RPAREN
+    (50) left_value -> . array_variable
+    (51) left_value -> . VARNAME
     (10) simple_init -> . DATATYPE VARNAME
-    (42) array_variable -> . VARNAME LSQB VARNAME RSQB LSQB VARNAME RSQB
-    (43) array_variable -> . VARNAME LSQB INTVAL RSQB LSQB VARNAME RSQB
-    (44) array_variable -> . VARNAME LSQB VARNAME RSQB LSQB INTVAL RSQB
-    (45) array_variable -> . VARNAME LSQB VARNAME RSQB
-    (46) array_variable -> . VARNAME LSQB INTVAL RSQB LSQB INTVAL RSQB
-    (47) array_variable -> . VARNAME LSQB INTVAL RSQB
+    (43) array_variable -> . VARNAME LSQB VARNAME RSQB LSQB VARNAME RSQB
+    (44) array_variable -> . VARNAME LSQB INTVAL RSQB LSQB VARNAME RSQB
+    (45) array_variable -> . VARNAME LSQB VARNAME RSQB LSQB INTVAL RSQB
+    (46) array_variable -> . VARNAME LSQB VARNAME RSQB
+    (47) array_variable -> . VARNAME LSQB INTVAL RSQB LSQB INTVAL RSQB
+    (48) array_variable -> . VARNAME LSQB INTVAL RSQB
     $end            reduce using rule 1 (statements -> .)
     RBRACE          reduce using rule 1 (statements -> .)
     IF              reduce using rule 7 (start_selection -> .)
@@ -250,7 +253,7 @@ state 3
 
     (3) statement -> start_selection . selection_statement
     (8) selection_statement -> . if_statement
-    (11) if_statement -> . IF LPAREN if_paren_open expr RPAREN LBRACE if_open statements if_close RBRACE
+    (11) if_statement -> . IF if_paren_open LPAREN expr RPAREN LBRACE if_open statements if_close RBRACE
     IF              shift and go to state 19
 
     selection_statement            shift and go to state 17
@@ -276,19 +279,19 @@ state 6
 
 state 7
 
-    (15) io_statement -> output_statement .
-    SEMICOL         reduce using rule 15 (io_statement -> output_statement .)
+    (17) io_statement -> output_statement .
+    SEMICOL         reduce using rule 17 (io_statement -> output_statement .)
 
 
 state 8
 
-    (16) io_statement -> input_statement .
-    SEMICOL         reduce using rule 16 (io_statement -> input_statement .)
+    (18) io_statement -> input_statement .
+    SEMICOL         reduce using rule 18 (io_statement -> input_statement .)
 
 
 state 9
 
-    (48) assignment_statement -> left_value . ASSIGN expr
+    (49) assignment_statement -> left_value . ASSIGN expr
     ASSIGN          shift and go to state 23
 
 
@@ -300,35 +303,35 @@ state 10
 
 state 11
 
-    (18) output_statement -> OUTPUT . LPAREN constant RPAREN
-    (19) output_statement -> OUTPUT . LPAREN left_value RPAREN
+    (20) output_statement -> OUTPUT . LPAREN constant RPAREN
+    (21) output_statement -> OUTPUT . LPAREN left_value RPAREN
     LPAREN          shift and go to state 24
 
 
 state 12
 
-    (17) input_statement -> INPUT . LPAREN left_value RPAREN
+    (19) input_statement -> INPUT . LPAREN left_value RPAREN
     LPAREN          shift and go to state 25
 
 
 state 13
 
-    (49) left_value -> array_variable .
-    ASSIGN          reduce using rule 49 (left_value -> array_variable .)
-    RPAREN          reduce using rule 49 (left_value -> array_variable .)
+    (50) left_value -> array_variable .
+    ASSIGN          reduce using rule 50 (left_value -> array_variable .)
+    RPAREN          reduce using rule 50 (left_value -> array_variable .)
 
 
 state 14
 
-    (50) left_value -> VARNAME .
-    (42) array_variable -> VARNAME . LSQB VARNAME RSQB LSQB VARNAME RSQB
-    (43) array_variable -> VARNAME . LSQB INTVAL RSQB LSQB VARNAME RSQB
-    (44) array_variable -> VARNAME . LSQB VARNAME RSQB LSQB INTVAL RSQB
-    (45) array_variable -> VARNAME . LSQB VARNAME RSQB
-    (46) array_variable -> VARNAME . LSQB INTVAL RSQB LSQB INTVAL RSQB
-    (47) array_variable -> VARNAME . LSQB INTVAL RSQB
-    ASSIGN          reduce using rule 50 (left_value -> VARNAME .)
-    RPAREN          reduce using rule 50 (left_value -> VARNAME .)
+    (51) left_value -> VARNAME .
+    (43) array_variable -> VARNAME . LSQB VARNAME RSQB LSQB VARNAME RSQB
+    (44) array_variable -> VARNAME . LSQB INTVAL RSQB LSQB VARNAME RSQB
+    (45) array_variable -> VARNAME . LSQB VARNAME RSQB LSQB INTVAL RSQB
+    (46) array_variable -> VARNAME . LSQB VARNAME RSQB
+    (47) array_variable -> VARNAME . LSQB INTVAL RSQB LSQB INTVAL RSQB
+    (48) array_variable -> VARNAME . LSQB INTVAL RSQB
+    ASSIGN          reduce using rule 51 (left_value -> VARNAME .)
+    RPAREN          reduce using rule 51 (left_value -> VARNAME .)
     LSQB            shift and go to state 26
 
 
@@ -371,9 +374,11 @@ state 18
 
 state 19
 
-    (11) if_statement -> IF . LPAREN if_paren_open expr RPAREN LBRACE if_open statements if_close RBRACE
-    LPAREN          shift and go to state 28
+    (11) if_statement -> IF . if_paren_open LPAREN expr RPAREN LBRACE if_open statements if_close RBRACE
+    (16) if_paren_open -> .
+    LPAREN          reduce using rule 16 (if_paren_open -> .)
 
+    if_paren_open                  shift and go to state 28
 
 state 20
 
@@ -413,39 +418,29 @@ state 22
 
 state 23
 
-    (48) assignment_statement -> left_value ASSIGN . expr
-    (24) expr -> . function_call
-    (25) expr -> . LPAREN DATATYPE RPAREN expr
-    (26) expr -> . constant
-    (27) expr -> . VARNAME
-    (28) expr -> . NOT expr
-    (29) expr -> . expr OR expr
-    (30) expr -> . b1_open expr b2_open AND expr
-    (31) expr -> . expr RELOP2 expr
-    (32) expr -> . expr RELOP1 expr
-    (33) expr -> . LPAREN expr RPAREN
-    (34) expr -> . MINUS expr
-    (35) expr -> . expr MOD expr
-    (36) expr -> . expr DIVIDE expr
-    (37) expr -> . expr MULT expr
-    (38) expr -> . expr MINUS expr
-    (39) expr -> . expr PLUS expr
-    (56) function_call -> . VARNAME LPAREN argument_list RPAREN
-    (51) constant -> . BOOLVAL
-    (52) constant -> . STRINGVAL
-    (53) constant -> . CHARVAL
-    (54) constant -> . FLOATVAL
-    (55) constant -> . INTVAL
-    (40) b1_open -> .
-  ! shift/reduce conflict for LPAREN resolved as shift
-  ! shift/reduce conflict for VARNAME resolved as shift
-  ! shift/reduce conflict for NOT resolved as shift
-  ! shift/reduce conflict for MINUS resolved as shift
-  ! shift/reduce conflict for BOOLVAL resolved as shift
-  ! shift/reduce conflict for STRINGVAL resolved as shift
-  ! shift/reduce conflict for CHARVAL resolved as shift
-  ! shift/reduce conflict for FLOATVAL resolved as shift
-  ! shift/reduce conflict for INTVAL resolved as shift
+    (49) assignment_statement -> left_value ASSIGN . expr
+    (26) expr -> . function_call
+    (27) expr -> . LPAREN DATATYPE RPAREN expr
+    (28) expr -> . constant
+    (29) expr -> . VARNAME
+    (30) expr -> . NOT expr
+    (31) expr -> . b1_open expr b2_open AND expr
+    (32) expr -> . expr RELOP2 expr
+    (33) expr -> . expr RELOP1 expr
+    (34) expr -> . LPAREN expr RPAREN
+    (35) expr -> . MINUS expr
+    (36) expr -> . expr MOD expr
+    (37) expr -> . expr DIVIDE expr
+    (38) expr -> . expr MULT expr
+    (39) expr -> . expr MINUS expr
+    (40) expr -> . expr PLUS expr
+    (57) function_call -> . VARNAME LPAREN argument_list RPAREN
+    (52) constant -> . BOOLVAL
+    (53) constant -> . STRINGVAL
+    (54) constant -> . CHARVAL
+    (55) constant -> . FLOATVAL
+    (56) constant -> . INTVAL
+    (41) b1_open -> . COMMA
     LPAREN          shift and go to state 31
     VARNAME         shift and go to state 33
     NOT             shift and go to state 34
@@ -455,6 +450,7 @@ state 23
     CHARVAL         shift and go to state 39
     FLOATVAL        shift and go to state 40
     INTVAL          shift and go to state 41
+    COMMA           shift and go to state 42
 
     expr                           shift and go to state 29
     function_call                  shift and go to state 30
@@ -463,21 +459,21 @@ state 23
 
 state 24
 
-    (18) output_statement -> OUTPUT LPAREN . constant RPAREN
-    (19) output_statement -> OUTPUT LPAREN . left_value RPAREN
-    (51) constant -> . BOOLVAL
-    (52) constant -> . STRINGVAL
-    (53) constant -> . CHARVAL
-    (54) constant -> . FLOATVAL
-    (55) constant -> . INTVAL
-    (49) left_value -> . array_variable
-    (50) left_value -> . VARNAME
-    (42) array_variable -> . VARNAME LSQB VARNAME RSQB LSQB VARNAME RSQB
-    (43) array_variable -> . VARNAME LSQB INTVAL RSQB LSQB VARNAME RSQB
-    (44) array_variable -> . VARNAME LSQB VARNAME RSQB LSQB INTVAL RSQB
-    (45) array_variable -> . VARNAME LSQB VARNAME RSQB
-    (46) array_variable -> . VARNAME LSQB INTVAL RSQB LSQB INTVAL RSQB
-    (47) array_variable -> . VARNAME LSQB INTVAL RSQB
+    (20) output_statement -> OUTPUT LPAREN . constant RPAREN
+    (21) output_statement -> OUTPUT LPAREN . left_value RPAREN
+    (52) constant -> . BOOLVAL
+    (53) constant -> . STRINGVAL
+    (54) constant -> . CHARVAL
+    (55) constant -> . FLOATVAL
+    (56) constant -> . INTVAL
+    (50) left_value -> . array_variable
+    (51) left_value -> . VARNAME
+    (43) array_variable -> . VARNAME LSQB VARNAME RSQB LSQB VARNAME RSQB
+    (44) array_variable -> . VARNAME LSQB INTVAL RSQB LSQB VARNAME RSQB
+    (45) array_variable -> . VARNAME LSQB VARNAME RSQB LSQB INTVAL RSQB
+    (46) array_variable -> . VARNAME LSQB VARNAME RSQB
+    (47) array_variable -> . VARNAME LSQB INTVAL RSQB LSQB INTVAL RSQB
+    (48) array_variable -> . VARNAME LSQB INTVAL RSQB
     BOOLVAL         shift and go to state 37
     STRINGVAL       shift and go to state 38
     CHARVAL         shift and go to state 39
@@ -485,36 +481,36 @@ state 24
     INTVAL          shift and go to state 41
     VARNAME         shift and go to state 14
 
-    constant                       shift and go to state 42
-    left_value                     shift and go to state 43
+    constant                       shift and go to state 43
+    left_value                     shift and go to state 44
     array_variable                 shift and go to state 13
 
 state 25
 
-    (17) input_statement -> INPUT LPAREN . left_value RPAREN
-    (49) left_value -> . array_variable
-    (50) left_value -> . VARNAME
-    (42) array_variable -> . VARNAME LSQB VARNAME RSQB LSQB VARNAME RSQB
-    (43) array_variable -> . VARNAME LSQB INTVAL RSQB LSQB VARNAME RSQB
-    (44) array_variable -> . VARNAME LSQB VARNAME RSQB LSQB INTVAL RSQB
-    (45) array_variable -> . VARNAME LSQB VARNAME RSQB
-    (46) array_variable -> . VARNAME LSQB INTVAL RSQB LSQB INTVAL RSQB
-    (47) array_variable -> . VARNAME LSQB INTVAL RSQB
+    (19) input_statement -> INPUT LPAREN . left_value RPAREN
+    (50) left_value -> . array_variable
+    (51) left_value -> . VARNAME
+    (43) array_variable -> . VARNAME LSQB VARNAME RSQB LSQB VARNAME RSQB
+    (44) array_variable -> . VARNAME LSQB INTVAL RSQB LSQB VARNAME RSQB
+    (45) array_variable -> . VARNAME LSQB VARNAME RSQB LSQB INTVAL RSQB
+    (46) array_variable -> . VARNAME LSQB VARNAME RSQB
+    (47) array_variable -> . VARNAME LSQB INTVAL RSQB LSQB INTVAL RSQB
+    (48) array_variable -> . VARNAME LSQB INTVAL RSQB
     VARNAME         shift and go to state 14
 
-    left_value                     shift and go to state 44
+    left_value                     shift and go to state 45
     array_variable                 shift and go to state 13
 
 state 26
 
-    (42) array_variable -> VARNAME LSQB . VARNAME RSQB LSQB VARNAME RSQB
-    (43) array_variable -> VARNAME LSQB . INTVAL RSQB LSQB VARNAME RSQB
-    (44) array_variable -> VARNAME LSQB . VARNAME RSQB LSQB INTVAL RSQB
-    (45) array_variable -> VARNAME LSQB . VARNAME RSQB
-    (46) array_variable -> VARNAME LSQB . INTVAL RSQB LSQB INTVAL RSQB
-    (47) array_variable -> VARNAME LSQB . INTVAL RSQB
-    VARNAME         shift and go to state 45
-    INTVAL          shift and go to state 46
+    (43) array_variable -> VARNAME LSQB . VARNAME RSQB LSQB VARNAME RSQB
+    (44) array_variable -> VARNAME LSQB . INTVAL RSQB LSQB VARNAME RSQB
+    (45) array_variable -> VARNAME LSQB . VARNAME RSQB LSQB INTVAL RSQB
+    (46) array_variable -> VARNAME LSQB . VARNAME RSQB
+    (47) array_variable -> VARNAME LSQB . INTVAL RSQB LSQB INTVAL RSQB
+    (48) array_variable -> VARNAME LSQB . INTVAL RSQB
+    VARNAME         shift and go to state 46
+    INTVAL          shift and go to state 47
 
 
 state 27
@@ -525,33 +521,21 @@ state 27
 
 state 28
 
-    (11) if_statement -> IF LPAREN . if_paren_open expr RPAREN LBRACE if_open statements if_close RBRACE
-    (14) if_paren_open -> .
-    LPAREN          reduce using rule 14 (if_paren_open -> .)
-    VARNAME         reduce using rule 14 (if_paren_open -> .)
-    NOT             reduce using rule 14 (if_paren_open -> .)
-    MINUS           reduce using rule 14 (if_paren_open -> .)
-    BOOLVAL         reduce using rule 14 (if_paren_open -> .)
-    STRINGVAL       reduce using rule 14 (if_paren_open -> .)
-    CHARVAL         reduce using rule 14 (if_paren_open -> .)
-    FLOATVAL        reduce using rule 14 (if_paren_open -> .)
-    INTVAL          reduce using rule 14 (if_paren_open -> .)
+    (11) if_statement -> IF if_paren_open . LPAREN expr RPAREN LBRACE if_open statements if_close RBRACE
+    LPAREN          shift and go to state 48
 
-    if_paren_open                  shift and go to state 47
 
 state 29
 
-    (48) assignment_statement -> left_value ASSIGN expr .
-    (29) expr -> expr . OR expr
-    (31) expr -> expr . RELOP2 expr
-    (32) expr -> expr . RELOP1 expr
-    (35) expr -> expr . MOD expr
-    (36) expr -> expr . DIVIDE expr
-    (37) expr -> expr . MULT expr
-    (38) expr -> expr . MINUS expr
-    (39) expr -> expr . PLUS expr
-    SEMICOL         reduce using rule 48 (assignment_statement -> left_value ASSIGN expr .)
-    OR              shift and go to state 48
+    (49) assignment_statement -> left_value ASSIGN expr .
+    (32) expr -> expr . RELOP2 expr
+    (33) expr -> expr . RELOP1 expr
+    (36) expr -> expr . MOD expr
+    (37) expr -> expr . DIVIDE expr
+    (38) expr -> expr . MULT expr
+    (39) expr -> expr . MINUS expr
+    (40) expr -> expr . PLUS expr
+    SEMICOL         reduce using rule 49 (assignment_statement -> left_value ASSIGN expr .)
     RELOP2          shift and go to state 49
     RELOP1          shift and go to state 50
     MOD             shift and go to state 51
@@ -563,56 +547,45 @@ state 29
 
 state 30
 
-    (24) expr -> function_call .
-    OR              reduce using rule 24 (expr -> function_call .)
-    RELOP2          reduce using rule 24 (expr -> function_call .)
-    RELOP1          reduce using rule 24 (expr -> function_call .)
-    MOD             reduce using rule 24 (expr -> function_call .)
-    DIVIDE          reduce using rule 24 (expr -> function_call .)
-    MULT            reduce using rule 24 (expr -> function_call .)
-    MINUS           reduce using rule 24 (expr -> function_call .)
-    PLUS            reduce using rule 24 (expr -> function_call .)
-    SEMICOL         reduce using rule 24 (expr -> function_call .)
-    RPAREN          reduce using rule 24 (expr -> function_call .)
-    AND             reduce using rule 24 (expr -> function_call .)
+    (26) expr -> function_call .
+    RELOP2          reduce using rule 26 (expr -> function_call .)
+    RELOP1          reduce using rule 26 (expr -> function_call .)
+    MOD             reduce using rule 26 (expr -> function_call .)
+    DIVIDE          reduce using rule 26 (expr -> function_call .)
+    MULT            reduce using rule 26 (expr -> function_call .)
+    MINUS           reduce using rule 26 (expr -> function_call .)
+    PLUS            reduce using rule 26 (expr -> function_call .)
+    SEMICOL         reduce using rule 26 (expr -> function_call .)
+    RPAREN          reduce using rule 26 (expr -> function_call .)
+    AND             reduce using rule 26 (expr -> function_call .)
 
 
 state 31
 
-    (25) expr -> LPAREN . DATATYPE RPAREN expr
-    (33) expr -> LPAREN . expr RPAREN
-    (24) expr -> . function_call
-    (25) expr -> . LPAREN DATATYPE RPAREN expr
-    (26) expr -> . constant
-    (27) expr -> . VARNAME
-    (28) expr -> . NOT expr
-    (29) expr -> . expr OR expr
-    (30) expr -> . b1_open expr b2_open AND expr
-    (31) expr -> . expr RELOP2 expr
-    (32) expr -> . expr RELOP1 expr
-    (33) expr -> . LPAREN expr RPAREN
-    (34) expr -> . MINUS expr
-    (35) expr -> . expr MOD expr
-    (36) expr -> . expr DIVIDE expr
-    (37) expr -> . expr MULT expr
-    (38) expr -> . expr MINUS expr
-    (39) expr -> . expr PLUS expr
-    (56) function_call -> . VARNAME LPAREN argument_list RPAREN
-    (51) constant -> . BOOLVAL
-    (52) constant -> . STRINGVAL
-    (53) constant -> . CHARVAL
-    (54) constant -> . FLOATVAL
-    (55) constant -> . INTVAL
-    (40) b1_open -> .
-  ! shift/reduce conflict for LPAREN resolved as shift
-  ! shift/reduce conflict for VARNAME resolved as shift
-  ! shift/reduce conflict for NOT resolved as shift
-  ! shift/reduce conflict for MINUS resolved as shift
-  ! shift/reduce conflict for BOOLVAL resolved as shift
-  ! shift/reduce conflict for STRINGVAL resolved as shift
-  ! shift/reduce conflict for CHARVAL resolved as shift
-  ! shift/reduce conflict for FLOATVAL resolved as shift
-  ! shift/reduce conflict for INTVAL resolved as shift
+    (27) expr -> LPAREN . DATATYPE RPAREN expr
+    (34) expr -> LPAREN . expr RPAREN
+    (26) expr -> . function_call
+    (27) expr -> . LPAREN DATATYPE RPAREN expr
+    (28) expr -> . constant
+    (29) expr -> . VARNAME
+    (30) expr -> . NOT expr
+    (31) expr -> . b1_open expr b2_open AND expr
+    (32) expr -> . expr RELOP2 expr
+    (33) expr -> . expr RELOP1 expr
+    (34) expr -> . LPAREN expr RPAREN
+    (35) expr -> . MINUS expr
+    (36) expr -> . expr MOD expr
+    (37) expr -> . expr DIVIDE expr
+    (38) expr -> . expr MULT expr
+    (39) expr -> . expr MINUS expr
+    (40) expr -> . expr PLUS expr
+    (57) function_call -> . VARNAME LPAREN argument_list RPAREN
+    (52) constant -> . BOOLVAL
+    (53) constant -> . STRINGVAL
+    (54) constant -> . CHARVAL
+    (55) constant -> . FLOATVAL
+    (56) constant -> . INTVAL
+    (41) b1_open -> . COMMA
     DATATYPE        shift and go to state 56
     LPAREN          shift and go to state 31
     VARNAME         shift and go to state 33
@@ -623,6 +596,7 @@ state 31
     CHARVAL         shift and go to state 39
     FLOATVAL        shift and go to state 40
     INTVAL          shift and go to state 41
+    COMMA           shift and go to state 42
 
     expr                           shift and go to state 57
     function_call                  shift and go to state 30
@@ -631,73 +605,61 @@ state 31
 
 state 32
 
-    (26) expr -> constant .
-    OR              reduce using rule 26 (expr -> constant .)
-    RELOP2          reduce using rule 26 (expr -> constant .)
-    RELOP1          reduce using rule 26 (expr -> constant .)
-    MOD             reduce using rule 26 (expr -> constant .)
-    DIVIDE          reduce using rule 26 (expr -> constant .)
-    MULT            reduce using rule 26 (expr -> constant .)
-    MINUS           reduce using rule 26 (expr -> constant .)
-    PLUS            reduce using rule 26 (expr -> constant .)
-    SEMICOL         reduce using rule 26 (expr -> constant .)
-    RPAREN          reduce using rule 26 (expr -> constant .)
-    AND             reduce using rule 26 (expr -> constant .)
+    (28) expr -> constant .
+    RELOP2          reduce using rule 28 (expr -> constant .)
+    RELOP1          reduce using rule 28 (expr -> constant .)
+    MOD             reduce using rule 28 (expr -> constant .)
+    DIVIDE          reduce using rule 28 (expr -> constant .)
+    MULT            reduce using rule 28 (expr -> constant .)
+    MINUS           reduce using rule 28 (expr -> constant .)
+    PLUS            reduce using rule 28 (expr -> constant .)
+    SEMICOL         reduce using rule 28 (expr -> constant .)
+    RPAREN          reduce using rule 28 (expr -> constant .)
+    AND             reduce using rule 28 (expr -> constant .)
 
 
 state 33
 
-    (27) expr -> VARNAME .
-    (56) function_call -> VARNAME . LPAREN argument_list RPAREN
-    OR              reduce using rule 27 (expr -> VARNAME .)
-    RELOP2          reduce using rule 27 (expr -> VARNAME .)
-    RELOP1          reduce using rule 27 (expr -> VARNAME .)
-    MOD             reduce using rule 27 (expr -> VARNAME .)
-    DIVIDE          reduce using rule 27 (expr -> VARNAME .)
-    MULT            reduce using rule 27 (expr -> VARNAME .)
-    MINUS           reduce using rule 27 (expr -> VARNAME .)
-    PLUS            reduce using rule 27 (expr -> VARNAME .)
-    SEMICOL         reduce using rule 27 (expr -> VARNAME .)
-    RPAREN          reduce using rule 27 (expr -> VARNAME .)
-    AND             reduce using rule 27 (expr -> VARNAME .)
+    (29) expr -> VARNAME .
+    (57) function_call -> VARNAME . LPAREN argument_list RPAREN
+    RELOP2          reduce using rule 29 (expr -> VARNAME .)
+    RELOP1          reduce using rule 29 (expr -> VARNAME .)
+    MOD             reduce using rule 29 (expr -> VARNAME .)
+    DIVIDE          reduce using rule 29 (expr -> VARNAME .)
+    MULT            reduce using rule 29 (expr -> VARNAME .)
+    MINUS           reduce using rule 29 (expr -> VARNAME .)
+    PLUS            reduce using rule 29 (expr -> VARNAME .)
+    SEMICOL         reduce using rule 29 (expr -> VARNAME .)
+    RPAREN          reduce using rule 29 (expr -> VARNAME .)
+    AND             reduce using rule 29 (expr -> VARNAME .)
     LPAREN          shift and go to state 58
 
 
 state 34
 
-    (28) expr -> NOT . expr
-    (24) expr -> . function_call
-    (25) expr -> . LPAREN DATATYPE RPAREN expr
-    (26) expr -> . constant
-    (27) expr -> . VARNAME
-    (28) expr -> . NOT expr
-    (29) expr -> . expr OR expr
-    (30) expr -> . b1_open expr b2_open AND expr
-    (31) expr -> . expr RELOP2 expr
-    (32) expr -> . expr RELOP1 expr
-    (33) expr -> . LPAREN expr RPAREN
-    (34) expr -> . MINUS expr
-    (35) expr -> . expr MOD expr
-    (36) expr -> . expr DIVIDE expr
-    (37) expr -> . expr MULT expr
-    (38) expr -> . expr MINUS expr
-    (39) expr -> . expr PLUS expr
-    (56) function_call -> . VARNAME LPAREN argument_list RPAREN
-    (51) constant -> . BOOLVAL
-    (52) constant -> . STRINGVAL
-    (53) constant -> . CHARVAL
-    (54) constant -> . FLOATVAL
-    (55) constant -> . INTVAL
-    (40) b1_open -> .
-  ! shift/reduce conflict for LPAREN resolved as shift
-  ! shift/reduce conflict for VARNAME resolved as shift
-  ! shift/reduce conflict for NOT resolved as shift
-  ! shift/reduce conflict for MINUS resolved as shift
-  ! shift/reduce conflict for BOOLVAL resolved as shift
-  ! shift/reduce conflict for STRINGVAL resolved as shift
-  ! shift/reduce conflict for CHARVAL resolved as shift
-  ! shift/reduce conflict for FLOATVAL resolved as shift
-  ! shift/reduce conflict for INTVAL resolved as shift
+    (30) expr -> NOT . expr
+    (26) expr -> . function_call
+    (27) expr -> . LPAREN DATATYPE RPAREN expr
+    (28) expr -> . constant
+    (29) expr -> . VARNAME
+    (30) expr -> . NOT expr
+    (31) expr -> . b1_open expr b2_open AND expr
+    (32) expr -> . expr RELOP2 expr
+    (33) expr -> . expr RELOP1 expr
+    (34) expr -> . LPAREN expr RPAREN
+    (35) expr -> . MINUS expr
+    (36) expr -> . expr MOD expr
+    (37) expr -> . expr DIVIDE expr
+    (38) expr -> . expr MULT expr
+    (39) expr -> . expr MINUS expr
+    (40) expr -> . expr PLUS expr
+    (57) function_call -> . VARNAME LPAREN argument_list RPAREN
+    (52) constant -> . BOOLVAL
+    (53) constant -> . STRINGVAL
+    (54) constant -> . CHARVAL
+    (55) constant -> . FLOATVAL
+    (56) constant -> . INTVAL
+    (41) b1_open -> . COMMA
     LPAREN          shift and go to state 31
     VARNAME         shift and go to state 33
     NOT             shift and go to state 34
@@ -707,6 +669,7 @@ state 34
     CHARVAL         shift and go to state 39
     FLOATVAL        shift and go to state 40
     INTVAL          shift and go to state 41
+    COMMA           shift and go to state 42
 
     expr                           shift and go to state 59
     function_call                  shift and go to state 30
@@ -715,39 +678,29 @@ state 34
 
 state 35
 
-    (30) expr -> b1_open . expr b2_open AND expr
-    (24) expr -> . function_call
-    (25) expr -> . LPAREN DATATYPE RPAREN expr
-    (26) expr -> . constant
-    (27) expr -> . VARNAME
-    (28) expr -> . NOT expr
-    (29) expr -> . expr OR expr
-    (30) expr -> . b1_open expr b2_open AND expr
-    (31) expr -> . expr RELOP2 expr
-    (32) expr -> . expr RELOP1 expr
-    (33) expr -> . LPAREN expr RPAREN
-    (34) expr -> . MINUS expr
-    (35) expr -> . expr MOD expr
-    (36) expr -> . expr DIVIDE expr
-    (37) expr -> . expr MULT expr
-    (38) expr -> . expr MINUS expr
-    (39) expr -> . expr PLUS expr
-    (56) function_call -> . VARNAME LPAREN argument_list RPAREN
-    (51) constant -> . BOOLVAL
-    (52) constant -> . STRINGVAL
-    (53) constant -> . CHARVAL
-    (54) constant -> . FLOATVAL
-    (55) constant -> . INTVAL
-    (40) b1_open -> .
-  ! shift/reduce conflict for LPAREN resolved as shift
-  ! shift/reduce conflict for VARNAME resolved as shift
-  ! shift/reduce conflict for NOT resolved as shift
-  ! shift/reduce conflict for MINUS resolved as shift
-  ! shift/reduce conflict for BOOLVAL resolved as shift
-  ! shift/reduce conflict for STRINGVAL resolved as shift
-  ! shift/reduce conflict for CHARVAL resolved as shift
-  ! shift/reduce conflict for FLOATVAL resolved as shift
-  ! shift/reduce conflict for INTVAL resolved as shift
+    (31) expr -> b1_open . expr b2_open AND expr
+    (26) expr -> . function_call
+    (27) expr -> . LPAREN DATATYPE RPAREN expr
+    (28) expr -> . constant
+    (29) expr -> . VARNAME
+    (30) expr -> . NOT expr
+    (31) expr -> . b1_open expr b2_open AND expr
+    (32) expr -> . expr RELOP2 expr
+    (33) expr -> . expr RELOP1 expr
+    (34) expr -> . LPAREN expr RPAREN
+    (35) expr -> . MINUS expr
+    (36) expr -> . expr MOD expr
+    (37) expr -> . expr DIVIDE expr
+    (38) expr -> . expr MULT expr
+    (39) expr -> . expr MINUS expr
+    (40) expr -> . expr PLUS expr
+    (57) function_call -> . VARNAME LPAREN argument_list RPAREN
+    (52) constant -> . BOOLVAL
+    (53) constant -> . STRINGVAL
+    (54) constant -> . CHARVAL
+    (55) constant -> . FLOATVAL
+    (56) constant -> . INTVAL
+    (41) b1_open -> . COMMA
     LPAREN          shift and go to state 31
     VARNAME         shift and go to state 33
     NOT             shift and go to state 34
@@ -757,6 +710,7 @@ state 35
     CHARVAL         shift and go to state 39
     FLOATVAL        shift and go to state 40
     INTVAL          shift and go to state 41
+    COMMA           shift and go to state 42
 
     b1_open                        shift and go to state 35
     expr                           shift and go to state 60
@@ -765,39 +719,29 @@ state 35
 
 state 36
 
-    (34) expr -> MINUS . expr
-    (24) expr -> . function_call
-    (25) expr -> . LPAREN DATATYPE RPAREN expr
-    (26) expr -> . constant
-    (27) expr -> . VARNAME
-    (28) expr -> . NOT expr
-    (29) expr -> . expr OR expr
-    (30) expr -> . b1_open expr b2_open AND expr
-    (31) expr -> . expr RELOP2 expr
-    (32) expr -> . expr RELOP1 expr
-    (33) expr -> . LPAREN expr RPAREN
-    (34) expr -> . MINUS expr
-    (35) expr -> . expr MOD expr
-    (36) expr -> . expr DIVIDE expr
-    (37) expr -> . expr MULT expr
-    (38) expr -> . expr MINUS expr
-    (39) expr -> . expr PLUS expr
-    (56) function_call -> . VARNAME LPAREN argument_list RPAREN
-    (51) constant -> . BOOLVAL
-    (52) constant -> . STRINGVAL
-    (53) constant -> . CHARVAL
-    (54) constant -> . FLOATVAL
-    (55) constant -> . INTVAL
-    (40) b1_open -> .
-  ! shift/reduce conflict for LPAREN resolved as shift
-  ! shift/reduce conflict for VARNAME resolved as shift
-  ! shift/reduce conflict for NOT resolved as shift
-  ! shift/reduce conflict for MINUS resolved as shift
-  ! shift/reduce conflict for BOOLVAL resolved as shift
-  ! shift/reduce conflict for STRINGVAL resolved as shift
-  ! shift/reduce conflict for CHARVAL resolved as shift
-  ! shift/reduce conflict for FLOATVAL resolved as shift
-  ! shift/reduce conflict for INTVAL resolved as shift
+    (35) expr -> MINUS . expr
+    (26) expr -> . function_call
+    (27) expr -> . LPAREN DATATYPE RPAREN expr
+    (28) expr -> . constant
+    (29) expr -> . VARNAME
+    (30) expr -> . NOT expr
+    (31) expr -> . b1_open expr b2_open AND expr
+    (32) expr -> . expr RELOP2 expr
+    (33) expr -> . expr RELOP1 expr
+    (34) expr -> . LPAREN expr RPAREN
+    (35) expr -> . MINUS expr
+    (36) expr -> . expr MOD expr
+    (37) expr -> . expr DIVIDE expr
+    (38) expr -> . expr MULT expr
+    (39) expr -> . expr MINUS expr
+    (40) expr -> . expr PLUS expr
+    (57) function_call -> . VARNAME LPAREN argument_list RPAREN
+    (52) constant -> . BOOLVAL
+    (53) constant -> . STRINGVAL
+    (54) constant -> . CHARVAL
+    (55) constant -> . FLOATVAL
+    (56) constant -> . INTVAL
+    (41) b1_open -> . COMMA
     LPAREN          shift and go to state 31
     VARNAME         shift and go to state 33
     NOT             shift and go to state 34
@@ -807,6 +751,7 @@ state 36
     CHARVAL         shift and go to state 39
     FLOATVAL        shift and go to state 40
     INTVAL          shift and go to state 41
+    COMMA           shift and go to state 42
 
     expr                           shift and go to state 61
     function_call                  shift and go to state 30
@@ -815,158 +760,158 @@ state 36
 
 state 37
 
-    (51) constant -> BOOLVAL .
-    OR              reduce using rule 51 (constant -> BOOLVAL .)
-    RELOP2          reduce using rule 51 (constant -> BOOLVAL .)
-    RELOP1          reduce using rule 51 (constant -> BOOLVAL .)
-    MOD             reduce using rule 51 (constant -> BOOLVAL .)
-    DIVIDE          reduce using rule 51 (constant -> BOOLVAL .)
-    MULT            reduce using rule 51 (constant -> BOOLVAL .)
-    MINUS           reduce using rule 51 (constant -> BOOLVAL .)
-    PLUS            reduce using rule 51 (constant -> BOOLVAL .)
-    SEMICOL         reduce using rule 51 (constant -> BOOLVAL .)
-    RPAREN          reduce using rule 51 (constant -> BOOLVAL .)
-    AND             reduce using rule 51 (constant -> BOOLVAL .)
-    COMMA           reduce using rule 51 (constant -> BOOLVAL .)
+    (52) constant -> BOOLVAL .
+    RELOP2          reduce using rule 52 (constant -> BOOLVAL .)
+    RELOP1          reduce using rule 52 (constant -> BOOLVAL .)
+    MOD             reduce using rule 52 (constant -> BOOLVAL .)
+    DIVIDE          reduce using rule 52 (constant -> BOOLVAL .)
+    MULT            reduce using rule 52 (constant -> BOOLVAL .)
+    MINUS           reduce using rule 52 (constant -> BOOLVAL .)
+    PLUS            reduce using rule 52 (constant -> BOOLVAL .)
+    SEMICOL         reduce using rule 52 (constant -> BOOLVAL .)
+    RPAREN          reduce using rule 52 (constant -> BOOLVAL .)
+    AND             reduce using rule 52 (constant -> BOOLVAL .)
+    COMMA           reduce using rule 52 (constant -> BOOLVAL .)
 
 
 state 38
 
-    (52) constant -> STRINGVAL .
-    OR              reduce using rule 52 (constant -> STRINGVAL .)
-    RELOP2          reduce using rule 52 (constant -> STRINGVAL .)
-    RELOP1          reduce using rule 52 (constant -> STRINGVAL .)
-    MOD             reduce using rule 52 (constant -> STRINGVAL .)
-    DIVIDE          reduce using rule 52 (constant -> STRINGVAL .)
-    MULT            reduce using rule 52 (constant -> STRINGVAL .)
-    MINUS           reduce using rule 52 (constant -> STRINGVAL .)
-    PLUS            reduce using rule 52 (constant -> STRINGVAL .)
-    SEMICOL         reduce using rule 52 (constant -> STRINGVAL .)
-    RPAREN          reduce using rule 52 (constant -> STRINGVAL .)
-    AND             reduce using rule 52 (constant -> STRINGVAL .)
-    COMMA           reduce using rule 52 (constant -> STRINGVAL .)
+    (53) constant -> STRINGVAL .
+    RELOP2          reduce using rule 53 (constant -> STRINGVAL .)
+    RELOP1          reduce using rule 53 (constant -> STRINGVAL .)
+    MOD             reduce using rule 53 (constant -> STRINGVAL .)
+    DIVIDE          reduce using rule 53 (constant -> STRINGVAL .)
+    MULT            reduce using rule 53 (constant -> STRINGVAL .)
+    MINUS           reduce using rule 53 (constant -> STRINGVAL .)
+    PLUS            reduce using rule 53 (constant -> STRINGVAL .)
+    SEMICOL         reduce using rule 53 (constant -> STRINGVAL .)
+    RPAREN          reduce using rule 53 (constant -> STRINGVAL .)
+    AND             reduce using rule 53 (constant -> STRINGVAL .)
+    COMMA           reduce using rule 53 (constant -> STRINGVAL .)
 
 
 state 39
 
-    (53) constant -> CHARVAL .
-    OR              reduce using rule 53 (constant -> CHARVAL .)
-    RELOP2          reduce using rule 53 (constant -> CHARVAL .)
-    RELOP1          reduce using rule 53 (constant -> CHARVAL .)
-    MOD             reduce using rule 53 (constant -> CHARVAL .)
-    DIVIDE          reduce using rule 53 (constant -> CHARVAL .)
-    MULT            reduce using rule 53 (constant -> CHARVAL .)
-    MINUS           reduce using rule 53 (constant -> CHARVAL .)
-    PLUS            reduce using rule 53 (constant -> CHARVAL .)
-    SEMICOL         reduce using rule 53 (constant -> CHARVAL .)
-    RPAREN          reduce using rule 53 (constant -> CHARVAL .)
-    AND             reduce using rule 53 (constant -> CHARVAL .)
-    COMMA           reduce using rule 53 (constant -> CHARVAL .)
+    (54) constant -> CHARVAL .
+    RELOP2          reduce using rule 54 (constant -> CHARVAL .)
+    RELOP1          reduce using rule 54 (constant -> CHARVAL .)
+    MOD             reduce using rule 54 (constant -> CHARVAL .)
+    DIVIDE          reduce using rule 54 (constant -> CHARVAL .)
+    MULT            reduce using rule 54 (constant -> CHARVAL .)
+    MINUS           reduce using rule 54 (constant -> CHARVAL .)
+    PLUS            reduce using rule 54 (constant -> CHARVAL .)
+    SEMICOL         reduce using rule 54 (constant -> CHARVAL .)
+    RPAREN          reduce using rule 54 (constant -> CHARVAL .)
+    AND             reduce using rule 54 (constant -> CHARVAL .)
+    COMMA           reduce using rule 54 (constant -> CHARVAL .)
 
 
 state 40
 
-    (54) constant -> FLOATVAL .
-    OR              reduce using rule 54 (constant -> FLOATVAL .)
-    RELOP2          reduce using rule 54 (constant -> FLOATVAL .)
-    RELOP1          reduce using rule 54 (constant -> FLOATVAL .)
-    MOD             reduce using rule 54 (constant -> FLOATVAL .)
-    DIVIDE          reduce using rule 54 (constant -> FLOATVAL .)
-    MULT            reduce using rule 54 (constant -> FLOATVAL .)
-    MINUS           reduce using rule 54 (constant -> FLOATVAL .)
-    PLUS            reduce using rule 54 (constant -> FLOATVAL .)
-    SEMICOL         reduce using rule 54 (constant -> FLOATVAL .)
-    RPAREN          reduce using rule 54 (constant -> FLOATVAL .)
-    AND             reduce using rule 54 (constant -> FLOATVAL .)
-    COMMA           reduce using rule 54 (constant -> FLOATVAL .)
+    (55) constant -> FLOATVAL .
+    RELOP2          reduce using rule 55 (constant -> FLOATVAL .)
+    RELOP1          reduce using rule 55 (constant -> FLOATVAL .)
+    MOD             reduce using rule 55 (constant -> FLOATVAL .)
+    DIVIDE          reduce using rule 55 (constant -> FLOATVAL .)
+    MULT            reduce using rule 55 (constant -> FLOATVAL .)
+    MINUS           reduce using rule 55 (constant -> FLOATVAL .)
+    PLUS            reduce using rule 55 (constant -> FLOATVAL .)
+    SEMICOL         reduce using rule 55 (constant -> FLOATVAL .)
+    RPAREN          reduce using rule 55 (constant -> FLOATVAL .)
+    AND             reduce using rule 55 (constant -> FLOATVAL .)
+    COMMA           reduce using rule 55 (constant -> FLOATVAL .)
 
 
 state 41
 
-    (55) constant -> INTVAL .
-    OR              reduce using rule 55 (constant -> INTVAL .)
-    RELOP2          reduce using rule 55 (constant -> INTVAL .)
-    RELOP1          reduce using rule 55 (constant -> INTVAL .)
-    MOD             reduce using rule 55 (constant -> INTVAL .)
-    DIVIDE          reduce using rule 55 (constant -> INTVAL .)
-    MULT            reduce using rule 55 (constant -> INTVAL .)
-    MINUS           reduce using rule 55 (constant -> INTVAL .)
-    PLUS            reduce using rule 55 (constant -> INTVAL .)
-    SEMICOL         reduce using rule 55 (constant -> INTVAL .)
-    RPAREN          reduce using rule 55 (constant -> INTVAL .)
-    AND             reduce using rule 55 (constant -> INTVAL .)
-    COMMA           reduce using rule 55 (constant -> INTVAL .)
+    (56) constant -> INTVAL .
+    RELOP2          reduce using rule 56 (constant -> INTVAL .)
+    RELOP1          reduce using rule 56 (constant -> INTVAL .)
+    MOD             reduce using rule 56 (constant -> INTVAL .)
+    DIVIDE          reduce using rule 56 (constant -> INTVAL .)
+    MULT            reduce using rule 56 (constant -> INTVAL .)
+    MINUS           reduce using rule 56 (constant -> INTVAL .)
+    PLUS            reduce using rule 56 (constant -> INTVAL .)
+    SEMICOL         reduce using rule 56 (constant -> INTVAL .)
+    RPAREN          reduce using rule 56 (constant -> INTVAL .)
+    AND             reduce using rule 56 (constant -> INTVAL .)
+    COMMA           reduce using rule 56 (constant -> INTVAL .)
 
 
 state 42
 
-    (18) output_statement -> OUTPUT LPAREN constant . RPAREN
-    RPAREN          shift and go to state 62
+    (41) b1_open -> COMMA .
+    LPAREN          reduce using rule 41 (b1_open -> COMMA .)
+    VARNAME         reduce using rule 41 (b1_open -> COMMA .)
+    NOT             reduce using rule 41 (b1_open -> COMMA .)
+    MINUS           reduce using rule 41 (b1_open -> COMMA .)
+    BOOLVAL         reduce using rule 41 (b1_open -> COMMA .)
+    STRINGVAL       reduce using rule 41 (b1_open -> COMMA .)
+    CHARVAL         reduce using rule 41 (b1_open -> COMMA .)
+    FLOATVAL        reduce using rule 41 (b1_open -> COMMA .)
+    INTVAL          reduce using rule 41 (b1_open -> COMMA .)
+    COMMA           reduce using rule 41 (b1_open -> COMMA .)
 
 
 state 43
 
-    (19) output_statement -> OUTPUT LPAREN left_value . RPAREN
-    RPAREN          shift and go to state 63
+    (20) output_statement -> OUTPUT LPAREN constant . RPAREN
+    RPAREN          shift and go to state 62
 
 
 state 44
 
-    (17) input_statement -> INPUT LPAREN left_value . RPAREN
-    RPAREN          shift and go to state 64
+    (21) output_statement -> OUTPUT LPAREN left_value . RPAREN
+    RPAREN          shift and go to state 63
 
 
 state 45
 
-    (42) array_variable -> VARNAME LSQB VARNAME . RSQB LSQB VARNAME RSQB
-    (44) array_variable -> VARNAME LSQB VARNAME . RSQB LSQB INTVAL RSQB
-    (45) array_variable -> VARNAME LSQB VARNAME . RSQB
-    RSQB            shift and go to state 65
+    (19) input_statement -> INPUT LPAREN left_value . RPAREN
+    RPAREN          shift and go to state 64
 
 
 state 46
 
-    (43) array_variable -> VARNAME LSQB INTVAL . RSQB LSQB VARNAME RSQB
-    (46) array_variable -> VARNAME LSQB INTVAL . RSQB LSQB INTVAL RSQB
-    (47) array_variable -> VARNAME LSQB INTVAL . RSQB
-    RSQB            shift and go to state 66
+    (43) array_variable -> VARNAME LSQB VARNAME . RSQB LSQB VARNAME RSQB
+    (45) array_variable -> VARNAME LSQB VARNAME . RSQB LSQB INTVAL RSQB
+    (46) array_variable -> VARNAME LSQB VARNAME . RSQB
+    RSQB            shift and go to state 65
 
 
 state 47
 
-    (11) if_statement -> IF LPAREN if_paren_open . expr RPAREN LBRACE if_open statements if_close RBRACE
-    (24) expr -> . function_call
-    (25) expr -> . LPAREN DATATYPE RPAREN expr
-    (26) expr -> . constant
-    (27) expr -> . VARNAME
-    (28) expr -> . NOT expr
-    (29) expr -> . expr OR expr
-    (30) expr -> . b1_open expr b2_open AND expr
-    (31) expr -> . expr RELOP2 expr
-    (32) expr -> . expr RELOP1 expr
-    (33) expr -> . LPAREN expr RPAREN
-    (34) expr -> . MINUS expr
-    (35) expr -> . expr MOD expr
-    (36) expr -> . expr DIVIDE expr
-    (37) expr -> . expr MULT expr
-    (38) expr -> . expr MINUS expr
-    (39) expr -> . expr PLUS expr
-    (56) function_call -> . VARNAME LPAREN argument_list RPAREN
-    (51) constant -> . BOOLVAL
-    (52) constant -> . STRINGVAL
-    (53) constant -> . CHARVAL
-    (54) constant -> . FLOATVAL
-    (55) constant -> . INTVAL
-    (40) b1_open -> .
-  ! shift/reduce conflict for LPAREN resolved as shift
-  ! shift/reduce conflict for VARNAME resolved as shift
-  ! shift/reduce conflict for NOT resolved as shift
-  ! shift/reduce conflict for MINUS resolved as shift
-  ! shift/reduce conflict for BOOLVAL resolved as shift
-  ! shift/reduce conflict for STRINGVAL resolved as shift
-  ! shift/reduce conflict for CHARVAL resolved as shift
-  ! shift/reduce conflict for FLOATVAL resolved as shift
-  ! shift/reduce conflict for INTVAL resolved as shift
+    (44) array_variable -> VARNAME LSQB INTVAL . RSQB LSQB VARNAME RSQB
+    (47) array_variable -> VARNAME LSQB INTVAL . RSQB LSQB INTVAL RSQB
+    (48) array_variable -> VARNAME LSQB INTVAL . RSQB
+    RSQB            shift and go to state 66
+
+
+state 48
+
+    (11) if_statement -> IF if_paren_open LPAREN . expr RPAREN LBRACE if_open statements if_close RBRACE
+    (26) expr -> . function_call
+    (27) expr -> . LPAREN DATATYPE RPAREN expr
+    (28) expr -> . constant
+    (29) expr -> . VARNAME
+    (30) expr -> . NOT expr
+    (31) expr -> . b1_open expr b2_open AND expr
+    (32) expr -> . expr RELOP2 expr
+    (33) expr -> . expr RELOP1 expr
+    (34) expr -> . LPAREN expr RPAREN
+    (35) expr -> . MINUS expr
+    (36) expr -> . expr MOD expr
+    (37) expr -> . expr DIVIDE expr
+    (38) expr -> . expr MULT expr
+    (39) expr -> . expr MINUS expr
+    (40) expr -> . expr PLUS expr
+    (57) function_call -> . VARNAME LPAREN argument_list RPAREN
+    (52) constant -> . BOOLVAL
+    (53) constant -> . STRINGVAL
+    (54) constant -> . CHARVAL
+    (55) constant -> . FLOATVAL
+    (56) constant -> . INTVAL
+    (41) b1_open -> . COMMA
     LPAREN          shift and go to state 31
     VARNAME         shift and go to state 33
     NOT             shift and go to state 34
@@ -976,47 +921,38 @@ state 47
     CHARVAL         shift and go to state 39
     FLOATVAL        shift and go to state 40
     INTVAL          shift and go to state 41
+    COMMA           shift and go to state 42
 
     expr                           shift and go to state 67
     function_call                  shift and go to state 30
     constant                       shift and go to state 32
     b1_open                        shift and go to state 35
 
-state 48
+state 49
 
-    (29) expr -> expr OR . expr
-    (24) expr -> . function_call
-    (25) expr -> . LPAREN DATATYPE RPAREN expr
-    (26) expr -> . constant
-    (27) expr -> . VARNAME
-    (28) expr -> . NOT expr
-    (29) expr -> . expr OR expr
-    (30) expr -> . b1_open expr b2_open AND expr
-    (31) expr -> . expr RELOP2 expr
-    (32) expr -> . expr RELOP1 expr
-    (33) expr -> . LPAREN expr RPAREN
-    (34) expr -> . MINUS expr
-    (35) expr -> . expr MOD expr
-    (36) expr -> . expr DIVIDE expr
-    (37) expr -> . expr MULT expr
-    (38) expr -> . expr MINUS expr
-    (39) expr -> . expr PLUS expr
-    (56) function_call -> . VARNAME LPAREN argument_list RPAREN
-    (51) constant -> . BOOLVAL
-    (52) constant -> . STRINGVAL
-    (53) constant -> . CHARVAL
-    (54) constant -> . FLOATVAL
-    (55) constant -> . INTVAL
-    (40) b1_open -> .
-  ! shift/reduce conflict for LPAREN resolved as shift
-  ! shift/reduce conflict for VARNAME resolved as shift
-  ! shift/reduce conflict for NOT resolved as shift
-  ! shift/reduce conflict for MINUS resolved as shift
-  ! shift/reduce conflict for BOOLVAL resolved as shift
-  ! shift/reduce conflict for STRINGVAL resolved as shift
-  ! shift/reduce conflict for CHARVAL resolved as shift
-  ! shift/reduce conflict for FLOATVAL resolved as shift
-  ! shift/reduce conflict for INTVAL resolved as shift
+    (32) expr -> expr RELOP2 . expr
+    (26) expr -> . function_call
+    (27) expr -> . LPAREN DATATYPE RPAREN expr
+    (28) expr -> . constant
+    (29) expr -> . VARNAME
+    (30) expr -> . NOT expr
+    (31) expr -> . b1_open expr b2_open AND expr
+    (32) expr -> . expr RELOP2 expr
+    (33) expr -> . expr RELOP1 expr
+    (34) expr -> . LPAREN expr RPAREN
+    (35) expr -> . MINUS expr
+    (36) expr -> . expr MOD expr
+    (37) expr -> . expr DIVIDE expr
+    (38) expr -> . expr MULT expr
+    (39) expr -> . expr MINUS expr
+    (40) expr -> . expr PLUS expr
+    (57) function_call -> . VARNAME LPAREN argument_list RPAREN
+    (52) constant -> . BOOLVAL
+    (53) constant -> . STRINGVAL
+    (54) constant -> . CHARVAL
+    (55) constant -> . FLOATVAL
+    (56) constant -> . INTVAL
+    (41) b1_open -> . COMMA
     LPAREN          shift and go to state 31
     VARNAME         shift and go to state 33
     NOT             shift and go to state 34
@@ -1026,47 +962,38 @@ state 48
     CHARVAL         shift and go to state 39
     FLOATVAL        shift and go to state 40
     INTVAL          shift and go to state 41
+    COMMA           shift and go to state 42
 
     expr                           shift and go to state 68
     function_call                  shift and go to state 30
     constant                       shift and go to state 32
     b1_open                        shift and go to state 35
 
-state 49
+state 50
 
-    (31) expr -> expr RELOP2 . expr
-    (24) expr -> . function_call
-    (25) expr -> . LPAREN DATATYPE RPAREN expr
-    (26) expr -> . constant
-    (27) expr -> . VARNAME
-    (28) expr -> . NOT expr
-    (29) expr -> . expr OR expr
-    (30) expr -> . b1_open expr b2_open AND expr
-    (31) expr -> . expr RELOP2 expr
-    (32) expr -> . expr RELOP1 expr
-    (33) expr -> . LPAREN expr RPAREN
-    (34) expr -> . MINUS expr
-    (35) expr -> . expr MOD expr
-    (36) expr -> . expr DIVIDE expr
-    (37) expr -> . expr MULT expr
-    (38) expr -> . expr MINUS expr
-    (39) expr -> . expr PLUS expr
-    (56) function_call -> . VARNAME LPAREN argument_list RPAREN
-    (51) constant -> . BOOLVAL
-    (52) constant -> . STRINGVAL
-    (53) constant -> . CHARVAL
-    (54) constant -> . FLOATVAL
-    (55) constant -> . INTVAL
-    (40) b1_open -> .
-  ! shift/reduce conflict for LPAREN resolved as shift
-  ! shift/reduce conflict for VARNAME resolved as shift
-  ! shift/reduce conflict for NOT resolved as shift
-  ! shift/reduce conflict for MINUS resolved as shift
-  ! shift/reduce conflict for BOOLVAL resolved as shift
-  ! shift/reduce conflict for STRINGVAL resolved as shift
-  ! shift/reduce conflict for CHARVAL resolved as shift
-  ! shift/reduce conflict for FLOATVAL resolved as shift
-  ! shift/reduce conflict for INTVAL resolved as shift
+    (33) expr -> expr RELOP1 . expr
+    (26) expr -> . function_call
+    (27) expr -> . LPAREN DATATYPE RPAREN expr
+    (28) expr -> . constant
+    (29) expr -> . VARNAME
+    (30) expr -> . NOT expr
+    (31) expr -> . b1_open expr b2_open AND expr
+    (32) expr -> . expr RELOP2 expr
+    (33) expr -> . expr RELOP1 expr
+    (34) expr -> . LPAREN expr RPAREN
+    (35) expr -> . MINUS expr
+    (36) expr -> . expr MOD expr
+    (37) expr -> . expr DIVIDE expr
+    (38) expr -> . expr MULT expr
+    (39) expr -> . expr MINUS expr
+    (40) expr -> . expr PLUS expr
+    (57) function_call -> . VARNAME LPAREN argument_list RPAREN
+    (52) constant -> . BOOLVAL
+    (53) constant -> . STRINGVAL
+    (54) constant -> . CHARVAL
+    (55) constant -> . FLOATVAL
+    (56) constant -> . INTVAL
+    (41) b1_open -> . COMMA
     LPAREN          shift and go to state 31
     VARNAME         shift and go to state 33
     NOT             shift and go to state 34
@@ -1076,47 +1003,38 @@ state 49
     CHARVAL         shift and go to state 39
     FLOATVAL        shift and go to state 40
     INTVAL          shift and go to state 41
+    COMMA           shift and go to state 42
 
     expr                           shift and go to state 69
     function_call                  shift and go to state 30
     constant                       shift and go to state 32
     b1_open                        shift and go to state 35
 
-state 50
+state 51
 
-    (32) expr -> expr RELOP1 . expr
-    (24) expr -> . function_call
-    (25) expr -> . LPAREN DATATYPE RPAREN expr
-    (26) expr -> . constant
-    (27) expr -> . VARNAME
-    (28) expr -> . NOT expr
-    (29) expr -> . expr OR expr
-    (30) expr -> . b1_open expr b2_open AND expr
-    (31) expr -> . expr RELOP2 expr
-    (32) expr -> . expr RELOP1 expr
-    (33) expr -> . LPAREN expr RPAREN
-    (34) expr -> . MINUS expr
-    (35) expr -> . expr MOD expr
-    (36) expr -> . expr DIVIDE expr
-    (37) expr -> . expr MULT expr
-    (38) expr -> . expr MINUS expr
-    (39) expr -> . expr PLUS expr
-    (56) function_call -> . VARNAME LPAREN argument_list RPAREN
-    (51) constant -> . BOOLVAL
-    (52) constant -> . STRINGVAL
-    (53) constant -> . CHARVAL
-    (54) constant -> . FLOATVAL
-    (55) constant -> . INTVAL
-    (40) b1_open -> .
-  ! shift/reduce conflict for LPAREN resolved as shift
-  ! shift/reduce conflict for VARNAME resolved as shift
-  ! shift/reduce conflict for NOT resolved as shift
-  ! shift/reduce conflict for MINUS resolved as shift
-  ! shift/reduce conflict for BOOLVAL resolved as shift
-  ! shift/reduce conflict for STRINGVAL resolved as shift
-  ! shift/reduce conflict for CHARVAL resolved as shift
-  ! shift/reduce conflict for FLOATVAL resolved as shift
-  ! shift/reduce conflict for INTVAL resolved as shift
+    (36) expr -> expr MOD . expr
+    (26) expr -> . function_call
+    (27) expr -> . LPAREN DATATYPE RPAREN expr
+    (28) expr -> . constant
+    (29) expr -> . VARNAME
+    (30) expr -> . NOT expr
+    (31) expr -> . b1_open expr b2_open AND expr
+    (32) expr -> . expr RELOP2 expr
+    (33) expr -> . expr RELOP1 expr
+    (34) expr -> . LPAREN expr RPAREN
+    (35) expr -> . MINUS expr
+    (36) expr -> . expr MOD expr
+    (37) expr -> . expr DIVIDE expr
+    (38) expr -> . expr MULT expr
+    (39) expr -> . expr MINUS expr
+    (40) expr -> . expr PLUS expr
+    (57) function_call -> . VARNAME LPAREN argument_list RPAREN
+    (52) constant -> . BOOLVAL
+    (53) constant -> . STRINGVAL
+    (54) constant -> . CHARVAL
+    (55) constant -> . FLOATVAL
+    (56) constant -> . INTVAL
+    (41) b1_open -> . COMMA
     LPAREN          shift and go to state 31
     VARNAME         shift and go to state 33
     NOT             shift and go to state 34
@@ -1126,47 +1044,38 @@ state 50
     CHARVAL         shift and go to state 39
     FLOATVAL        shift and go to state 40
     INTVAL          shift and go to state 41
+    COMMA           shift and go to state 42
 
     expr                           shift and go to state 70
     function_call                  shift and go to state 30
     constant                       shift and go to state 32
     b1_open                        shift and go to state 35
 
-state 51
+state 52
 
-    (35) expr -> expr MOD . expr
-    (24) expr -> . function_call
-    (25) expr -> . LPAREN DATATYPE RPAREN expr
-    (26) expr -> . constant
-    (27) expr -> . VARNAME
-    (28) expr -> . NOT expr
-    (29) expr -> . expr OR expr
-    (30) expr -> . b1_open expr b2_open AND expr
-    (31) expr -> . expr RELOP2 expr
-    (32) expr -> . expr RELOP1 expr
-    (33) expr -> . LPAREN expr RPAREN
-    (34) expr -> . MINUS expr
-    (35) expr -> . expr MOD expr
-    (36) expr -> . expr DIVIDE expr
-    (37) expr -> . expr MULT expr
-    (38) expr -> . expr MINUS expr
-    (39) expr -> . expr PLUS expr
-    (56) function_call -> . VARNAME LPAREN argument_list RPAREN
-    (51) constant -> . BOOLVAL
-    (52) constant -> . STRINGVAL
-    (53) constant -> . CHARVAL
-    (54) constant -> . FLOATVAL
-    (55) constant -> . INTVAL
-    (40) b1_open -> .
-  ! shift/reduce conflict for LPAREN resolved as shift
-  ! shift/reduce conflict for VARNAME resolved as shift
-  ! shift/reduce conflict for NOT resolved as shift
-  ! shift/reduce conflict for MINUS resolved as shift
-  ! shift/reduce conflict for BOOLVAL resolved as shift
-  ! shift/reduce conflict for STRINGVAL resolved as shift
-  ! shift/reduce conflict for CHARVAL resolved as shift
-  ! shift/reduce conflict for FLOATVAL resolved as shift
-  ! shift/reduce conflict for INTVAL resolved as shift
+    (37) expr -> expr DIVIDE . expr
+    (26) expr -> . function_call
+    (27) expr -> . LPAREN DATATYPE RPAREN expr
+    (28) expr -> . constant
+    (29) expr -> . VARNAME
+    (30) expr -> . NOT expr
+    (31) expr -> . b1_open expr b2_open AND expr
+    (32) expr -> . expr RELOP2 expr
+    (33) expr -> . expr RELOP1 expr
+    (34) expr -> . LPAREN expr RPAREN
+    (35) expr -> . MINUS expr
+    (36) expr -> . expr MOD expr
+    (37) expr -> . expr DIVIDE expr
+    (38) expr -> . expr MULT expr
+    (39) expr -> . expr MINUS expr
+    (40) expr -> . expr PLUS expr
+    (57) function_call -> . VARNAME LPAREN argument_list RPAREN
+    (52) constant -> . BOOLVAL
+    (53) constant -> . STRINGVAL
+    (54) constant -> . CHARVAL
+    (55) constant -> . FLOATVAL
+    (56) constant -> . INTVAL
+    (41) b1_open -> . COMMA
     LPAREN          shift and go to state 31
     VARNAME         shift and go to state 33
     NOT             shift and go to state 34
@@ -1176,47 +1085,38 @@ state 51
     CHARVAL         shift and go to state 39
     FLOATVAL        shift and go to state 40
     INTVAL          shift and go to state 41
+    COMMA           shift and go to state 42
 
     expr                           shift and go to state 71
     function_call                  shift and go to state 30
     constant                       shift and go to state 32
     b1_open                        shift and go to state 35
 
-state 52
+state 53
 
-    (36) expr -> expr DIVIDE . expr
-    (24) expr -> . function_call
-    (25) expr -> . LPAREN DATATYPE RPAREN expr
-    (26) expr -> . constant
-    (27) expr -> . VARNAME
-    (28) expr -> . NOT expr
-    (29) expr -> . expr OR expr
-    (30) expr -> . b1_open expr b2_open AND expr
-    (31) expr -> . expr RELOP2 expr
-    (32) expr -> . expr RELOP1 expr
-    (33) expr -> . LPAREN expr RPAREN
-    (34) expr -> . MINUS expr
-    (35) expr -> . expr MOD expr
-    (36) expr -> . expr DIVIDE expr
-    (37) expr -> . expr MULT expr
-    (38) expr -> . expr MINUS expr
-    (39) expr -> . expr PLUS expr
-    (56) function_call -> . VARNAME LPAREN argument_list RPAREN
-    (51) constant -> . BOOLVAL
-    (52) constant -> . STRINGVAL
-    (53) constant -> . CHARVAL
-    (54) constant -> . FLOATVAL
-    (55) constant -> . INTVAL
-    (40) b1_open -> .
-  ! shift/reduce conflict for LPAREN resolved as shift
-  ! shift/reduce conflict for VARNAME resolved as shift
-  ! shift/reduce conflict for NOT resolved as shift
-  ! shift/reduce conflict for MINUS resolved as shift
-  ! shift/reduce conflict for BOOLVAL resolved as shift
-  ! shift/reduce conflict for STRINGVAL resolved as shift
-  ! shift/reduce conflict for CHARVAL resolved as shift
-  ! shift/reduce conflict for FLOATVAL resolved as shift
-  ! shift/reduce conflict for INTVAL resolved as shift
+    (38) expr -> expr MULT . expr
+    (26) expr -> . function_call
+    (27) expr -> . LPAREN DATATYPE RPAREN expr
+    (28) expr -> . constant
+    (29) expr -> . VARNAME
+    (30) expr -> . NOT expr
+    (31) expr -> . b1_open expr b2_open AND expr
+    (32) expr -> . expr RELOP2 expr
+    (33) expr -> . expr RELOP1 expr
+    (34) expr -> . LPAREN expr RPAREN
+    (35) expr -> . MINUS expr
+    (36) expr -> . expr MOD expr
+    (37) expr -> . expr DIVIDE expr
+    (38) expr -> . expr MULT expr
+    (39) expr -> . expr MINUS expr
+    (40) expr -> . expr PLUS expr
+    (57) function_call -> . VARNAME LPAREN argument_list RPAREN
+    (52) constant -> . BOOLVAL
+    (53) constant -> . STRINGVAL
+    (54) constant -> . CHARVAL
+    (55) constant -> . FLOATVAL
+    (56) constant -> . INTVAL
+    (41) b1_open -> . COMMA
     LPAREN          shift and go to state 31
     VARNAME         shift and go to state 33
     NOT             shift and go to state 34
@@ -1226,47 +1126,38 @@ state 52
     CHARVAL         shift and go to state 39
     FLOATVAL        shift and go to state 40
     INTVAL          shift and go to state 41
+    COMMA           shift and go to state 42
 
     expr                           shift and go to state 72
     function_call                  shift and go to state 30
     constant                       shift and go to state 32
     b1_open                        shift and go to state 35
 
-state 53
+state 54
 
-    (37) expr -> expr MULT . expr
-    (24) expr -> . function_call
-    (25) expr -> . LPAREN DATATYPE RPAREN expr
-    (26) expr -> . constant
-    (27) expr -> . VARNAME
-    (28) expr -> . NOT expr
-    (29) expr -> . expr OR expr
-    (30) expr -> . b1_open expr b2_open AND expr
-    (31) expr -> . expr RELOP2 expr
-    (32) expr -> . expr RELOP1 expr
-    (33) expr -> . LPAREN expr RPAREN
-    (34) expr -> . MINUS expr
-    (35) expr -> . expr MOD expr
-    (36) expr -> . expr DIVIDE expr
-    (37) expr -> . expr MULT expr
-    (38) expr -> . expr MINUS expr
-    (39) expr -> . expr PLUS expr
-    (56) function_call -> . VARNAME LPAREN argument_list RPAREN
-    (51) constant -> . BOOLVAL
-    (52) constant -> . STRINGVAL
-    (53) constant -> . CHARVAL
-    (54) constant -> . FLOATVAL
-    (55) constant -> . INTVAL
-    (40) b1_open -> .
-  ! shift/reduce conflict for LPAREN resolved as shift
-  ! shift/reduce conflict for VARNAME resolved as shift
-  ! shift/reduce conflict for NOT resolved as shift
-  ! shift/reduce conflict for MINUS resolved as shift
-  ! shift/reduce conflict for BOOLVAL resolved as shift
-  ! shift/reduce conflict for STRINGVAL resolved as shift
-  ! shift/reduce conflict for CHARVAL resolved as shift
-  ! shift/reduce conflict for FLOATVAL resolved as shift
-  ! shift/reduce conflict for INTVAL resolved as shift
+    (39) expr -> expr MINUS . expr
+    (26) expr -> . function_call
+    (27) expr -> . LPAREN DATATYPE RPAREN expr
+    (28) expr -> . constant
+    (29) expr -> . VARNAME
+    (30) expr -> . NOT expr
+    (31) expr -> . b1_open expr b2_open AND expr
+    (32) expr -> . expr RELOP2 expr
+    (33) expr -> . expr RELOP1 expr
+    (34) expr -> . LPAREN expr RPAREN
+    (35) expr -> . MINUS expr
+    (36) expr -> . expr MOD expr
+    (37) expr -> . expr DIVIDE expr
+    (38) expr -> . expr MULT expr
+    (39) expr -> . expr MINUS expr
+    (40) expr -> . expr PLUS expr
+    (57) function_call -> . VARNAME LPAREN argument_list RPAREN
+    (52) constant -> . BOOLVAL
+    (53) constant -> . STRINGVAL
+    (54) constant -> . CHARVAL
+    (55) constant -> . FLOATVAL
+    (56) constant -> . INTVAL
+    (41) b1_open -> . COMMA
     LPAREN          shift and go to state 31
     VARNAME         shift and go to state 33
     NOT             shift and go to state 34
@@ -1276,47 +1167,38 @@ state 53
     CHARVAL         shift and go to state 39
     FLOATVAL        shift and go to state 40
     INTVAL          shift and go to state 41
+    COMMA           shift and go to state 42
 
     expr                           shift and go to state 73
     function_call                  shift and go to state 30
     constant                       shift and go to state 32
     b1_open                        shift and go to state 35
 
-state 54
+state 55
 
-    (38) expr -> expr MINUS . expr
-    (24) expr -> . function_call
-    (25) expr -> . LPAREN DATATYPE RPAREN expr
-    (26) expr -> . constant
-    (27) expr -> . VARNAME
-    (28) expr -> . NOT expr
-    (29) expr -> . expr OR expr
-    (30) expr -> . b1_open expr b2_open AND expr
-    (31) expr -> . expr RELOP2 expr
-    (32) expr -> . expr RELOP1 expr
-    (33) expr -> . LPAREN expr RPAREN
-    (34) expr -> . MINUS expr
-    (35) expr -> . expr MOD expr
-    (36) expr -> . expr DIVIDE expr
-    (37) expr -> . expr MULT expr
-    (38) expr -> . expr MINUS expr
-    (39) expr -> . expr PLUS expr
-    (56) function_call -> . VARNAME LPAREN argument_list RPAREN
-    (51) constant -> . BOOLVAL
-    (52) constant -> . STRINGVAL
-    (53) constant -> . CHARVAL
-    (54) constant -> . FLOATVAL
-    (55) constant -> . INTVAL
-    (40) b1_open -> .
-  ! shift/reduce conflict for LPAREN resolved as shift
-  ! shift/reduce conflict for VARNAME resolved as shift
-  ! shift/reduce conflict for NOT resolved as shift
-  ! shift/reduce conflict for MINUS resolved as shift
-  ! shift/reduce conflict for BOOLVAL resolved as shift
-  ! shift/reduce conflict for STRINGVAL resolved as shift
-  ! shift/reduce conflict for CHARVAL resolved as shift
-  ! shift/reduce conflict for FLOATVAL resolved as shift
-  ! shift/reduce conflict for INTVAL resolved as shift
+    (40) expr -> expr PLUS . expr
+    (26) expr -> . function_call
+    (27) expr -> . LPAREN DATATYPE RPAREN expr
+    (28) expr -> . constant
+    (29) expr -> . VARNAME
+    (30) expr -> . NOT expr
+    (31) expr -> . b1_open expr b2_open AND expr
+    (32) expr -> . expr RELOP2 expr
+    (33) expr -> . expr RELOP1 expr
+    (34) expr -> . LPAREN expr RPAREN
+    (35) expr -> . MINUS expr
+    (36) expr -> . expr MOD expr
+    (37) expr -> . expr DIVIDE expr
+    (38) expr -> . expr MULT expr
+    (39) expr -> . expr MINUS expr
+    (40) expr -> . expr PLUS expr
+    (57) function_call -> . VARNAME LPAREN argument_list RPAREN
+    (52) constant -> . BOOLVAL
+    (53) constant -> . STRINGVAL
+    (54) constant -> . CHARVAL
+    (55) constant -> . FLOATVAL
+    (56) constant -> . INTVAL
+    (41) b1_open -> . COMMA
     LPAREN          shift and go to state 31
     VARNAME         shift and go to state 33
     NOT             shift and go to state 34
@@ -1326,81 +1208,30 @@ state 54
     CHARVAL         shift and go to state 39
     FLOATVAL        shift and go to state 40
     INTVAL          shift and go to state 41
+    COMMA           shift and go to state 42
 
     expr                           shift and go to state 74
     function_call                  shift and go to state 30
     constant                       shift and go to state 32
     b1_open                        shift and go to state 35
 
-state 55
-
-    (39) expr -> expr PLUS . expr
-    (24) expr -> . function_call
-    (25) expr -> . LPAREN DATATYPE RPAREN expr
-    (26) expr -> . constant
-    (27) expr -> . VARNAME
-    (28) expr -> . NOT expr
-    (29) expr -> . expr OR expr
-    (30) expr -> . b1_open expr b2_open AND expr
-    (31) expr -> . expr RELOP2 expr
-    (32) expr -> . expr RELOP1 expr
-    (33) expr -> . LPAREN expr RPAREN
-    (34) expr -> . MINUS expr
-    (35) expr -> . expr MOD expr
-    (36) expr -> . expr DIVIDE expr
-    (37) expr -> . expr MULT expr
-    (38) expr -> . expr MINUS expr
-    (39) expr -> . expr PLUS expr
-    (56) function_call -> . VARNAME LPAREN argument_list RPAREN
-    (51) constant -> . BOOLVAL
-    (52) constant -> . STRINGVAL
-    (53) constant -> . CHARVAL
-    (54) constant -> . FLOATVAL
-    (55) constant -> . INTVAL
-    (40) b1_open -> .
-  ! shift/reduce conflict for LPAREN resolved as shift
-  ! shift/reduce conflict for VARNAME resolved as shift
-  ! shift/reduce conflict for NOT resolved as shift
-  ! shift/reduce conflict for MINUS resolved as shift
-  ! shift/reduce conflict for BOOLVAL resolved as shift
-  ! shift/reduce conflict for STRINGVAL resolved as shift
-  ! shift/reduce conflict for CHARVAL resolved as shift
-  ! shift/reduce conflict for FLOATVAL resolved as shift
-  ! shift/reduce conflict for INTVAL resolved as shift
-    LPAREN          shift and go to state 31
-    VARNAME         shift and go to state 33
-    NOT             shift and go to state 34
-    MINUS           shift and go to state 36
-    BOOLVAL         shift and go to state 37
-    STRINGVAL       shift and go to state 38
-    CHARVAL         shift and go to state 39
-    FLOATVAL        shift and go to state 40
-    INTVAL          shift and go to state 41
-
-    expr                           shift and go to state 75
-    function_call                  shift and go to state 30
-    constant                       shift and go to state 32
-    b1_open                        shift and go to state 35
-
 state 56
 
-    (25) expr -> LPAREN DATATYPE . RPAREN expr
-    RPAREN          shift and go to state 76
+    (27) expr -> LPAREN DATATYPE . RPAREN expr
+    RPAREN          shift and go to state 75
 
 
 state 57
 
-    (33) expr -> LPAREN expr . RPAREN
-    (29) expr -> expr . OR expr
-    (31) expr -> expr . RELOP2 expr
-    (32) expr -> expr . RELOP1 expr
-    (35) expr -> expr . MOD expr
-    (36) expr -> expr . DIVIDE expr
-    (37) expr -> expr . MULT expr
-    (38) expr -> expr . MINUS expr
-    (39) expr -> expr . PLUS expr
-    RPAREN          shift and go to state 77
-    OR              shift and go to state 48
+    (34) expr -> LPAREN expr . RPAREN
+    (32) expr -> expr . RELOP2 expr
+    (33) expr -> expr . RELOP1 expr
+    (36) expr -> expr . MOD expr
+    (37) expr -> expr . DIVIDE expr
+    (38) expr -> expr . MULT expr
+    (39) expr -> expr . MINUS expr
+    (40) expr -> expr . PLUS expr
+    RPAREN          shift and go to state 76
     RELOP2          shift and go to state 49
     RELOP1          shift and go to state 50
     MOD             shift and go to state 51
@@ -1412,72 +1243,68 @@ state 57
 
 state 58
 
-    (56) function_call -> VARNAME LPAREN . argument_list RPAREN
-    (57) argument_list -> . argument
-    (58) argument_list -> . argument COMMA argument_list
-    (59) argument -> . array_variable
-    (60) argument -> . constant
-    (61) argument -> . VARNAME
-    (42) array_variable -> . VARNAME LSQB VARNAME RSQB LSQB VARNAME RSQB
-    (43) array_variable -> . VARNAME LSQB INTVAL RSQB LSQB VARNAME RSQB
-    (44) array_variable -> . VARNAME LSQB VARNAME RSQB LSQB INTVAL RSQB
-    (45) array_variable -> . VARNAME LSQB VARNAME RSQB
-    (46) array_variable -> . VARNAME LSQB INTVAL RSQB LSQB INTVAL RSQB
-    (47) array_variable -> . VARNAME LSQB INTVAL RSQB
-    (51) constant -> . BOOLVAL
-    (52) constant -> . STRINGVAL
-    (53) constant -> . CHARVAL
-    (54) constant -> . FLOATVAL
-    (55) constant -> . INTVAL
-    VARNAME         shift and go to state 78
+    (57) function_call -> VARNAME LPAREN . argument_list RPAREN
+    (58) argument_list -> . argument
+    (59) argument_list -> . argument COMMA argument_list
+    (60) argument -> . array_variable
+    (61) argument -> . constant
+    (62) argument -> . VARNAME
+    (43) array_variable -> . VARNAME LSQB VARNAME RSQB LSQB VARNAME RSQB
+    (44) array_variable -> . VARNAME LSQB INTVAL RSQB LSQB VARNAME RSQB
+    (45) array_variable -> . VARNAME LSQB VARNAME RSQB LSQB INTVAL RSQB
+    (46) array_variable -> . VARNAME LSQB VARNAME RSQB
+    (47) array_variable -> . VARNAME LSQB INTVAL RSQB LSQB INTVAL RSQB
+    (48) array_variable -> . VARNAME LSQB INTVAL RSQB
+    (52) constant -> . BOOLVAL
+    (53) constant -> . STRINGVAL
+    (54) constant -> . CHARVAL
+    (55) constant -> . FLOATVAL
+    (56) constant -> . INTVAL
+    VARNAME         shift and go to state 77
     BOOLVAL         shift and go to state 37
     STRINGVAL       shift and go to state 38
     CHARVAL         shift and go to state 39
     FLOATVAL        shift and go to state 40
     INTVAL          shift and go to state 41
 
-    argument_list                  shift and go to state 79
-    argument                       shift and go to state 80
-    array_variable                 shift and go to state 81
-    constant                       shift and go to state 82
+    argument_list                  shift and go to state 78
+    argument                       shift and go to state 79
+    array_variable                 shift and go to state 80
+    constant                       shift and go to state 81
 
 state 59
 
-    (28) expr -> NOT expr .
-    (29) expr -> expr . OR expr
-    (31) expr -> expr . RELOP2 expr
-    (32) expr -> expr . RELOP1 expr
-    (35) expr -> expr . MOD expr
-    (36) expr -> expr . DIVIDE expr
-    (37) expr -> expr . MULT expr
-    (38) expr -> expr . MINUS expr
-    (39) expr -> expr . PLUS expr
-    OR              reduce using rule 28 (expr -> NOT expr .)
-    RELOP2          reduce using rule 28 (expr -> NOT expr .)
-    RELOP1          reduce using rule 28 (expr -> NOT expr .)
-    MOD             reduce using rule 28 (expr -> NOT expr .)
-    DIVIDE          reduce using rule 28 (expr -> NOT expr .)
-    MULT            reduce using rule 28 (expr -> NOT expr .)
-    MINUS           reduce using rule 28 (expr -> NOT expr .)
-    PLUS            reduce using rule 28 (expr -> NOT expr .)
-    SEMICOL         reduce using rule 28 (expr -> NOT expr .)
-    RPAREN          reduce using rule 28 (expr -> NOT expr .)
-    AND             reduce using rule 28 (expr -> NOT expr .)
+    (30) expr -> NOT expr .
+    (32) expr -> expr . RELOP2 expr
+    (33) expr -> expr . RELOP1 expr
+    (36) expr -> expr . MOD expr
+    (37) expr -> expr . DIVIDE expr
+    (38) expr -> expr . MULT expr
+    (39) expr -> expr . MINUS expr
+    (40) expr -> expr . PLUS expr
+    RELOP2          reduce using rule 30 (expr -> NOT expr .)
+    RELOP1          reduce using rule 30 (expr -> NOT expr .)
+    MOD             reduce using rule 30 (expr -> NOT expr .)
+    DIVIDE          reduce using rule 30 (expr -> NOT expr .)
+    MULT            reduce using rule 30 (expr -> NOT expr .)
+    MINUS           reduce using rule 30 (expr -> NOT expr .)
+    PLUS            reduce using rule 30 (expr -> NOT expr .)
+    SEMICOL         reduce using rule 30 (expr -> NOT expr .)
+    RPAREN          reduce using rule 30 (expr -> NOT expr .)
+    AND             reduce using rule 30 (expr -> NOT expr .)
 
 
 state 60
 
-    (30) expr -> b1_open expr . b2_open AND expr
-    (29) expr -> expr . OR expr
-    (31) expr -> expr . RELOP2 expr
-    (32) expr -> expr . RELOP1 expr
-    (35) expr -> expr . MOD expr
-    (36) expr -> expr . DIVIDE expr
-    (37) expr -> expr . MULT expr
-    (38) expr -> expr . MINUS expr
-    (39) expr -> expr . PLUS expr
-    (41) b2_open -> .
-    OR              shift and go to state 48
+    (31) expr -> b1_open expr . b2_open AND expr
+    (32) expr -> expr . RELOP2 expr
+    (33) expr -> expr . RELOP1 expr
+    (36) expr -> expr . MOD expr
+    (37) expr -> expr . DIVIDE expr
+    (38) expr -> expr . MULT expr
+    (39) expr -> expr . MINUS expr
+    (40) expr -> expr . PLUS expr
+    (42) b2_open -> .
     RELOP2          shift and go to state 49
     RELOP1          shift and go to state 50
     MOD             shift and go to state 51
@@ -1485,87 +1312,83 @@ state 60
     MULT            shift and go to state 53
     MINUS           shift and go to state 54
     PLUS            shift and go to state 55
-    AND             reduce using rule 41 (b2_open -> .)
+    AND             reduce using rule 42 (b2_open -> .)
 
-    b2_open                        shift and go to state 83
+    b2_open                        shift and go to state 82
 
 state 61
 
-    (34) expr -> MINUS expr .
-    (29) expr -> expr . OR expr
-    (31) expr -> expr . RELOP2 expr
-    (32) expr -> expr . RELOP1 expr
-    (35) expr -> expr . MOD expr
-    (36) expr -> expr . DIVIDE expr
-    (37) expr -> expr . MULT expr
-    (38) expr -> expr . MINUS expr
-    (39) expr -> expr . PLUS expr
-    OR              reduce using rule 34 (expr -> MINUS expr .)
-    RELOP2          reduce using rule 34 (expr -> MINUS expr .)
-    RELOP1          reduce using rule 34 (expr -> MINUS expr .)
-    MOD             reduce using rule 34 (expr -> MINUS expr .)
-    DIVIDE          reduce using rule 34 (expr -> MINUS expr .)
-    MULT            reduce using rule 34 (expr -> MINUS expr .)
-    MINUS           reduce using rule 34 (expr -> MINUS expr .)
-    PLUS            reduce using rule 34 (expr -> MINUS expr .)
-    SEMICOL         reduce using rule 34 (expr -> MINUS expr .)
-    RPAREN          reduce using rule 34 (expr -> MINUS expr .)
-    AND             reduce using rule 34 (expr -> MINUS expr .)
+    (35) expr -> MINUS expr .
+    (32) expr -> expr . RELOP2 expr
+    (33) expr -> expr . RELOP1 expr
+    (36) expr -> expr . MOD expr
+    (37) expr -> expr . DIVIDE expr
+    (38) expr -> expr . MULT expr
+    (39) expr -> expr . MINUS expr
+    (40) expr -> expr . PLUS expr
+    RELOP2          reduce using rule 35 (expr -> MINUS expr .)
+    RELOP1          reduce using rule 35 (expr -> MINUS expr .)
+    MOD             reduce using rule 35 (expr -> MINUS expr .)
+    DIVIDE          reduce using rule 35 (expr -> MINUS expr .)
+    MULT            reduce using rule 35 (expr -> MINUS expr .)
+    MINUS           reduce using rule 35 (expr -> MINUS expr .)
+    PLUS            reduce using rule 35 (expr -> MINUS expr .)
+    SEMICOL         reduce using rule 35 (expr -> MINUS expr .)
+    RPAREN          reduce using rule 35 (expr -> MINUS expr .)
+    AND             reduce using rule 35 (expr -> MINUS expr .)
 
 
 state 62
 
-    (18) output_statement -> OUTPUT LPAREN constant RPAREN .
-    SEMICOL         reduce using rule 18 (output_statement -> OUTPUT LPAREN constant RPAREN .)
+    (20) output_statement -> OUTPUT LPAREN constant RPAREN .
+    SEMICOL         reduce using rule 20 (output_statement -> OUTPUT LPAREN constant RPAREN .)
 
 
 state 63
 
-    (19) output_statement -> OUTPUT LPAREN left_value RPAREN .
-    SEMICOL         reduce using rule 19 (output_statement -> OUTPUT LPAREN left_value RPAREN .)
+    (21) output_statement -> OUTPUT LPAREN left_value RPAREN .
+    SEMICOL         reduce using rule 21 (output_statement -> OUTPUT LPAREN left_value RPAREN .)
 
 
 state 64
 
-    (17) input_statement -> INPUT LPAREN left_value RPAREN .
-    SEMICOL         reduce using rule 17 (input_statement -> INPUT LPAREN left_value RPAREN .)
+    (19) input_statement -> INPUT LPAREN left_value RPAREN .
+    SEMICOL         reduce using rule 19 (input_statement -> INPUT LPAREN left_value RPAREN .)
 
 
 state 65
 
-    (42) array_variable -> VARNAME LSQB VARNAME RSQB . LSQB VARNAME RSQB
-    (44) array_variable -> VARNAME LSQB VARNAME RSQB . LSQB INTVAL RSQB
-    (45) array_variable -> VARNAME LSQB VARNAME RSQB .
-    LSQB            shift and go to state 84
-    ASSIGN          reduce using rule 45 (array_variable -> VARNAME LSQB VARNAME RSQB .)
-    RPAREN          reduce using rule 45 (array_variable -> VARNAME LSQB VARNAME RSQB .)
-    COMMA           reduce using rule 45 (array_variable -> VARNAME LSQB VARNAME RSQB .)
+    (43) array_variable -> VARNAME LSQB VARNAME RSQB . LSQB VARNAME RSQB
+    (45) array_variable -> VARNAME LSQB VARNAME RSQB . LSQB INTVAL RSQB
+    (46) array_variable -> VARNAME LSQB VARNAME RSQB .
+    LSQB            shift and go to state 83
+    ASSIGN          reduce using rule 46 (array_variable -> VARNAME LSQB VARNAME RSQB .)
+    RPAREN          reduce using rule 46 (array_variable -> VARNAME LSQB VARNAME RSQB .)
+    COMMA           reduce using rule 46 (array_variable -> VARNAME LSQB VARNAME RSQB .)
 
 
 state 66
 
-    (43) array_variable -> VARNAME LSQB INTVAL RSQB . LSQB VARNAME RSQB
-    (46) array_variable -> VARNAME LSQB INTVAL RSQB . LSQB INTVAL RSQB
-    (47) array_variable -> VARNAME LSQB INTVAL RSQB .
-    LSQB            shift and go to state 85
-    ASSIGN          reduce using rule 47 (array_variable -> VARNAME LSQB INTVAL RSQB .)
-    RPAREN          reduce using rule 47 (array_variable -> VARNAME LSQB INTVAL RSQB .)
-    COMMA           reduce using rule 47 (array_variable -> VARNAME LSQB INTVAL RSQB .)
+    (44) array_variable -> VARNAME LSQB INTVAL RSQB . LSQB VARNAME RSQB
+    (47) array_variable -> VARNAME LSQB INTVAL RSQB . LSQB INTVAL RSQB
+    (48) array_variable -> VARNAME LSQB INTVAL RSQB .
+    LSQB            shift and go to state 84
+    ASSIGN          reduce using rule 48 (array_variable -> VARNAME LSQB INTVAL RSQB .)
+    RPAREN          reduce using rule 48 (array_variable -> VARNAME LSQB INTVAL RSQB .)
+    COMMA           reduce using rule 48 (array_variable -> VARNAME LSQB INTVAL RSQB .)
 
 
 state 67
 
-    (11) if_statement -> IF LPAREN if_paren_open expr . RPAREN LBRACE if_open statements if_close RBRACE
-    (29) expr -> expr . OR expr
-    (31) expr -> expr . RELOP2 expr
-    (32) expr -> expr . RELOP1 expr
-    (35) expr -> expr . MOD expr
-    (36) expr -> expr . DIVIDE expr
-    (37) expr -> expr . MULT expr
-    (38) expr -> expr . MINUS expr
-    (39) expr -> expr . PLUS expr
-    RPAREN          shift and go to state 86
-    OR              shift and go to state 48
+    (11) if_statement -> IF if_paren_open LPAREN expr . RPAREN LBRACE if_open statements if_close RBRACE
+    (32) expr -> expr . RELOP2 expr
+    (33) expr -> expr . RELOP1 expr
+    (36) expr -> expr . MOD expr
+    (37) expr -> expr . DIVIDE expr
+    (38) expr -> expr . MULT expr
+    (39) expr -> expr . MINUS expr
+    (40) expr -> expr . PLUS expr
+    RPAREN          shift and go to state 85
     RELOP2          shift and go to state 49
     RELOP1          shift and go to state 50
     MOD             shift and go to state 51
@@ -1577,20 +1400,18 @@ state 67
 
 state 68
 
-    (29) expr -> expr OR expr .
-    (29) expr -> expr . OR expr
-    (31) expr -> expr . RELOP2 expr
-    (32) expr -> expr . RELOP1 expr
-    (35) expr -> expr . MOD expr
-    (36) expr -> expr . DIVIDE expr
-    (37) expr -> expr . MULT expr
-    (38) expr -> expr . MINUS expr
-    (39) expr -> expr . PLUS expr
-    OR              reduce using rule 29 (expr -> expr OR expr .)
-    SEMICOL         reduce using rule 29 (expr -> expr OR expr .)
-    RPAREN          reduce using rule 29 (expr -> expr OR expr .)
-    AND             reduce using rule 29 (expr -> expr OR expr .)
-    RELOP2          shift and go to state 49
+    (32) expr -> expr RELOP2 expr .
+    (32) expr -> expr . RELOP2 expr
+    (33) expr -> expr . RELOP1 expr
+    (36) expr -> expr . MOD expr
+    (37) expr -> expr . DIVIDE expr
+    (38) expr -> expr . MULT expr
+    (39) expr -> expr . MINUS expr
+    (40) expr -> expr . PLUS expr
+    RELOP2          reduce using rule 32 (expr -> expr RELOP2 expr .)
+    SEMICOL         reduce using rule 32 (expr -> expr RELOP2 expr .)
+    RPAREN          reduce using rule 32 (expr -> expr RELOP2 expr .)
+    AND             reduce using rule 32 (expr -> expr RELOP2 expr .)
     RELOP1          shift and go to state 50
     MOD             shift and go to state 51
     DIVIDE          shift and go to state 52
@@ -1601,21 +1422,19 @@ state 68
 
 state 69
 
-    (31) expr -> expr RELOP2 expr .
-    (29) expr -> expr . OR expr
-    (31) expr -> expr . RELOP2 expr
-    (32) expr -> expr . RELOP1 expr
-    (35) expr -> expr . MOD expr
-    (36) expr -> expr . DIVIDE expr
-    (37) expr -> expr . MULT expr
-    (38) expr -> expr . MINUS expr
-    (39) expr -> expr . PLUS expr
-    OR              reduce using rule 31 (expr -> expr RELOP2 expr .)
-    RELOP2          reduce using rule 31 (expr -> expr RELOP2 expr .)
-    SEMICOL         reduce using rule 31 (expr -> expr RELOP2 expr .)
-    RPAREN          reduce using rule 31 (expr -> expr RELOP2 expr .)
-    AND             reduce using rule 31 (expr -> expr RELOP2 expr .)
-    RELOP1          shift and go to state 50
+    (33) expr -> expr RELOP1 expr .
+    (32) expr -> expr . RELOP2 expr
+    (33) expr -> expr . RELOP1 expr
+    (36) expr -> expr . MOD expr
+    (37) expr -> expr . DIVIDE expr
+    (38) expr -> expr . MULT expr
+    (39) expr -> expr . MINUS expr
+    (40) expr -> expr . PLUS expr
+    RELOP2          reduce using rule 33 (expr -> expr RELOP1 expr .)
+    RELOP1          reduce using rule 33 (expr -> expr RELOP1 expr .)
+    SEMICOL         reduce using rule 33 (expr -> expr RELOP1 expr .)
+    RPAREN          reduce using rule 33 (expr -> expr RELOP1 expr .)
+    AND             reduce using rule 33 (expr -> expr RELOP1 expr .)
     MOD             shift and go to state 51
     DIVIDE          shift and go to state 52
     MULT            shift and go to state 53
@@ -1625,119 +1444,109 @@ state 69
 
 state 70
 
-    (32) expr -> expr RELOP1 expr .
-    (29) expr -> expr . OR expr
-    (31) expr -> expr . RELOP2 expr
-    (32) expr -> expr . RELOP1 expr
-    (35) expr -> expr . MOD expr
-    (36) expr -> expr . DIVIDE expr
-    (37) expr -> expr . MULT expr
-    (38) expr -> expr . MINUS expr
-    (39) expr -> expr . PLUS expr
-    OR              reduce using rule 32 (expr -> expr RELOP1 expr .)
-    RELOP2          reduce using rule 32 (expr -> expr RELOP1 expr .)
-    RELOP1          reduce using rule 32 (expr -> expr RELOP1 expr .)
-    SEMICOL         reduce using rule 32 (expr -> expr RELOP1 expr .)
-    RPAREN          reduce using rule 32 (expr -> expr RELOP1 expr .)
-    AND             reduce using rule 32 (expr -> expr RELOP1 expr .)
-    MOD             shift and go to state 51
-    DIVIDE          shift and go to state 52
-    MULT            shift and go to state 53
-    MINUS           shift and go to state 54
-    PLUS            shift and go to state 55
+    (36) expr -> expr MOD expr .
+    (32) expr -> expr . RELOP2 expr
+    (33) expr -> expr . RELOP1 expr
+    (36) expr -> expr . MOD expr
+    (37) expr -> expr . DIVIDE expr
+    (38) expr -> expr . MULT expr
+    (39) expr -> expr . MINUS expr
+    (40) expr -> expr . PLUS expr
+    RELOP2          reduce using rule 36 (expr -> expr MOD expr .)
+    RELOP1          reduce using rule 36 (expr -> expr MOD expr .)
+    MOD             reduce using rule 36 (expr -> expr MOD expr .)
+    DIVIDE          reduce using rule 36 (expr -> expr MOD expr .)
+    MULT            reduce using rule 36 (expr -> expr MOD expr .)
+    MINUS           reduce using rule 36 (expr -> expr MOD expr .)
+    PLUS            reduce using rule 36 (expr -> expr MOD expr .)
+    SEMICOL         reduce using rule 36 (expr -> expr MOD expr .)
+    RPAREN          reduce using rule 36 (expr -> expr MOD expr .)
+    AND             reduce using rule 36 (expr -> expr MOD expr .)
 
 
 state 71
 
-    (35) expr -> expr MOD expr .
-    (29) expr -> expr . OR expr
-    (31) expr -> expr . RELOP2 expr
-    (32) expr -> expr . RELOP1 expr
-    (35) expr -> expr . MOD expr
-    (36) expr -> expr . DIVIDE expr
-    (37) expr -> expr . MULT expr
-    (38) expr -> expr . MINUS expr
-    (39) expr -> expr . PLUS expr
-    OR              reduce using rule 35 (expr -> expr MOD expr .)
-    RELOP2          reduce using rule 35 (expr -> expr MOD expr .)
-    RELOP1          reduce using rule 35 (expr -> expr MOD expr .)
-    MOD             reduce using rule 35 (expr -> expr MOD expr .)
-    DIVIDE          reduce using rule 35 (expr -> expr MOD expr .)
-    MULT            reduce using rule 35 (expr -> expr MOD expr .)
-    MINUS           reduce using rule 35 (expr -> expr MOD expr .)
-    PLUS            reduce using rule 35 (expr -> expr MOD expr .)
-    SEMICOL         reduce using rule 35 (expr -> expr MOD expr .)
-    RPAREN          reduce using rule 35 (expr -> expr MOD expr .)
-    AND             reduce using rule 35 (expr -> expr MOD expr .)
+    (37) expr -> expr DIVIDE expr .
+    (32) expr -> expr . RELOP2 expr
+    (33) expr -> expr . RELOP1 expr
+    (36) expr -> expr . MOD expr
+    (37) expr -> expr . DIVIDE expr
+    (38) expr -> expr . MULT expr
+    (39) expr -> expr . MINUS expr
+    (40) expr -> expr . PLUS expr
+    RELOP2          reduce using rule 37 (expr -> expr DIVIDE expr .)
+    RELOP1          reduce using rule 37 (expr -> expr DIVIDE expr .)
+    MOD             reduce using rule 37 (expr -> expr DIVIDE expr .)
+    DIVIDE          reduce using rule 37 (expr -> expr DIVIDE expr .)
+    MULT            reduce using rule 37 (expr -> expr DIVIDE expr .)
+    MINUS           reduce using rule 37 (expr -> expr DIVIDE expr .)
+    PLUS            reduce using rule 37 (expr -> expr DIVIDE expr .)
+    SEMICOL         reduce using rule 37 (expr -> expr DIVIDE expr .)
+    RPAREN          reduce using rule 37 (expr -> expr DIVIDE expr .)
+    AND             reduce using rule 37 (expr -> expr DIVIDE expr .)
 
 
 state 72
 
-    (36) expr -> expr DIVIDE expr .
-    (29) expr -> expr . OR expr
-    (31) expr -> expr . RELOP2 expr
-    (32) expr -> expr . RELOP1 expr
-    (35) expr -> expr . MOD expr
-    (36) expr -> expr . DIVIDE expr
-    (37) expr -> expr . MULT expr
-    (38) expr -> expr . MINUS expr
-    (39) expr -> expr . PLUS expr
-    OR              reduce using rule 36 (expr -> expr DIVIDE expr .)
-    RELOP2          reduce using rule 36 (expr -> expr DIVIDE expr .)
-    RELOP1          reduce using rule 36 (expr -> expr DIVIDE expr .)
-    MOD             reduce using rule 36 (expr -> expr DIVIDE expr .)
-    DIVIDE          reduce using rule 36 (expr -> expr DIVIDE expr .)
-    MULT            reduce using rule 36 (expr -> expr DIVIDE expr .)
-    MINUS           reduce using rule 36 (expr -> expr DIVIDE expr .)
-    PLUS            reduce using rule 36 (expr -> expr DIVIDE expr .)
-    SEMICOL         reduce using rule 36 (expr -> expr DIVIDE expr .)
-    RPAREN          reduce using rule 36 (expr -> expr DIVIDE expr .)
-    AND             reduce using rule 36 (expr -> expr DIVIDE expr .)
+    (38) expr -> expr MULT expr .
+    (32) expr -> expr . RELOP2 expr
+    (33) expr -> expr . RELOP1 expr
+    (36) expr -> expr . MOD expr
+    (37) expr -> expr . DIVIDE expr
+    (38) expr -> expr . MULT expr
+    (39) expr -> expr . MINUS expr
+    (40) expr -> expr . PLUS expr
+    RELOP2          reduce using rule 38 (expr -> expr MULT expr .)
+    RELOP1          reduce using rule 38 (expr -> expr MULT expr .)
+    MOD             reduce using rule 38 (expr -> expr MULT expr .)
+    DIVIDE          reduce using rule 38 (expr -> expr MULT expr .)
+    MULT            reduce using rule 38 (expr -> expr MULT expr .)
+    MINUS           reduce using rule 38 (expr -> expr MULT expr .)
+    PLUS            reduce using rule 38 (expr -> expr MULT expr .)
+    SEMICOL         reduce using rule 38 (expr -> expr MULT expr .)
+    RPAREN          reduce using rule 38 (expr -> expr MULT expr .)
+    AND             reduce using rule 38 (expr -> expr MULT expr .)
 
 
 state 73
 
-    (37) expr -> expr MULT expr .
-    (29) expr -> expr . OR expr
-    (31) expr -> expr . RELOP2 expr
-    (32) expr -> expr . RELOP1 expr
-    (35) expr -> expr . MOD expr
-    (36) expr -> expr . DIVIDE expr
-    (37) expr -> expr . MULT expr
-    (38) expr -> expr . MINUS expr
-    (39) expr -> expr . PLUS expr
-    OR              reduce using rule 37 (expr -> expr MULT expr .)
-    RELOP2          reduce using rule 37 (expr -> expr MULT expr .)
-    RELOP1          reduce using rule 37 (expr -> expr MULT expr .)
-    MOD             reduce using rule 37 (expr -> expr MULT expr .)
-    DIVIDE          reduce using rule 37 (expr -> expr MULT expr .)
-    MULT            reduce using rule 37 (expr -> expr MULT expr .)
-    MINUS           reduce using rule 37 (expr -> expr MULT expr .)
-    PLUS            reduce using rule 37 (expr -> expr MULT expr .)
-    SEMICOL         reduce using rule 37 (expr -> expr MULT expr .)
-    RPAREN          reduce using rule 37 (expr -> expr MULT expr .)
-    AND             reduce using rule 37 (expr -> expr MULT expr .)
+    (39) expr -> expr MINUS expr .
+    (32) expr -> expr . RELOP2 expr
+    (33) expr -> expr . RELOP1 expr
+    (36) expr -> expr . MOD expr
+    (37) expr -> expr . DIVIDE expr
+    (38) expr -> expr . MULT expr
+    (39) expr -> expr . MINUS expr
+    (40) expr -> expr . PLUS expr
+    RELOP2          reduce using rule 39 (expr -> expr MINUS expr .)
+    RELOP1          reduce using rule 39 (expr -> expr MINUS expr .)
+    MINUS           reduce using rule 39 (expr -> expr MINUS expr .)
+    PLUS            reduce using rule 39 (expr -> expr MINUS expr .)
+    SEMICOL         reduce using rule 39 (expr -> expr MINUS expr .)
+    RPAREN          reduce using rule 39 (expr -> expr MINUS expr .)
+    AND             reduce using rule 39 (expr -> expr MINUS expr .)
+    MOD             shift and go to state 51
+    DIVIDE          shift and go to state 52
+    MULT            shift and go to state 53
 
 
 state 74
 
-    (38) expr -> expr MINUS expr .
-    (29) expr -> expr . OR expr
-    (31) expr -> expr . RELOP2 expr
-    (32) expr -> expr . RELOP1 expr
-    (35) expr -> expr . MOD expr
-    (36) expr -> expr . DIVIDE expr
-    (37) expr -> expr . MULT expr
-    (38) expr -> expr . MINUS expr
-    (39) expr -> expr . PLUS expr
-    OR              reduce using rule 38 (expr -> expr MINUS expr .)
-    RELOP2          reduce using rule 38 (expr -> expr MINUS expr .)
-    RELOP1          reduce using rule 38 (expr -> expr MINUS expr .)
-    MINUS           reduce using rule 38 (expr -> expr MINUS expr .)
-    PLUS            reduce using rule 38 (expr -> expr MINUS expr .)
-    SEMICOL         reduce using rule 38 (expr -> expr MINUS expr .)
-    RPAREN          reduce using rule 38 (expr -> expr MINUS expr .)
-    AND             reduce using rule 38 (expr -> expr MINUS expr .)
+    (40) expr -> expr PLUS expr .
+    (32) expr -> expr . RELOP2 expr
+    (33) expr -> expr . RELOP1 expr
+    (36) expr -> expr . MOD expr
+    (37) expr -> expr . DIVIDE expr
+    (38) expr -> expr . MULT expr
+    (39) expr -> expr . MINUS expr
+    (40) expr -> expr . PLUS expr
+    RELOP2          reduce using rule 40 (expr -> expr PLUS expr .)
+    RELOP1          reduce using rule 40 (expr -> expr PLUS expr .)
+    MINUS           reduce using rule 40 (expr -> expr PLUS expr .)
+    PLUS            reduce using rule 40 (expr -> expr PLUS expr .)
+    SEMICOL         reduce using rule 40 (expr -> expr PLUS expr .)
+    RPAREN          reduce using rule 40 (expr -> expr PLUS expr .)
+    AND             reduce using rule 40 (expr -> expr PLUS expr .)
     MOD             shift and go to state 51
     DIVIDE          shift and go to state 52
     MULT            shift and go to state 53
@@ -1745,63 +1554,29 @@ state 74
 
 state 75
 
-    (39) expr -> expr PLUS expr .
-    (29) expr -> expr . OR expr
-    (31) expr -> expr . RELOP2 expr
-    (32) expr -> expr . RELOP1 expr
-    (35) expr -> expr . MOD expr
-    (36) expr -> expr . DIVIDE expr
-    (37) expr -> expr . MULT expr
-    (38) expr -> expr . MINUS expr
-    (39) expr -> expr . PLUS expr
-    OR              reduce using rule 39 (expr -> expr PLUS expr .)
-    RELOP2          reduce using rule 39 (expr -> expr PLUS expr .)
-    RELOP1          reduce using rule 39 (expr -> expr PLUS expr .)
-    MINUS           reduce using rule 39 (expr -> expr PLUS expr .)
-    PLUS            reduce using rule 39 (expr -> expr PLUS expr .)
-    SEMICOL         reduce using rule 39 (expr -> expr PLUS expr .)
-    RPAREN          reduce using rule 39 (expr -> expr PLUS expr .)
-    AND             reduce using rule 39 (expr -> expr PLUS expr .)
-    MOD             shift and go to state 51
-    DIVIDE          shift and go to state 52
-    MULT            shift and go to state 53
-
-
-state 76
-
-    (25) expr -> LPAREN DATATYPE RPAREN . expr
-    (24) expr -> . function_call
-    (25) expr -> . LPAREN DATATYPE RPAREN expr
-    (26) expr -> . constant
-    (27) expr -> . VARNAME
-    (28) expr -> . NOT expr
-    (29) expr -> . expr OR expr
-    (30) expr -> . b1_open expr b2_open AND expr
-    (31) expr -> . expr RELOP2 expr
-    (32) expr -> . expr RELOP1 expr
-    (33) expr -> . LPAREN expr RPAREN
-    (34) expr -> . MINUS expr
-    (35) expr -> . expr MOD expr
-    (36) expr -> . expr DIVIDE expr
-    (37) expr -> . expr MULT expr
-    (38) expr -> . expr MINUS expr
-    (39) expr -> . expr PLUS expr
-    (56) function_call -> . VARNAME LPAREN argument_list RPAREN
-    (51) constant -> . BOOLVAL
-    (52) constant -> . STRINGVAL
-    (53) constant -> . CHARVAL
-    (54) constant -> . FLOATVAL
-    (55) constant -> . INTVAL
-    (40) b1_open -> .
-  ! shift/reduce conflict for LPAREN resolved as shift
-  ! shift/reduce conflict for VARNAME resolved as shift
-  ! shift/reduce conflict for NOT resolved as shift
-  ! shift/reduce conflict for MINUS resolved as shift
-  ! shift/reduce conflict for BOOLVAL resolved as shift
-  ! shift/reduce conflict for STRINGVAL resolved as shift
-  ! shift/reduce conflict for CHARVAL resolved as shift
-  ! shift/reduce conflict for FLOATVAL resolved as shift
-  ! shift/reduce conflict for INTVAL resolved as shift
+    (27) expr -> LPAREN DATATYPE RPAREN . expr
+    (26) expr -> . function_call
+    (27) expr -> . LPAREN DATATYPE RPAREN expr
+    (28) expr -> . constant
+    (29) expr -> . VARNAME
+    (30) expr -> . NOT expr
+    (31) expr -> . b1_open expr b2_open AND expr
+    (32) expr -> . expr RELOP2 expr
+    (33) expr -> . expr RELOP1 expr
+    (34) expr -> . LPAREN expr RPAREN
+    (35) expr -> . MINUS expr
+    (36) expr -> . expr MOD expr
+    (37) expr -> . expr DIVIDE expr
+    (38) expr -> . expr MULT expr
+    (39) expr -> . expr MINUS expr
+    (40) expr -> . expr PLUS expr
+    (57) function_call -> . VARNAME LPAREN argument_list RPAREN
+    (52) constant -> . BOOLVAL
+    (53) constant -> . STRINGVAL
+    (54) constant -> . CHARVAL
+    (55) constant -> . FLOATVAL
+    (56) constant -> . INTVAL
+    (41) b1_open -> . COMMA
     LPAREN          shift and go to state 31
     VARNAME         shift and go to state 33
     NOT             shift and go to state 34
@@ -1811,204 +1586,191 @@ state 76
     CHARVAL         shift and go to state 39
     FLOATVAL        shift and go to state 40
     INTVAL          shift and go to state 41
+    COMMA           shift and go to state 42
 
-    expr                           shift and go to state 87
+    expr                           shift and go to state 86
     function_call                  shift and go to state 30
     constant                       shift and go to state 32
     b1_open                        shift and go to state 35
 
+state 76
+
+    (34) expr -> LPAREN expr RPAREN .
+    RELOP2          reduce using rule 34 (expr -> LPAREN expr RPAREN .)
+    RELOP1          reduce using rule 34 (expr -> LPAREN expr RPAREN .)
+    MOD             reduce using rule 34 (expr -> LPAREN expr RPAREN .)
+    DIVIDE          reduce using rule 34 (expr -> LPAREN expr RPAREN .)
+    MULT            reduce using rule 34 (expr -> LPAREN expr RPAREN .)
+    MINUS           reduce using rule 34 (expr -> LPAREN expr RPAREN .)
+    PLUS            reduce using rule 34 (expr -> LPAREN expr RPAREN .)
+    SEMICOL         reduce using rule 34 (expr -> LPAREN expr RPAREN .)
+    RPAREN          reduce using rule 34 (expr -> LPAREN expr RPAREN .)
+    AND             reduce using rule 34 (expr -> LPAREN expr RPAREN .)
+
+
 state 77
 
-    (33) expr -> LPAREN expr RPAREN .
-    OR              reduce using rule 33 (expr -> LPAREN expr RPAREN .)
-    RELOP2          reduce using rule 33 (expr -> LPAREN expr RPAREN .)
-    RELOP1          reduce using rule 33 (expr -> LPAREN expr RPAREN .)
-    MOD             reduce using rule 33 (expr -> LPAREN expr RPAREN .)
-    DIVIDE          reduce using rule 33 (expr -> LPAREN expr RPAREN .)
-    MULT            reduce using rule 33 (expr -> LPAREN expr RPAREN .)
-    MINUS           reduce using rule 33 (expr -> LPAREN expr RPAREN .)
-    PLUS            reduce using rule 33 (expr -> LPAREN expr RPAREN .)
-    SEMICOL         reduce using rule 33 (expr -> LPAREN expr RPAREN .)
-    RPAREN          reduce using rule 33 (expr -> LPAREN expr RPAREN .)
-    AND             reduce using rule 33 (expr -> LPAREN expr RPAREN .)
+    (62) argument -> VARNAME .
+    (43) array_variable -> VARNAME . LSQB VARNAME RSQB LSQB VARNAME RSQB
+    (44) array_variable -> VARNAME . LSQB INTVAL RSQB LSQB VARNAME RSQB
+    (45) array_variable -> VARNAME . LSQB VARNAME RSQB LSQB INTVAL RSQB
+    (46) array_variable -> VARNAME . LSQB VARNAME RSQB
+    (47) array_variable -> VARNAME . LSQB INTVAL RSQB LSQB INTVAL RSQB
+    (48) array_variable -> VARNAME . LSQB INTVAL RSQB
+    COMMA           reduce using rule 62 (argument -> VARNAME .)
+    RPAREN          reduce using rule 62 (argument -> VARNAME .)
+    LSQB            shift and go to state 26
 
 
 state 78
 
-    (61) argument -> VARNAME .
-    (42) array_variable -> VARNAME . LSQB VARNAME RSQB LSQB VARNAME RSQB
-    (43) array_variable -> VARNAME . LSQB INTVAL RSQB LSQB VARNAME RSQB
-    (44) array_variable -> VARNAME . LSQB VARNAME RSQB LSQB INTVAL RSQB
-    (45) array_variable -> VARNAME . LSQB VARNAME RSQB
-    (46) array_variable -> VARNAME . LSQB INTVAL RSQB LSQB INTVAL RSQB
-    (47) array_variable -> VARNAME . LSQB INTVAL RSQB
-    COMMA           reduce using rule 61 (argument -> VARNAME .)
-    RPAREN          reduce using rule 61 (argument -> VARNAME .)
-    LSQB            shift and go to state 26
+    (57) function_call -> VARNAME LPAREN argument_list . RPAREN
+    RPAREN          shift and go to state 87
 
 
 state 79
 
-    (56) function_call -> VARNAME LPAREN argument_list . RPAREN
-    RPAREN          shift and go to state 88
+    (58) argument_list -> argument .
+    (59) argument_list -> argument . COMMA argument_list
+    RPAREN          reduce using rule 58 (argument_list -> argument .)
+    COMMA           shift and go to state 88
 
 
 state 80
 
-    (57) argument_list -> argument .
-    (58) argument_list -> argument . COMMA argument_list
-    RPAREN          reduce using rule 57 (argument_list -> argument .)
-    COMMA           shift and go to state 89
+    (60) argument -> array_variable .
+    COMMA           reduce using rule 60 (argument -> array_variable .)
+    RPAREN          reduce using rule 60 (argument -> array_variable .)
 
 
 state 81
 
-    (59) argument -> array_variable .
-    COMMA           reduce using rule 59 (argument -> array_variable .)
-    RPAREN          reduce using rule 59 (argument -> array_variable .)
+    (61) argument -> constant .
+    COMMA           reduce using rule 61 (argument -> constant .)
+    RPAREN          reduce using rule 61 (argument -> constant .)
 
 
 state 82
 
-    (60) argument -> constant .
-    COMMA           reduce using rule 60 (argument -> constant .)
-    RPAREN          reduce using rule 60 (argument -> constant .)
+    (31) expr -> b1_open expr b2_open . AND expr
+    AND             shift and go to state 89
 
 
 state 83
 
-    (30) expr -> b1_open expr b2_open . AND expr
-    AND             shift and go to state 90
+    (43) array_variable -> VARNAME LSQB VARNAME RSQB LSQB . VARNAME RSQB
+    (45) array_variable -> VARNAME LSQB VARNAME RSQB LSQB . INTVAL RSQB
+    VARNAME         shift and go to state 90
+    INTVAL          shift and go to state 91
 
 
 state 84
 
-    (42) array_variable -> VARNAME LSQB VARNAME RSQB LSQB . VARNAME RSQB
-    (44) array_variable -> VARNAME LSQB VARNAME RSQB LSQB . INTVAL RSQB
-    VARNAME         shift and go to state 91
-    INTVAL          shift and go to state 92
+    (44) array_variable -> VARNAME LSQB INTVAL RSQB LSQB . VARNAME RSQB
+    (47) array_variable -> VARNAME LSQB INTVAL RSQB LSQB . INTVAL RSQB
+    VARNAME         shift and go to state 92
+    INTVAL          shift and go to state 93
 
 
 state 85
 
-    (43) array_variable -> VARNAME LSQB INTVAL RSQB LSQB . VARNAME RSQB
-    (46) array_variable -> VARNAME LSQB INTVAL RSQB LSQB . INTVAL RSQB
-    VARNAME         shift and go to state 93
-    INTVAL          shift and go to state 94
+    (11) if_statement -> IF if_paren_open LPAREN expr RPAREN . LBRACE if_open statements if_close RBRACE
+    LBRACE          shift and go to state 94
 
 
 state 86
 
-    (11) if_statement -> IF LPAREN if_paren_open expr RPAREN . LBRACE if_open statements if_close RBRACE
-    LBRACE          shift and go to state 95
+    (27) expr -> LPAREN DATATYPE RPAREN expr .
+    (32) expr -> expr . RELOP2 expr
+    (33) expr -> expr . RELOP1 expr
+    (36) expr -> expr . MOD expr
+    (37) expr -> expr . DIVIDE expr
+    (38) expr -> expr . MULT expr
+    (39) expr -> expr . MINUS expr
+    (40) expr -> expr . PLUS expr
+    RELOP2          reduce using rule 27 (expr -> LPAREN DATATYPE RPAREN expr .)
+    RELOP1          reduce using rule 27 (expr -> LPAREN DATATYPE RPAREN expr .)
+    MOD             reduce using rule 27 (expr -> LPAREN DATATYPE RPAREN expr .)
+    DIVIDE          reduce using rule 27 (expr -> LPAREN DATATYPE RPAREN expr .)
+    MULT            reduce using rule 27 (expr -> LPAREN DATATYPE RPAREN expr .)
+    MINUS           reduce using rule 27 (expr -> LPAREN DATATYPE RPAREN expr .)
+    PLUS            reduce using rule 27 (expr -> LPAREN DATATYPE RPAREN expr .)
+    SEMICOL         reduce using rule 27 (expr -> LPAREN DATATYPE RPAREN expr .)
+    RPAREN          reduce using rule 27 (expr -> LPAREN DATATYPE RPAREN expr .)
+    AND             reduce using rule 27 (expr -> LPAREN DATATYPE RPAREN expr .)
 
 
 state 87
 
-    (25) expr -> LPAREN DATATYPE RPAREN expr .
-    (29) expr -> expr . OR expr
-    (31) expr -> expr . RELOP2 expr
-    (32) expr -> expr . RELOP1 expr
-    (35) expr -> expr . MOD expr
-    (36) expr -> expr . DIVIDE expr
-    (37) expr -> expr . MULT expr
-    (38) expr -> expr . MINUS expr
-    (39) expr -> expr . PLUS expr
-    OR              reduce using rule 25 (expr -> LPAREN DATATYPE RPAREN expr .)
-    RELOP2          reduce using rule 25 (expr -> LPAREN DATATYPE RPAREN expr .)
-    RELOP1          reduce using rule 25 (expr -> LPAREN DATATYPE RPAREN expr .)
-    MOD             reduce using rule 25 (expr -> LPAREN DATATYPE RPAREN expr .)
-    DIVIDE          reduce using rule 25 (expr -> LPAREN DATATYPE RPAREN expr .)
-    MULT            reduce using rule 25 (expr -> LPAREN DATATYPE RPAREN expr .)
-    MINUS           reduce using rule 25 (expr -> LPAREN DATATYPE RPAREN expr .)
-    PLUS            reduce using rule 25 (expr -> LPAREN DATATYPE RPAREN expr .)
-    SEMICOL         reduce using rule 25 (expr -> LPAREN DATATYPE RPAREN expr .)
-    RPAREN          reduce using rule 25 (expr -> LPAREN DATATYPE RPAREN expr .)
-    AND             reduce using rule 25 (expr -> LPAREN DATATYPE RPAREN expr .)
+    (57) function_call -> VARNAME LPAREN argument_list RPAREN .
+    RELOP2          reduce using rule 57 (function_call -> VARNAME LPAREN argument_list RPAREN .)
+    RELOP1          reduce using rule 57 (function_call -> VARNAME LPAREN argument_list RPAREN .)
+    MOD             reduce using rule 57 (function_call -> VARNAME LPAREN argument_list RPAREN .)
+    DIVIDE          reduce using rule 57 (function_call -> VARNAME LPAREN argument_list RPAREN .)
+    MULT            reduce using rule 57 (function_call -> VARNAME LPAREN argument_list RPAREN .)
+    MINUS           reduce using rule 57 (function_call -> VARNAME LPAREN argument_list RPAREN .)
+    PLUS            reduce using rule 57 (function_call -> VARNAME LPAREN argument_list RPAREN .)
+    SEMICOL         reduce using rule 57 (function_call -> VARNAME LPAREN argument_list RPAREN .)
+    RPAREN          reduce using rule 57 (function_call -> VARNAME LPAREN argument_list RPAREN .)
+    AND             reduce using rule 57 (function_call -> VARNAME LPAREN argument_list RPAREN .)
 
 
 state 88
 
-    (56) function_call -> VARNAME LPAREN argument_list RPAREN .
-    OR              reduce using rule 56 (function_call -> VARNAME LPAREN argument_list RPAREN .)
-    RELOP2          reduce using rule 56 (function_call -> VARNAME LPAREN argument_list RPAREN .)
-    RELOP1          reduce using rule 56 (function_call -> VARNAME LPAREN argument_list RPAREN .)
-    MOD             reduce using rule 56 (function_call -> VARNAME LPAREN argument_list RPAREN .)
-    DIVIDE          reduce using rule 56 (function_call -> VARNAME LPAREN argument_list RPAREN .)
-    MULT            reduce using rule 56 (function_call -> VARNAME LPAREN argument_list RPAREN .)
-    MINUS           reduce using rule 56 (function_call -> VARNAME LPAREN argument_list RPAREN .)
-    PLUS            reduce using rule 56 (function_call -> VARNAME LPAREN argument_list RPAREN .)
-    SEMICOL         reduce using rule 56 (function_call -> VARNAME LPAREN argument_list RPAREN .)
-    RPAREN          reduce using rule 56 (function_call -> VARNAME LPAREN argument_list RPAREN .)
-    AND             reduce using rule 56 (function_call -> VARNAME LPAREN argument_list RPAREN .)
-
-
-state 89
-
-    (58) argument_list -> argument COMMA . argument_list
-    (57) argument_list -> . argument
-    (58) argument_list -> . argument COMMA argument_list
-    (59) argument -> . array_variable
-    (60) argument -> . constant
-    (61) argument -> . VARNAME
-    (42) array_variable -> . VARNAME LSQB VARNAME RSQB LSQB VARNAME RSQB
-    (43) array_variable -> . VARNAME LSQB INTVAL RSQB LSQB VARNAME RSQB
-    (44) array_variable -> . VARNAME LSQB VARNAME RSQB LSQB INTVAL RSQB
-    (45) array_variable -> . VARNAME LSQB VARNAME RSQB
-    (46) array_variable -> . VARNAME LSQB INTVAL RSQB LSQB INTVAL RSQB
-    (47) array_variable -> . VARNAME LSQB INTVAL RSQB
-    (51) constant -> . BOOLVAL
-    (52) constant -> . STRINGVAL
-    (53) constant -> . CHARVAL
-    (54) constant -> . FLOATVAL
-    (55) constant -> . INTVAL
-    VARNAME         shift and go to state 78
+    (59) argument_list -> argument COMMA . argument_list
+    (58) argument_list -> . argument
+    (59) argument_list -> . argument COMMA argument_list
+    (60) argument -> . array_variable
+    (61) argument -> . constant
+    (62) argument -> . VARNAME
+    (43) array_variable -> . VARNAME LSQB VARNAME RSQB LSQB VARNAME RSQB
+    (44) array_variable -> . VARNAME LSQB INTVAL RSQB LSQB VARNAME RSQB
+    (45) array_variable -> . VARNAME LSQB VARNAME RSQB LSQB INTVAL RSQB
+    (46) array_variable -> . VARNAME LSQB VARNAME RSQB
+    (47) array_variable -> . VARNAME LSQB INTVAL RSQB LSQB INTVAL RSQB
+    (48) array_variable -> . VARNAME LSQB INTVAL RSQB
+    (52) constant -> . BOOLVAL
+    (53) constant -> . STRINGVAL
+    (54) constant -> . CHARVAL
+    (55) constant -> . FLOATVAL
+    (56) constant -> . INTVAL
+    VARNAME         shift and go to state 77
     BOOLVAL         shift and go to state 37
     STRINGVAL       shift and go to state 38
     CHARVAL         shift and go to state 39
     FLOATVAL        shift and go to state 40
     INTVAL          shift and go to state 41
 
-    argument                       shift and go to state 80
-    argument_list                  shift and go to state 96
-    array_variable                 shift and go to state 81
-    constant                       shift and go to state 82
+    argument                       shift and go to state 79
+    argument_list                  shift and go to state 95
+    array_variable                 shift and go to state 80
+    constant                       shift and go to state 81
 
-state 90
+state 89
 
-    (30) expr -> b1_open expr b2_open AND . expr
-    (24) expr -> . function_call
-    (25) expr -> . LPAREN DATATYPE RPAREN expr
-    (26) expr -> . constant
-    (27) expr -> . VARNAME
-    (28) expr -> . NOT expr
-    (29) expr -> . expr OR expr
-    (30) expr -> . b1_open expr b2_open AND expr
-    (31) expr -> . expr RELOP2 expr
-    (32) expr -> . expr RELOP1 expr
-    (33) expr -> . LPAREN expr RPAREN
-    (34) expr -> . MINUS expr
-    (35) expr -> . expr MOD expr
-    (36) expr -> . expr DIVIDE expr
-    (37) expr -> . expr MULT expr
-    (38) expr -> . expr MINUS expr
-    (39) expr -> . expr PLUS expr
-    (56) function_call -> . VARNAME LPAREN argument_list RPAREN
-    (51) constant -> . BOOLVAL
-    (52) constant -> . STRINGVAL
-    (53) constant -> . CHARVAL
-    (54) constant -> . FLOATVAL
-    (55) constant -> . INTVAL
-    (40) b1_open -> .
-  ! shift/reduce conflict for LPAREN resolved as shift
-  ! shift/reduce conflict for VARNAME resolved as shift
-  ! shift/reduce conflict for NOT resolved as shift
-  ! shift/reduce conflict for MINUS resolved as shift
-  ! shift/reduce conflict for BOOLVAL resolved as shift
-  ! shift/reduce conflict for STRINGVAL resolved as shift
-  ! shift/reduce conflict for CHARVAL resolved as shift
-  ! shift/reduce conflict for FLOATVAL resolved as shift
-  ! shift/reduce conflict for INTVAL resolved as shift
+    (31) expr -> b1_open expr b2_open AND . expr
+    (26) expr -> . function_call
+    (27) expr -> . LPAREN DATATYPE RPAREN expr
+    (28) expr -> . constant
+    (29) expr -> . VARNAME
+    (30) expr -> . NOT expr
+    (31) expr -> . b1_open expr b2_open AND expr
+    (32) expr -> . expr RELOP2 expr
+    (33) expr -> . expr RELOP1 expr
+    (34) expr -> . LPAREN expr RPAREN
+    (35) expr -> . MINUS expr
+    (36) expr -> . expr MOD expr
+    (37) expr -> . expr DIVIDE expr
+    (38) expr -> . expr MULT expr
+    (39) expr -> . expr MINUS expr
+    (40) expr -> . expr PLUS expr
+    (57) function_call -> . VARNAME LPAREN argument_list RPAREN
+    (52) constant -> . BOOLVAL
+    (53) constant -> . STRINGVAL
+    (54) constant -> . CHARVAL
+    (55) constant -> . FLOATVAL
+    (56) constant -> . INTVAL
+    (41) b1_open -> . COMMA
     LPAREN          shift and go to state 31
     VARNAME         shift and go to state 33
     NOT             shift and go to state 34
@@ -2018,70 +1780,69 @@ state 90
     CHARVAL         shift and go to state 39
     FLOATVAL        shift and go to state 40
     INTVAL          shift and go to state 41
+    COMMA           shift and go to state 42
 
     b1_open                        shift and go to state 35
-    expr                           shift and go to state 97
+    expr                           shift and go to state 96
     function_call                  shift and go to state 30
     constant                       shift and go to state 32
 
+state 90
+
+    (43) array_variable -> VARNAME LSQB VARNAME RSQB LSQB VARNAME . RSQB
+    RSQB            shift and go to state 97
+
+
 state 91
 
-    (42) array_variable -> VARNAME LSQB VARNAME RSQB LSQB VARNAME . RSQB
+    (45) array_variable -> VARNAME LSQB VARNAME RSQB LSQB INTVAL . RSQB
     RSQB            shift and go to state 98
 
 
 state 92
 
-    (44) array_variable -> VARNAME LSQB VARNAME RSQB LSQB INTVAL . RSQB
+    (44) array_variable -> VARNAME LSQB INTVAL RSQB LSQB VARNAME . RSQB
     RSQB            shift and go to state 99
 
 
 state 93
 
-    (43) array_variable -> VARNAME LSQB INTVAL RSQB LSQB VARNAME . RSQB
+    (47) array_variable -> VARNAME LSQB INTVAL RSQB LSQB INTVAL . RSQB
     RSQB            shift and go to state 100
 
 
 state 94
 
-    (46) array_variable -> VARNAME LSQB INTVAL RSQB LSQB INTVAL . RSQB
-    RSQB            shift and go to state 101
+    (11) if_statement -> IF if_paren_open LPAREN expr RPAREN LBRACE . if_open statements if_close RBRACE
+    (14) if_open -> .
+    OUTPUT          reduce using rule 14 (if_open -> .)
+    INPUT           reduce using rule 14 (if_open -> .)
+    VARNAME         reduce using rule 14 (if_open -> .)
+    DATATYPE        reduce using rule 14 (if_open -> .)
+    RBRACE          reduce using rule 14 (if_open -> .)
+    IF              reduce using rule 14 (if_open -> .)
 
+    if_open                        shift and go to state 101
 
 state 95
 
-    (11) if_statement -> IF LPAREN if_paren_open expr RPAREN LBRACE . if_open statements if_close RBRACE
-    (12) if_open -> .
-    OUTPUT          reduce using rule 12 (if_open -> .)
-    INPUT           reduce using rule 12 (if_open -> .)
-    VARNAME         reduce using rule 12 (if_open -> .)
-    DATATYPE        reduce using rule 12 (if_open -> .)
-    RBRACE          reduce using rule 12 (if_open -> .)
-    IF              reduce using rule 12 (if_open -> .)
+    (59) argument_list -> argument COMMA argument_list .
+    RPAREN          reduce using rule 59 (argument_list -> argument COMMA argument_list .)
 
-    if_open                        shift and go to state 102
 
 state 96
 
-    (58) argument_list -> argument COMMA argument_list .
-    RPAREN          reduce using rule 58 (argument_list -> argument COMMA argument_list .)
-
-
-state 97
-
-    (30) expr -> b1_open expr b2_open AND expr .
-    (29) expr -> expr . OR expr
-    (31) expr -> expr . RELOP2 expr
-    (32) expr -> expr . RELOP1 expr
-    (35) expr -> expr . MOD expr
-    (36) expr -> expr . DIVIDE expr
-    (37) expr -> expr . MULT expr
-    (38) expr -> expr . MINUS expr
-    (39) expr -> expr . PLUS expr
-    OR              reduce using rule 30 (expr -> b1_open expr b2_open AND expr .)
-    SEMICOL         reduce using rule 30 (expr -> b1_open expr b2_open AND expr .)
-    RPAREN          reduce using rule 30 (expr -> b1_open expr b2_open AND expr .)
-    AND             reduce using rule 30 (expr -> b1_open expr b2_open AND expr .)
+    (31) expr -> b1_open expr b2_open AND expr .
+    (32) expr -> expr . RELOP2 expr
+    (33) expr -> expr . RELOP1 expr
+    (36) expr -> expr . MOD expr
+    (37) expr -> expr . DIVIDE expr
+    (38) expr -> expr . MULT expr
+    (39) expr -> expr . MINUS expr
+    (40) expr -> expr . PLUS expr
+    SEMICOL         reduce using rule 31 (expr -> b1_open expr b2_open AND expr .)
+    RPAREN          reduce using rule 31 (expr -> b1_open expr b2_open AND expr .)
+    AND             reduce using rule 31 (expr -> b1_open expr b2_open AND expr .)
     RELOP2          shift and go to state 49
     RELOP1          shift and go to state 50
     MOD             shift and go to state 51
@@ -2091,41 +1852,41 @@ state 97
     PLUS            shift and go to state 55
 
 
+state 97
+
+    (43) array_variable -> VARNAME LSQB VARNAME RSQB LSQB VARNAME RSQB .
+    ASSIGN          reduce using rule 43 (array_variable -> VARNAME LSQB VARNAME RSQB LSQB VARNAME RSQB .)
+    RPAREN          reduce using rule 43 (array_variable -> VARNAME LSQB VARNAME RSQB LSQB VARNAME RSQB .)
+    COMMA           reduce using rule 43 (array_variable -> VARNAME LSQB VARNAME RSQB LSQB VARNAME RSQB .)
+
+
 state 98
 
-    (42) array_variable -> VARNAME LSQB VARNAME RSQB LSQB VARNAME RSQB .
-    ASSIGN          reduce using rule 42 (array_variable -> VARNAME LSQB VARNAME RSQB LSQB VARNAME RSQB .)
-    RPAREN          reduce using rule 42 (array_variable -> VARNAME LSQB VARNAME RSQB LSQB VARNAME RSQB .)
-    COMMA           reduce using rule 42 (array_variable -> VARNAME LSQB VARNAME RSQB LSQB VARNAME RSQB .)
+    (45) array_variable -> VARNAME LSQB VARNAME RSQB LSQB INTVAL RSQB .
+    ASSIGN          reduce using rule 45 (array_variable -> VARNAME LSQB VARNAME RSQB LSQB INTVAL RSQB .)
+    RPAREN          reduce using rule 45 (array_variable -> VARNAME LSQB VARNAME RSQB LSQB INTVAL RSQB .)
+    COMMA           reduce using rule 45 (array_variable -> VARNAME LSQB VARNAME RSQB LSQB INTVAL RSQB .)
 
 
 state 99
 
-    (44) array_variable -> VARNAME LSQB VARNAME RSQB LSQB INTVAL RSQB .
-    ASSIGN          reduce using rule 44 (array_variable -> VARNAME LSQB VARNAME RSQB LSQB INTVAL RSQB .)
-    RPAREN          reduce using rule 44 (array_variable -> VARNAME LSQB VARNAME RSQB LSQB INTVAL RSQB .)
-    COMMA           reduce using rule 44 (array_variable -> VARNAME LSQB VARNAME RSQB LSQB INTVAL RSQB .)
+    (44) array_variable -> VARNAME LSQB INTVAL RSQB LSQB VARNAME RSQB .
+    ASSIGN          reduce using rule 44 (array_variable -> VARNAME LSQB INTVAL RSQB LSQB VARNAME RSQB .)
+    RPAREN          reduce using rule 44 (array_variable -> VARNAME LSQB INTVAL RSQB LSQB VARNAME RSQB .)
+    COMMA           reduce using rule 44 (array_variable -> VARNAME LSQB INTVAL RSQB LSQB VARNAME RSQB .)
 
 
 state 100
 
-    (43) array_variable -> VARNAME LSQB INTVAL RSQB LSQB VARNAME RSQB .
-    ASSIGN          reduce using rule 43 (array_variable -> VARNAME LSQB INTVAL RSQB LSQB VARNAME RSQB .)
-    RPAREN          reduce using rule 43 (array_variable -> VARNAME LSQB INTVAL RSQB LSQB VARNAME RSQB .)
-    COMMA           reduce using rule 43 (array_variable -> VARNAME LSQB INTVAL RSQB LSQB VARNAME RSQB .)
+    (47) array_variable -> VARNAME LSQB INTVAL RSQB LSQB INTVAL RSQB .
+    ASSIGN          reduce using rule 47 (array_variable -> VARNAME LSQB INTVAL RSQB LSQB INTVAL RSQB .)
+    RPAREN          reduce using rule 47 (array_variable -> VARNAME LSQB INTVAL RSQB LSQB INTVAL RSQB .)
+    COMMA           reduce using rule 47 (array_variable -> VARNAME LSQB INTVAL RSQB LSQB INTVAL RSQB .)
 
 
 state 101
 
-    (46) array_variable -> VARNAME LSQB INTVAL RSQB LSQB INTVAL RSQB .
-    ASSIGN          reduce using rule 46 (array_variable -> VARNAME LSQB INTVAL RSQB LSQB INTVAL RSQB .)
-    RPAREN          reduce using rule 46 (array_variable -> VARNAME LSQB INTVAL RSQB LSQB INTVAL RSQB .)
-    COMMA           reduce using rule 46 (array_variable -> VARNAME LSQB INTVAL RSQB LSQB INTVAL RSQB .)
-
-
-state 102
-
-    (11) if_statement -> IF LPAREN if_paren_open expr RPAREN LBRACE if_open . statements if_close RBRACE
+    (11) if_statement -> IF if_paren_open LPAREN expr RPAREN LBRACE if_open . statements if_close RBRACE
     (1) statements -> .
     (2) statements -> . statement statements
     (3) statement -> . start_selection selection_statement
@@ -2133,22 +1894,22 @@ state 102
     (5) statement -> . assignment_statement SEMICOL
     (6) statement -> . declaration_statement SEMICOL
     (7) start_selection -> .
-    (15) io_statement -> . output_statement
-    (16) io_statement -> . input_statement
-    (48) assignment_statement -> . left_value ASSIGN expr
+    (17) io_statement -> . output_statement
+    (18) io_statement -> . input_statement
+    (49) assignment_statement -> . left_value ASSIGN expr
     (9) declaration_statement -> . simple_init
-    (18) output_statement -> . OUTPUT LPAREN constant RPAREN
-    (19) output_statement -> . OUTPUT LPAREN left_value RPAREN
-    (17) input_statement -> . INPUT LPAREN left_value RPAREN
-    (49) left_value -> . array_variable
-    (50) left_value -> . VARNAME
+    (20) output_statement -> . OUTPUT LPAREN constant RPAREN
+    (21) output_statement -> . OUTPUT LPAREN left_value RPAREN
+    (19) input_statement -> . INPUT LPAREN left_value RPAREN
+    (50) left_value -> . array_variable
+    (51) left_value -> . VARNAME
     (10) simple_init -> . DATATYPE VARNAME
-    (42) array_variable -> . VARNAME LSQB VARNAME RSQB LSQB VARNAME RSQB
-    (43) array_variable -> . VARNAME LSQB INTVAL RSQB LSQB VARNAME RSQB
-    (44) array_variable -> . VARNAME LSQB VARNAME RSQB LSQB INTVAL RSQB
-    (45) array_variable -> . VARNAME LSQB VARNAME RSQB
-    (46) array_variable -> . VARNAME LSQB INTVAL RSQB LSQB INTVAL RSQB
-    (47) array_variable -> . VARNAME LSQB INTVAL RSQB
+    (43) array_variable -> . VARNAME LSQB VARNAME RSQB LSQB VARNAME RSQB
+    (44) array_variable -> . VARNAME LSQB INTVAL RSQB LSQB VARNAME RSQB
+    (45) array_variable -> . VARNAME LSQB VARNAME RSQB LSQB INTVAL RSQB
+    (46) array_variable -> . VARNAME LSQB VARNAME RSQB
+    (47) array_variable -> . VARNAME LSQB INTVAL RSQB LSQB INTVAL RSQB
+    (48) array_variable -> . VARNAME LSQB INTVAL RSQB
     RBRACE          reduce using rule 1 (statements -> .)
     IF              reduce using rule 7 (start_selection -> .)
     OUTPUT          shift and go to state 11
@@ -2156,7 +1917,7 @@ state 102
     VARNAME         shift and go to state 14
     DATATYPE        shift and go to state 15
 
-    statements                     shift and go to state 103
+    statements                     shift and go to state 102
     statement                      shift and go to state 2
     start_selection                shift and go to state 3
     io_statement                   shift and go to state 4
@@ -2168,175 +1929,27 @@ state 102
     simple_init                    shift and go to state 10
     array_variable                 shift and go to state 13
 
+state 102
+
+    (11) if_statement -> IF if_paren_open LPAREN expr RPAREN LBRACE if_open statements . if_close RBRACE
+    (15) if_close -> .
+    RBRACE          reduce using rule 15 (if_close -> .)
+
+    if_close                       shift and go to state 103
+
 state 103
 
-    (11) if_statement -> IF LPAREN if_paren_open expr RPAREN LBRACE if_open statements . if_close RBRACE
-    (13) if_close -> .
-    RBRACE          reduce using rule 13 (if_close -> .)
+    (11) if_statement -> IF if_paren_open LPAREN expr RPAREN LBRACE if_open statements if_close . RBRACE
+    RBRACE          shift and go to state 104
 
-    if_close                       shift and go to state 104
 
 state 104
 
-    (11) if_statement -> IF LPAREN if_paren_open expr RPAREN LBRACE if_open statements if_close . RBRACE
-    RBRACE          shift and go to state 105
-
-
-state 105
-
-    (11) if_statement -> IF LPAREN if_paren_open expr RPAREN LBRACE if_open statements if_close RBRACE .
-    OUTPUT          reduce using rule 11 (if_statement -> IF LPAREN if_paren_open expr RPAREN LBRACE if_open statements if_close RBRACE .)
-    INPUT           reduce using rule 11 (if_statement -> IF LPAREN if_paren_open expr RPAREN LBRACE if_open statements if_close RBRACE .)
-    VARNAME         reduce using rule 11 (if_statement -> IF LPAREN if_paren_open expr RPAREN LBRACE if_open statements if_close RBRACE .)
-    DATATYPE        reduce using rule 11 (if_statement -> IF LPAREN if_paren_open expr RPAREN LBRACE if_open statements if_close RBRACE .)
-    IF              reduce using rule 11 (if_statement -> IF LPAREN if_paren_open expr RPAREN LBRACE if_open statements if_close RBRACE .)
-    $end            reduce using rule 11 (if_statement -> IF LPAREN if_paren_open expr RPAREN LBRACE if_open statements if_close RBRACE .)
-    RBRACE          reduce using rule 11 (if_statement -> IF LPAREN if_paren_open expr RPAREN LBRACE if_open statements if_close RBRACE .)
-
-
-Conflicts:
-
-shift/reduce conflict for LPAREN in state 23 resolved as shift
-shift/reduce conflict for VARNAME in state 23 resolved as shift
-shift/reduce conflict for NOT in state 23 resolved as shift
-shift/reduce conflict for MINUS in state 23 resolved as shift
-shift/reduce conflict for BOOLVAL in state 23 resolved as shift
-shift/reduce conflict for STRINGVAL in state 23 resolved as shift
-shift/reduce conflict for CHARVAL in state 23 resolved as shift
-shift/reduce conflict for FLOATVAL in state 23 resolved as shift
-shift/reduce conflict for INTVAL in state 23 resolved as shift
-shift/reduce conflict for LPAREN in state 31 resolved as shift
-shift/reduce conflict for VARNAME in state 31 resolved as shift
-shift/reduce conflict for NOT in state 31 resolved as shift
-shift/reduce conflict for MINUS in state 31 resolved as shift
-shift/reduce conflict for BOOLVAL in state 31 resolved as shift
-shift/reduce conflict for STRINGVAL in state 31 resolved as shift
-shift/reduce conflict for CHARVAL in state 31 resolved as shift
-shift/reduce conflict for FLOATVAL in state 31 resolved as shift
-shift/reduce conflict for INTVAL in state 31 resolved as shift
-shift/reduce conflict for LPAREN in state 34 resolved as shift
-shift/reduce conflict for VARNAME in state 34 resolved as shift
-shift/reduce conflict for NOT in state 34 resolved as shift
-shift/reduce conflict for MINUS in state 34 resolved as shift
-shift/reduce conflict for BOOLVAL in state 34 resolved as shift
-shift/reduce conflict for STRINGVAL in state 34 resolved as shift
-shift/reduce conflict for CHARVAL in state 34 resolved as shift
-shift/reduce conflict for FLOATVAL in state 34 resolved as shift
-shift/reduce conflict for INTVAL in state 34 resolved as shift
-shift/reduce conflict for LPAREN in state 35 resolved as shift
-shift/reduce conflict for VARNAME in state 35 resolved as shift
-shift/reduce conflict for NOT in state 35 resolved as shift
-shift/reduce conflict for MINUS in state 35 resolved as shift
-shift/reduce conflict for BOOLVAL in state 35 resolved as shift
-shift/reduce conflict for STRINGVAL in state 35 resolved as shift
-shift/reduce conflict for CHARVAL in state 35 resolved as shift
-shift/reduce conflict for FLOATVAL in state 35 resolved as shift
-shift/reduce conflict for INTVAL in state 35 resolved as shift
-shift/reduce conflict for LPAREN in state 36 resolved as shift
-shift/reduce conflict for VARNAME in state 36 resolved as shift
-shift/reduce conflict for NOT in state 36 resolved as shift
-shift/reduce conflict for MINUS in state 36 resolved as shift
-shift/reduce conflict for BOOLVAL in state 36 resolved as shift
-shift/reduce conflict for STRINGVAL in state 36 resolved as shift
-shift/reduce conflict for CHARVAL in state 36 resolved as shift
-shift/reduce conflict for FLOATVAL in state 36 resolved as shift
-shift/reduce conflict for INTVAL in state 36 resolved as shift
-shift/reduce conflict for LPAREN in state 47 resolved as shift
-shift/reduce conflict for VARNAME in state 47 resolved as shift
-shift/reduce conflict for NOT in state 47 resolved as shift
-shift/reduce conflict for MINUS in state 47 resolved as shift
-shift/reduce conflict for BOOLVAL in state 47 resolved as shift
-shift/reduce conflict for STRINGVAL in state 47 resolved as shift
-shift/reduce conflict for CHARVAL in state 47 resolved as shift
-shift/reduce conflict for FLOATVAL in state 47 resolved as shift
-shift/reduce conflict for INTVAL in state 47 resolved as shift
-shift/reduce conflict for LPAREN in state 48 resolved as shift
-shift/reduce conflict for VARNAME in state 48 resolved as shift
-shift/reduce conflict for NOT in state 48 resolved as shift
-shift/reduce conflict for MINUS in state 48 resolved as shift
-shift/reduce conflict for BOOLVAL in state 48 resolved as shift
-shift/reduce conflict for STRINGVAL in state 48 resolved as shift
-shift/reduce conflict for CHARVAL in state 48 resolved as shift
-shift/reduce conflict for FLOATVAL in state 48 resolved as shift
-shift/reduce conflict for INTVAL in state 48 resolved as shift
-shift/reduce conflict for LPAREN in state 49 resolved as shift
-shift/reduce conflict for VARNAME in state 49 resolved as shift
-shift/reduce conflict for NOT in state 49 resolved as shift
-shift/reduce conflict for MINUS in state 49 resolved as shift
-shift/reduce conflict for BOOLVAL in state 49 resolved as shift
-shift/reduce conflict for STRINGVAL in state 49 resolved as shift
-shift/reduce conflict for CHARVAL in state 49 resolved as shift
-shift/reduce conflict for FLOATVAL in state 49 resolved as shift
-shift/reduce conflict for INTVAL in state 49 resolved as shift
-shift/reduce conflict for LPAREN in state 50 resolved as shift
-shift/reduce conflict for VARNAME in state 50 resolved as shift
-shift/reduce conflict for NOT in state 50 resolved as shift
-shift/reduce conflict for MINUS in state 50 resolved as shift
-shift/reduce conflict for BOOLVAL in state 50 resolved as shift
-shift/reduce conflict for STRINGVAL in state 50 resolved as shift
-shift/reduce conflict for CHARVAL in state 50 resolved as shift
-shift/reduce conflict for FLOATVAL in state 50 resolved as shift
-shift/reduce conflict for INTVAL in state 50 resolved as shift
-shift/reduce conflict for LPAREN in state 51 resolved as shift
-shift/reduce conflict for VARNAME in state 51 resolved as shift
-shift/reduce conflict for NOT in state 51 resolved as shift
-shift/reduce conflict for MINUS in state 51 resolved as shift
-shift/reduce conflict for BOOLVAL in state 51 resolved as shift
-shift/reduce conflict for STRINGVAL in state 51 resolved as shift
-shift/reduce conflict for CHARVAL in state 51 resolved as shift
-shift/reduce conflict for FLOATVAL in state 51 resolved as shift
-shift/reduce conflict for INTVAL in state 51 resolved as shift
-shift/reduce conflict for LPAREN in state 52 resolved as shift
-shift/reduce conflict for VARNAME in state 52 resolved as shift
-shift/reduce conflict for NOT in state 52 resolved as shift
-shift/reduce conflict for MINUS in state 52 resolved as shift
-shift/reduce conflict for BOOLVAL in state 52 resolved as shift
-shift/reduce conflict for STRINGVAL in state 52 resolved as shift
-shift/reduce conflict for CHARVAL in state 52 resolved as shift
-shift/reduce conflict for FLOATVAL in state 52 resolved as shift
-shift/reduce conflict for INTVAL in state 52 resolved as shift
-shift/reduce conflict for LPAREN in state 53 resolved as shift
-shift/reduce conflict for VARNAME in state 53 resolved as shift
-shift/reduce conflict for NOT in state 53 resolved as shift
-shift/reduce conflict for MINUS in state 53 resolved as shift
-shift/reduce conflict for BOOLVAL in state 53 resolved as shift
-shift/reduce conflict for STRINGVAL in state 53 resolved as shift
-shift/reduce conflict for CHARVAL in state 53 resolved as shift
-shift/reduce conflict for FLOATVAL in state 53 resolved as shift
-shift/reduce conflict for INTVAL in state 53 resolved as shift
-shift/reduce conflict for LPAREN in state 54 resolved as shift
-shift/reduce conflict for VARNAME in state 54 resolved as shift
-shift/reduce conflict for NOT in state 54 resolved as shift
-shift/reduce conflict for MINUS in state 54 resolved as shift
-shift/reduce conflict for BOOLVAL in state 54 resolved as shift
-shift/reduce conflict for STRINGVAL in state 54 resolved as shift
-shift/reduce conflict for CHARVAL in state 54 resolved as shift
-shift/reduce conflict for FLOATVAL in state 54 resolved as shift
-shift/reduce conflict for INTVAL in state 54 resolved as shift
-shift/reduce conflict for LPAREN in state 55 resolved as shift
-shift/reduce conflict for VARNAME in state 55 resolved as shift
-shift/reduce conflict for NOT in state 55 resolved as shift
-shift/reduce conflict for MINUS in state 55 resolved as shift
-shift/reduce conflict for BOOLVAL in state 55 resolved as shift
-shift/reduce conflict for STRINGVAL in state 55 resolved as shift
-shift/reduce conflict for CHARVAL in state 55 resolved as shift
-shift/reduce conflict for FLOATVAL in state 55 resolved as shift
-shift/reduce conflict for INTVAL in state 55 resolved as shift
-shift/reduce conflict for LPAREN in state 76 resolved as shift
-shift/reduce conflict for VARNAME in state 76 resolved as shift
-shift/reduce conflict for NOT in state 76 resolved as shift
-shift/reduce conflict for MINUS in state 76 resolved as shift
-shift/reduce conflict for BOOLVAL in state 76 resolved as shift
-shift/reduce conflict for STRINGVAL in state 76 resolved as shift
-shift/reduce conflict for CHARVAL in state 76 resolved as shift
-shift/reduce conflict for FLOATVAL in state 76 resolved as shift
-shift/reduce conflict for INTVAL in state 76 resolved as shift
-shift/reduce conflict for LPAREN in state 90 resolved as shift
-shift/reduce conflict for VARNAME in state 90 resolved as shift
-shift/reduce conflict for NOT in state 90 resolved as shift
-shift/reduce conflict for MINUS in state 90 resolved as shift
-shift/reduce conflict for BOOLVAL in state 90 resolved as shift
-shift/reduce conflict for STRINGVAL in state 90 resolved as shift
-shift/reduce conflict for CHARVAL in state 90 resolved as shift
-shift/reduce conflict for FLOATVAL in state 90 resolved as shift
-shift/reduce conflict for INTVAL in state 90 resolved as shift
+    (11) if_statement -> IF if_paren_open LPAREN expr RPAREN LBRACE if_open statements if_close RBRACE .
+    OUTPUT          reduce using rule 11 (if_statement -> IF if_paren_open LPAREN expr RPAREN LBRACE if_open statements if_close RBRACE .)
+    INPUT           reduce using rule 11 (if_statement -> IF if_paren_open LPAREN expr RPAREN LBRACE if_open statements if_close RBRACE .)
+    VARNAME         reduce using rule 11 (if_statement -> IF if_paren_open LPAREN expr RPAREN LBRACE if_open statements if_close RBRACE .)
+    DATATYPE        reduce using rule 11 (if_statement -> IF if_paren_open LPAREN expr RPAREN LBRACE if_open statements if_close RBRACE .)
+    IF              reduce using rule 11 (if_statement -> IF if_paren_open LPAREN expr RPAREN LBRACE if_open statements if_close RBRACE .)
+    $end            reduce using rule 11 (if_statement -> IF if_paren_open LPAREN expr RPAREN LBRACE if_open statements if_close RBRACE .)
+    RBRACE          reduce using rule 11 (if_statement -> IF if_paren_open LPAREN expr RPAREN LBRACE if_open statements if_close RBRACE .)
