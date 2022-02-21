@@ -1,4 +1,8 @@
-
-if(, true && true){
-    a = b+c+d;
+int @start()
+{
+    if (true && true)
+        {
+            ``int I;
+            int I;``
+        }
 }
