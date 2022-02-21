@@ -33,7 +33,7 @@ class Operator(Enum):
 
     
 class AstNode:
-    def __init__(self, operator=None, left=None, mid=None, right=None, value=None, next_label=None) :
+    def __init__(self, operator=None, left=None, mid=None, right=None, value=None, next_label=None):
         self.operator = operator
         self.left = left
         self.mid = mid
@@ -43,7 +43,7 @@ class AstNode:
         self.true = None
         self.false = None
 
-        self.code = "None"
+        self.code = None
         self.next = next_label
 
     @staticmethod
@@ -60,27 +60,30 @@ class AstNode:
             left, right = head.left, head.right
             
             if left and right:
+                head.next=get_new_label()
                 right.next = head.next
-                AstNode.generateCode(right, get_new_label)
-                head.code += left.next + ":\n" + right.code     
-            elif left:
                 left.next = get_new_label()
                 AstNode.generateCode(left, get_new_label)
                 head.code = left.code + "\n"
-            
+                AstNode.generateCode(right, get_new_label)
+                head.code += left.next + ":\n" + right.code + "\n" + head.next + ":"
+            elif left:
+                head.next=get_new_label()
+                left.next = get_new_label()
+                AstNode.generateCode(left, get_new_label)
+                head.code = left.code
             elif right:
+                head.next=get_new_label()
                 right.next = head.next
                 AstNode.generateCode(right, get_new_label)
-                head.code = right.code
+                head.code = '\n' + right.code + "\n" + head.next + ":"
 
         # ------------------------------------------------------------
 
         elif head.operator == Operator.A_FUNC:
             left, right = head.left, head.right
-            print('first:',right.code)
 
             AstNode.generateCode(right,get_new_label)
-            print('second:',right.code)
             
             head.code = right.code + "\n" + head.next + ":\n" + "return\n"
 
@@ -104,6 +107,10 @@ class AstNode:
         # ------------------------------------------------------------
 
         elif head.operator == Operator.A_OR:
+
+            left, right = head.left, head.right
+            true, false = head.true, head.false
+            
             left.true = true
             left.false = get_new_label()
             right.true = true
@@ -122,15 +129,15 @@ class AstNode:
             expr.false = head.next
             statements.next = head.next
             AstNode.generateCode(expr, get_new_label)
-            print('afjadfjlaas',statements.code)
+            AstNode.generateCode(statements, get_new_label)
             head.code = expr.code + "\n" + expr.true + ":\n" + statements.code + "\n"
 
         # ------------------------------------------------------------
 
         elif head.operator == Operator.A_CONST:
             if head.value == "true":
-                head.code = "goto " + head.true + "\n"
+                head.code = "goto " + head.true
             elif head.value == "false":
-                head.code = "goto " + head.false + "\n" 
+                head.code = "goto " + head.false
 
         # --------------------------------------------------------------------

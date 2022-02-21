@@ -68,14 +68,14 @@ Rule 64    empty -> <empty>
 
 Unused terminals:
 
+    SWITCH
+    FOR
+    FUZZY
     DEFAULT
     COLON
-    SWITCH
     CASE
-    FOR
-    ELSE
     ELIF
-    FUZZY
+    ELSE
     WHILE
 
 Terminals, with rules where they appear:
