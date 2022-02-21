@@ -12,7 +12,7 @@ symbol_table : {
         'size' : 4,
         'line_no' : 1,
         'scope' : 'global',
-    
+
 }
 
 { id -> 1
@@ -138,6 +138,7 @@ class Parser(SlyParser):
     # method -> DATATYPE FUNCNAME ( params ) { statements }
     @_('DATATYPE FUNCNAME LPAREN params RPAREN LBRACE statements RBRACE')
     def method(self,p):
+        # return AstNode(Operator.A_FUNC,left=p.params,right=p.statements)
         return AstNode(Operator.A_FUNC,left=p.params,right=p.statements, next_label=self.get_new_label())
 
     # params -> DATATYPE VARNAME, params | e
@@ -193,8 +194,7 @@ class Parser(SlyParser):
         val.code = p.DATATYPE + " " + p.VARNAME
         return val
 
-
-    # if_statement -> IF ( expr ) { statements if_close }
+    # if_statement -> IF ( expr ) { statements }
     @_("IF LPAREN expr RPAREN LBRACE statements RBRACE")
     def if_statement(self, p):
         return AstNode(Operator.A_IF, left=p.expr, right=p.statements)
@@ -253,7 +253,6 @@ class Parser(SlyParser):
     def expr(self, p):
         pass
 
-
     @_('expr MULT expr')
     def expr(self, p):
         pass
@@ -266,7 +265,6 @@ class Parser(SlyParser):
     def expr(self, p):
         pass
 
-
     @_('MINUS expr %prec UMINUS')
     def expr(self, p):
         pass
@@ -274,8 +272,6 @@ class Parser(SlyParser):
     @_('LPAREN expr RPAREN %prec PAREN')
     def expr(self, p):
         return p.expr
-    
- 
     
     @_('expr RELOP1 expr')
     def expr(self, p):

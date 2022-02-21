@@ -1,8 +1,8 @@
 int @start()
 {
-    if (true && true)
+    if (false || true && false)
         {
-            ``int I;
-            int I;``
+            int I;
+            int I;
         }
 }
