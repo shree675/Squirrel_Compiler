@@ -1,4 +1,5 @@
 **/__pycache__
+**/parser.out
 env
 .vscode
-SyntaxAnalysis/parser.out
+squirrel_compiler.egg-info

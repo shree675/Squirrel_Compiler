@@ -1,4 +1,3 @@
-from marshal import dump
 from sly import Lexer as SlyLexer
 
 class Lexer(SlyLexer):

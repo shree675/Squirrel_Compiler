@@ -1,9 +1,11 @@
 from sly import Parser as SlyParser
-import sys
-import os
-sys.path.append(os.path.abspath('../LexicalAnalysis'))
-import lexer
 from AstNode import Operator, AstNode
+from LexicalAnalysis import lexer
+import os
+
+TEST_SUITES_DIR = "..\\TestSuites\\" if os.getcwd().endswith("SyntaxAnalysis") else "TestSuites//"
+
+print(os.getcwd())
 
 '''
 symbol_table : {
@@ -439,7 +441,7 @@ if __name__ == '__main__':
     lex = lexer.Lexer()
     parser = Parser()
 
-    with open("../TestSuites/TACtest.sq", 'r') as f:
+    with open(TEST_SUITES_DIR + "TACtest.sq", 'r') as f:
         text = f.read()
 
     parser.parse(lex.tokenize(text))
