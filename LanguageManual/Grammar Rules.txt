@@ -25,8 +25,8 @@ array_list = constant, array_list | constant
 ✓ output_statement -> OUTPUT ( left_value ) | OUTPUT ( constant )
 
 selection_statement -> if_statement | switch_statement
-if_statement -> IF ( expr ) { statements } | IF ( expr ) { statements} ELSE { statements} | IF ( expr ) { statements} elif | IF ( expr ) { statements} elif ELSE { statements}
-elif -> ELIF ( expr ) { statements } elif | ELIF ( expr ) { statements }
+if_statement -> IF ( expr ) { statements } | IF ( expr ) { statements} ELSE { statements} | IF ( expr ) { statements} elif
+elif -> ELIF ( expr ) { statements } elif | ELIF ( expr ) { statements } | ELIF ( expr ) { statements } ELSE { statements }
 
 switch_statement -> SWITCH ( left_value ) { case_statements }
 case_statements -> case_statement case_statements | case_statement | default_statement

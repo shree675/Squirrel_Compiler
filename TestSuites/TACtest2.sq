@@ -1,0 +1,5 @@
+void @start(){
+    while(true || false){
+        int i;
+    }
+}

@@ -179,6 +179,38 @@ class Parser(SlyParser):
     def statement(self, p):
         return p.selection_statement
 
+    @_('iteration_statement')
+    def statement(self, p):
+        return p.iteration_statement
+
+    # interation_statement -> while_statement | for_statement
+    @_('while_statement')
+    def iteration_statement(self, p):
+        return p.while_statement
+
+    @_('for_statement')
+    def iteration_statement(self, p):
+        return p.for_statement
+
+    # while_statement -> WHILE ( expr ) { statements }
+    @_('WHILE LPAREN expr RPAREN LBRACE statements RBRACE')
+    def while_statement(self, p):
+        return AstNode(Operator.A_WHILE, left=p.expr, right=p.statements)
+
+    # for_statement -> FOR ( for_init ; expr ; assignment_statement ) { statements }
+    @_('FOR LPAREN for_init SEMICOL expr SEMICOL assignment_statement RPAREN LBRACE statements RBRACE')
+    def for_statement(self, p):
+        pass
+
+    # for_init -> DATATYPE VARNAME = expr | VARNAME = expr
+    @_('DATATYPE VARNAME ASSIGN expr')
+    def for_init(self, p):
+        pass
+
+    @_('VARNAME ASSIGN expr')
+    def for_init(self, p):
+        pass
+
     @_("if_statement")
     def selection_statement(self, p):
         return p.if_statement
@@ -210,9 +242,7 @@ class Parser(SlyParser):
     def if_statement(self, p):
         return AstNode(Operator.A_IFELSE, left=p.expr, mid=p.statements, right=p.elif_statement)
 
-    # TODO: if_statement -> IF ( expr ) { statements} elif ELSE { statements}
-
-    # elif -> ELIF ( expr ) { statements } elif | ELIF ( expr ) { statements }
+    # elif -> ELIF ( expr ) { statements } elif | ELIF ( expr ) { statements } | ELIF ( expr ) { statements } ELSE { statements }
     @_("ELIF LPAREN expr RPAREN LBRACE statements RBRACE elif_statement")
     def elif_statement(self, p):
         return AstNode(Operator.A_ELIFMULTIPLE, left=p.expr, mid=p.statements, right=p.elif_statement)
@@ -220,6 +250,10 @@ class Parser(SlyParser):
     @_("ELIF LPAREN expr RPAREN LBRACE statements RBRACE")
     def elif_statement(self, p):
         return AstNode(Operator.A_ELIFSINGLE, left=p.expr, right=p.statements)
+
+    @_("ELIF LPAREN expr RPAREN LBRACE statements RBRACE ELSE LBRACE statements RBRACE")
+    def elif_statement(self, p):
+        return AstNode(Operator.A_IFELIFELSE, left=p.expr, mid=p.statements0, right=p.statements1)
 
     # io_statement -> input_statement | output_statement
     @_('input_statement')
@@ -383,7 +417,6 @@ class Parser(SlyParser):
         }
 
     # left_value -> VARNAME | array_variable
-
     @_('VARNAME')
     def left_value(self, p):
         return str(p[0])
@@ -393,7 +426,6 @@ class Parser(SlyParser):
         return str(p[0])
 
     # constant -> INTVAL | FLOATVAL | CHARVAL | STRINGVAL | BOOLVAL
-
     @_('INTVAL')
     def constant(self, p):
         return str(p[0])
