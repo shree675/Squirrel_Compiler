@@ -1,8 +1,11 @@
-int @start()
-{
-    if (false || true && false)
-        {
-            int I;
-            int I;
-        }
+int @start(){
+    if(false || true && false){
+        int i;
+    }
+    elif(true || false){
+        int j;
+    }
+    elif(true){
+        int k;
+    }
 }
