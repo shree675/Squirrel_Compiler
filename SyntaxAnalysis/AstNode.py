@@ -30,11 +30,12 @@ class Operator(Enum):
     A_NODE = "node"
     A_ROOT = "root"
     A_DECL = "decl"
-    A_IFELSE = "ifelse"
+    A_IFELSE = "if else"
     A_CONTINUE = "continue"
-    A_IFELIF = "ifelif"
-    A_ELIFSINGLE = "elifsingle"
-    A_ELIFMULTIPLE = "elifmultiple"
+    A_IFELIF = "if elif"
+    A_ELIFSINGLE = "elif single"
+    A_ELIFMULTIPLE = "elif multiple"
+    A_IFELIFELSE = "if elif else"
 
 
 class AstNode:
@@ -150,8 +151,9 @@ class AstNode:
 
         # ------------------------------------------------------------
 
-        elif head.operator == Operator.A_IFELSE or head.operator == Operator.A_ELIFMULTIPLE:
+        elif head.operator == Operator.A_IFELSE or head.operator == Operator.A_ELIFMULTIPLE or head.operator == Operator.A_IFELIFELSE:
             expr, statements1, statements2 = head.left, head.mid, head.right
+
             expr.true = get_new_label()
             expr.false = get_new_label()
             statements1.next = head.next
@@ -163,6 +165,22 @@ class AstNode:
 
             head.code = expr.code + "\n" + expr.true + ":\n" + statements1.code + "\n" + \
                 "goto " + head.next + "\n" + expr.false + ":\n" + statements2.code + "\n"
+
+        # ------------------------------------------------------------
+
+        elif head.operator == Operator.A_WHILE:
+            expr, statements = head.left, head.right
+
+            begin = get_new_label()
+            expr.true = get_new_label()
+            expr.false = head.next
+            statements.next = begin
+
+            AstNode.generateCode(expr, get_new_label)
+            AstNode.generateCode(statements, get_new_label)
+
+            head.code = begin + ":\n" + expr.code + "\n" + expr.true + ":\n" + statements.code + "\n" + \
+                "goto " + begin
 
         # ------------------------------------------------------------
 

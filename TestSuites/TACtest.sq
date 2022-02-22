@@ -2,10 +2,13 @@ int @start(){
     if(false || true && false){
         int i;
     }
-    elif(true || false){
+    elif(false || false){
         int j;
     }
-    elif(true){
+    elif(false){
         int k;
+    }
+    else{
+        int x;
     }
 }

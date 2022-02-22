@@ -14,7 +14,7 @@ int i
 L9:
 goto L3
 L6:
-goto L11
+goto L13
 L13:
 goto L12
 
@@ -25,12 +25,18 @@ int j
 L14:
 goto L3
 L12:
-goto L16
+goto L17
 L16:
 
-L18:
+L19:
 int k
+L18:
+goto L3
 L17:
+
+L21:
+int x
+L20:
 
 
 
