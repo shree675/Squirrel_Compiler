@@ -3,7 +3,8 @@ from AstNode import Operator, AstNode
 from LexicalAnalysis import lexer
 import os
 
-TEST_SUITES_DIR = "..\\TestSuites\\" if os.getcwd().endswith("SyntaxAnalysis") else "TestSuites//"
+TEST_SUITES_DIR = "..\\TestSuites\\" if os.getcwd().endswith(
+    "SyntaxAnalysis") else "TestSuites//"
 
 print(os.getcwd())
 
@@ -14,7 +15,6 @@ symbol_table : {
         'size' : 4,
         'line_no' : 1,
         'scope' : 'global',
-
 }
 
 { id -> 1
@@ -101,7 +101,7 @@ class Parser(SlyParser):
     def get_new_label(self):
         self.num_labels += 1
         return "L" + str(self.num_labels - 1)
-    
+
     start = "program"
     tokens = lexer.Lexer.tokens
 
@@ -124,34 +124,34 @@ class Parser(SlyParser):
     # program -> methods
     @_('methods')
     def program(self, p):
-        val = AstNode(Operator.A_ROOT,left=p.methods)
+        val = AstNode(Operator.A_ROOT, left=p.methods)
         AstNode.generateCode(val, self.get_new_label)
 
     # methods -> methods method
     @_('methods method')
     def methods(self, p):
-        return AstNode(Operator.A_NODE,left=p.methods, right=p.method)
+        return AstNode(Operator.A_NODE, left=p.methods, right=p.method)
 
     @_('method')
     def methods(self, p):
-        return AstNode(Operator.A_NODE,left=p.method)
+        return AstNode(Operator.A_NODE, left=p.method)
 
     # method -> DATATYPE FUNCNAME ( params ) { statements }
     @_('DATATYPE FUNCNAME LPAREN params RPAREN LBRACE statements RBRACE')
-    def method(self,p):
+    def method(self, p):
         # return AstNode(Operator.A_FUNC,left=p.params,right=p.statements)
-        return AstNode(Operator.A_FUNC,left=p.params,right=p.statements, next_label=self.get_new_label())
+        return AstNode(Operator.A_FUNC, left=p.params, right=p.statements, next_label=self.get_new_label())
 
     # params -> DATATYPE VARNAME, params | e
     @_('DATATYPE VARNAME COMMA params')
-    def params(self,p):
+    def params(self, p):
         return None
 
     @_('empty')
-    def params(self,p):
+    def params(self, p):
         return None
 
-    # statements -> statements statement 
+    # statements -> statements statement
     @_("statements statement")
     def statements(self, p):
         return AstNode(Operator.A_NODE, left=p.statements, right=p.statement)
@@ -178,11 +178,11 @@ class Parser(SlyParser):
     @_('selection_statement')
     def statement(self, p):
         return p.selection_statement
-    
+
     @_("if_statement")
     def selection_statement(self, p):
         return p.if_statement
-    
+
     # declaration_statement -> simple_init | array_init
     @_("simple_init")
     def declaration_statement(self, p):
@@ -199,6 +199,27 @@ class Parser(SlyParser):
     @_("IF LPAREN expr RPAREN LBRACE statements RBRACE")
     def if_statement(self, p):
         return AstNode(Operator.A_IF, left=p.expr, right=p.statements)
+
+    # if_statement -> IF ( expr ) { statements } else { statements }
+    @_("IF LPAREN expr RPAREN LBRACE statements RBRACE ELSE LBRACE statements RBRACE")
+    def if_statement(self, p):
+        return AstNode(Operator.A_IFELSE, left=p.expr, mid=p.statements0, right=p.statements1)
+
+    # if_statement -> IF ( expr ) { statements} elif
+    @_('IF LPAREN expr RPAREN LBRACE statements RBRACE elif_statement')
+    def if_statement(self, p):
+        return AstNode(Operator.A_IFELSE, left=p.expr, mid=p.statements, right=p.elif_statement)
+
+    # TODO: if_statement -> IF ( expr ) { statements} elif ELSE { statements}
+
+    # elif -> ELIF ( expr ) { statements } elif | ELIF ( expr ) { statements }
+    @_("ELIF LPAREN expr RPAREN LBRACE statements RBRACE elif_statement")
+    def elif_statement(self, p):
+        return AstNode(Operator.A_ELIFMULTIPLE, left=p.expr, mid=p.statements, right=p.elif_statement)
+
+    @_("ELIF LPAREN expr RPAREN LBRACE statements RBRACE")
+    def elif_statement(self, p):
+        return AstNode(Operator.A_ELIFSINGLE, left=p.expr, right=p.statements)
 
     # io_statement -> input_statement | output_statement
     @_('input_statement')
@@ -273,7 +294,7 @@ class Parser(SlyParser):
     @_('LPAREN expr RPAREN %prec PAREN')
     def expr(self, p):
         return p.expr
-    
+
     @_('expr RELOP1 expr')
     def expr(self, p):
         return str('('+p.expr0+p[1]+p.expr1+')')
@@ -281,7 +302,7 @@ class Parser(SlyParser):
     @_('expr RELOP2 expr')
     def expr(self, p):
         return str('('+p.expr0+p[1]+p.expr1+')')
-    
+
     @_("COMMA")
     def b1_open(self, p):
         pass
@@ -289,10 +310,10 @@ class Parser(SlyParser):
     @_('')
     def b2_open(self, p):
         print("b2_open")
-        
+
     @_('expr AND expr')
     def expr(self, p):
-        return AstNode(Operator.A_AND, left=p.expr0, right=p.expr1)        
+        return AstNode(Operator.A_AND, left=p.expr0, right=p.expr1)
 
     @_('expr OR expr')
     def expr(self, p):
@@ -307,14 +328,14 @@ class Parser(SlyParser):
     def expr(self, p):
         print("varname : " + p.VARNAME)
         return {
-            "addr" : p.VARNAME,
-            "code" : ""
+            "addr": p.VARNAME,
+            "code": ""
         }
 
     # expr -> constant
     @_('constant')
     def expr(self, p):
-        return AstNode(Operator.A_BOOLCONST,value=p.constant)
+        return AstNode(Operator.A_BOOLCONST, value=p.constant)
 
     # expr -> (DATATYPE) expr
     @_('LPAREN DATATYPE RPAREN expr %prec TYPECASTING')
@@ -326,7 +347,6 @@ class Parser(SlyParser):
     # arr_variable -> VARNAME [INTVAL] | VARNAME [INTVAL][INTVAL] | VARNAME [VARNAME] | VARNAME [VARNAME][VARNAME] | VARNAME [INTVAL][VARNAME] | VARNAME [VARNAME][INTVAL]
     @_('VARNAME LSQB INTVAL RSQB')
     def array_variable(self, p):
-
         '''return {
             "code"
             "addr"
@@ -359,11 +379,11 @@ class Parser(SlyParser):
     @_('left_value ASSIGN expr')
     def assignment_statement(self, p):
         return {
-            "code" : p.expr["code"] + str(p.left_value + '=' + p.expr["addr"]) + "\n"
+            "code": p.expr["code"] + str(p.left_value + '=' + p.expr["addr"]) + "\n"
         }
-        
 
     # left_value -> VARNAME | array_variable
+
     @_('VARNAME')
     def left_value(self, p):
         return str(p[0])
@@ -372,8 +392,8 @@ class Parser(SlyParser):
     def left_value(self, p):
         return str(p[0])
 
-
     # constant -> INTVAL | FLOATVAL | CHARVAL | STRINGVAL | BOOLVAL
+
     @_('INTVAL')
     def constant(self, p):
         return str(p[0])
@@ -425,17 +445,16 @@ class Parser(SlyParser):
     def empty(self, p):
         pass
 
-    #def error(self, p):
-        #if p:
-            #print("Syntax error at line", p.lineno, "| TOKEN:", p.value)
-            #
-        #else:
-            #print("Syntax error at EOF")
+    # def error(self, p):
+        # if p:
+        #print("Syntax error at line", p.lineno, "| TOKEN:", p.value)
+        #
+        # else:
+        #print("Syntax error at EOF")
         #raise Exception('Syntax error')
 
 
 if __name__ == '__main__':
-
 
     lex = lexer.Lexer()
     parser = Parser()

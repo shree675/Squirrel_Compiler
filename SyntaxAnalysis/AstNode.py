@@ -1,5 +1,6 @@
 from enum import Enum
 
+
 class Operator(Enum):
     A_AND = "&&"
     A_OR = "||"
@@ -29,14 +30,19 @@ class Operator(Enum):
     A_NODE = "node"
     A_ROOT = "root"
     A_DECL = "decl"
-    # A_CONTINUE = "continue"
+    A_IFELSE = "ifelse"
+    A_CONTINUE = "continue"
+    A_IFELIF = "ifelif"
+    A_ELIFSINGLE = "elifsingle"
+    A_ELIFMULTIPLE = "elifmultiple"
 
-    
+
 class AstNode:
     '''
     If a node contains 2 children, they must be assigned to the left and right attributes
     If a node contains 1 child, it must be assigned to the left child
     '''
+
     def __init__(self, operator=None, left=None, mid=None, right=None, value=None, next_label=None):
         self.operator = operator
         self.left = left
@@ -52,8 +58,11 @@ class AstNode:
 
     @staticmethod
     def generateCode(head, get_new_label):
-        if head is None: return
-        
+        if head is None:
+            return
+
+        # --------------------------------------------------
+
         if head.operator == Operator.A_ROOT:
             AstNode.generateCode(head.left, get_new_label)
             head.code = head.left.code
@@ -61,15 +70,15 @@ class AstNode:
             with open("output.tac", "w") as f:
                 f.write(head.code)
 
-            print(head.code)
+            # print(head.code)
 
         # --------------------------------------------------
 
         elif head.operator == Operator.A_NODE:
             left, right = head.left, head.right
-            
+
             if left and right:
-                head.next=get_new_label()
+                head.next = get_new_label()
                 right.next = head.next
                 left.next = get_new_label()
                 AstNode.generateCode(left, get_new_label)
@@ -77,23 +86,18 @@ class AstNode:
                 AstNode.generateCode(right, get_new_label)
                 head.code += left.next + ":\n" + right.code + "\n" + head.next + ":"
             elif left:
-                head.next=get_new_label()
+                head.next = get_new_label()
                 left.next = get_new_label()
                 AstNode.generateCode(left, get_new_label)
                 head.code = left.code
-            # elif right:
-            #     head.next=get_new_label()
-            #     right.next = head.next
-            #     AstNode.generateCode(right, get_new_label)
-            #     head.code = '\n' + right.code + "\n" + head.next + ":"
 
         # ------------------------------------------------------------
 
         elif head.operator == Operator.A_FUNC:
             params, statements = head.left, head.right
 
-            AstNode.generateCode(statements,get_new_label)
-            
+            AstNode.generateCode(statements, get_new_label)
+
             head.code = statements.code + "\n" + head.next + ":\n" + "return\n"
 
         # ------------------------------------------------------------
@@ -119,7 +123,7 @@ class AstNode:
 
             left, right = head.left, head.right
             true, false = head.true, head.false
-            
+
             left.true = true
             left.false = get_new_label()
             right.true = true
@@ -131,15 +135,34 @@ class AstNode:
             head.code = left.code + "\n" + left.false + ":" + "\n" + right.code + "\n"
 
         # ------------------------------------------------------------
-            
-        elif head.operator == Operator.A_IF:
+
+        elif head.operator == Operator.A_IF or head.operator == Operator.A_ELIFSINGLE:
             expr, statements = head.left, head.right
+
             expr.true = get_new_label()
             expr.false = head.next
             statements.next = head.next
+
             AstNode.generateCode(expr, get_new_label)
             AstNode.generateCode(statements, get_new_label)
+
             head.code = expr.code + "\n" + expr.true + ":\n" + statements.code + "\n"
+
+        # ------------------------------------------------------------
+
+        elif head.operator == Operator.A_IFELSE or head.operator == Operator.A_ELIFMULTIPLE:
+            expr, statements1, statements2 = head.left, head.mid, head.right
+            expr.true = get_new_label()
+            expr.false = get_new_label()
+            statements1.next = head.next
+            statements2.next = head.next
+
+            AstNode.generateCode(expr, get_new_label)
+            AstNode.generateCode(statements1, get_new_label)
+            AstNode.generateCode(statements2, get_new_label)
+
+            head.code = expr.code + "\n" + expr.true + ":\n" + statements1.code + "\n" + \
+                "goto " + head.next + "\n" + expr.false + ":\n" + statements2.code + "\n"
 
         # ------------------------------------------------------------
 
