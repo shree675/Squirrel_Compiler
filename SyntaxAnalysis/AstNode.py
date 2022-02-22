@@ -24,7 +24,7 @@ class Operator(Enum):
     A_RETURN = "return"
     A_BREAK = "break"
     A_VAR = "var"
-    A_CONST = "const"
+    A_BOOLCONST = "const"
     A_FUNC = "func"
     A_NODE = "node"
     A_ROOT = "root"
@@ -33,6 +33,10 @@ class Operator(Enum):
 
     
 class AstNode:
+    '''
+    If a node contains 2 children, they must be assigned to the left and right attributes
+    If a node contains 1 child, it must be assigned to the left child
+    '''
     def __init__(self, operator=None, left=None, mid=None, right=None, value=None, next_label=None):
         self.operator = operator
         self.left = left
@@ -52,7 +56,12 @@ class AstNode:
         
         if head.operator == Operator.A_ROOT:
             AstNode.generateCode(head.left, get_new_label)
-            print(head.left.code)
+            head.code = head.left.code
+
+            with open("output.tac", "w") as f:
+                f.write(head.code)
+
+            print(head.code)
 
         # --------------------------------------------------
 
@@ -72,20 +81,20 @@ class AstNode:
                 left.next = get_new_label()
                 AstNode.generateCode(left, get_new_label)
                 head.code = left.code
-            elif right:
-                head.next=get_new_label()
-                right.next = head.next
-                AstNode.generateCode(right, get_new_label)
-                head.code = '\n' + right.code + "\n" + head.next + ":"
+            # elif right:
+            #     head.next=get_new_label()
+            #     right.next = head.next
+            #     AstNode.generateCode(right, get_new_label)
+            #     head.code = '\n' + right.code + "\n" + head.next + ":"
 
         # ------------------------------------------------------------
 
         elif head.operator == Operator.A_FUNC:
-            left, right = head.left, head.right
+            params, statements = head.left, head.right
 
-            AstNode.generateCode(right,get_new_label)
+            AstNode.generateCode(statements,get_new_label)
             
-            head.code = right.code + "\n" + head.next + ":\n" + "return\n"
+            head.code = statements.code + "\n" + head.next + ":\n" + "return\n"
 
         # ------------------------------------------------------------
 
@@ -134,7 +143,7 @@ class AstNode:
 
         # ------------------------------------------------------------
 
-        elif head.operator == Operator.A_CONST:
+        elif head.operator == Operator.A_BOOLCONST:
             if head.value == "true":
                 head.code = "goto " + head.true
             elif head.value == "false":

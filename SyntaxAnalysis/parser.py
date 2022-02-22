@@ -125,7 +125,6 @@ class Parser(SlyParser):
     @_('methods')
     def program(self, p):
         val = AstNode(Operator.A_ROOT,left=p.methods)
-        val.left = p.methods
         AstNode.generateCode(val, self.get_new_label)
 
     # methods -> methods method
@@ -315,7 +314,7 @@ class Parser(SlyParser):
     # expr -> constant
     @_('constant')
     def expr(self, p):
-        return AstNode(Operator.A_CONST,value=p.constant)
+        return AstNode(Operator.A_BOOLCONST,value=p.constant)
 
     # expr -> (DATATYPE) expr
     @_('LPAREN DATATYPE RPAREN expr %prec TYPECASTING')

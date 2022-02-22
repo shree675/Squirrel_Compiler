@@ -38,7 +38,7 @@ while_statement -> WHILE ( expr ) { statements }
 for_statement -> FOR ( for_init ; expr ; assignment_statement ) { statements }
 for_init -> DATATYPE VARNAME = expr | VARNAME = expr
 
-✓ jump_statement -> BREAK | return_statement
+✓ jump_statement -> BREAK | return_statement | CONTINUE
 ✓ return_statement -> RETURN expr | RETURN
 
 ✓ expr -> expr PLUS expr | expr MINUS expr | expr MULT expr | expr DIVIDE expr | expr MOD expr | MINUS expr %prec UMINUS
