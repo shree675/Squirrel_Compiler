@@ -162,9 +162,7 @@ class Parser(SlyParser):
 
     @_('empty')
     def statements(self, p):
-        val = AstNode()
-        val.code = ""
-        return val
+        return p.empty
 
     # statement -> declaration_statement | assignment_statement | io_statement | selection_statement | iteration_statement | jump_statement
     @_('declaration_statement SEMICOL')
@@ -205,15 +203,15 @@ class Parser(SlyParser):
     @_('FOR LPAREN for_init SEMICOL expr SEMICOL assignment_statement RPAREN LBRACE statements RBRACE')
     def for_statement(self, p):
         pass
-
+            
     # for_init -> DATATYPE VARNAME = expr | VARNAME = expr
     @_('DATATYPE VARNAME ASSIGN expr')
     def for_init(self, p):
         pass
 
-    @_('VARNAME ASSIGN expr')
+    @_('assignment_statement')
     def for_init(self, p):
-        pass
+        return p.assignment_statement
 
     @_("if_statement")
     def selection_statement(self, p):
@@ -401,6 +399,7 @@ class Parser(SlyParser):
     # assignment_statement -> left_value = expr
     @_('left_value ASSIGN expr')
     def assignment_statement(self, p):
+        # TODO: update this
         try:
             return AstNode(Operator.A_ASSIGN_STMT, left=p.left_value[1], right=p.expr)
         except:
@@ -465,7 +464,9 @@ class Parser(SlyParser):
 
     @_('')
     def empty(self, p):
-        pass
+        val = AstNode()
+        val.code = ""
+        return val
 
     # def error(self, p):
         # if p:

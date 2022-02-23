@@ -36,7 +36,7 @@ default_statement -> DEFAULT COLON statements
 interation_statement -> while_statement | for_statement
 ✓ while_statement -> WHILE ( expr ) { statements }
 for_statement -> FOR ( for_init ; expr ; assignment_statement ) { statements }
-for_init -> DATATYPE VARNAME = expr | VARNAME = expr
+for_init -> assignment_statement | declaration_statement
 
 jump_statement -> BREAK | return_statement | CONTINUE
 return_statement -> RETURN expr | RETURN
