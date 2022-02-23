@@ -6,6 +6,12 @@ import os
 TEST_SUITES_DIR = "..\\TestSuites\\" if os.getcwd().endswith(
     "SyntaxAnalysis") else "TestSuites//"
 
+INT = "int"
+FLOAT = "float"
+STRING = "string"
+BOOL = "bool"
+CHAR = "char"
+
 print(os.getcwd())
 
 '''
@@ -199,15 +205,26 @@ class Parser(SlyParser):
     def while_statement(self, p):
         return AstNode(Operator.A_WHILE, left=p.expr, right=p.statements)
 
+    '''
+                        A_NODE
+                    1           A_NODE
+                           2          A_NODE
+                                  4            3
+    '''
+
     # for_statement -> FOR ( for_init ; expr ; assignment_statement ) { statements }
     @_('FOR LPAREN for_init SEMICOL expr SEMICOL assignment_statement RPAREN LBRACE statements RBRACE')
     def for_statement(self, p):
-        pass
-            
-    # for_init -> DATATYPE VARNAME = expr | VARNAME = expr
-    @_('DATATYPE VARNAME ASSIGN expr')
+        node_1 = AstNode(Operator.A_NODE, left=p.statements,
+                         right=p.assignment_statement)
+        node_2 = AstNode(Operator.A_NODE, left=p.expr, right=node_1)
+        node_3 = AstNode(Operator.A_NODE, left=p.for_init, right=node_2)
+        return node_3
+
+    # for_init -> declaration_statement | assignment_statement
+    @_('declaration_statement')
     def for_init(self, p):
-        pass
+        return p.declaration_statement
 
     @_('assignment_statement')
     def for_init(self, p):
@@ -226,8 +243,22 @@ class Parser(SlyParser):
     @_("DATATYPE VARNAME")
     def simple_init(self, p):
         val = AstNode(Operator.A_DECL, left=p.VARNAME)
-        val.code = p.DATATYPE + " " + p.VARNAME
+        val.code = p.DATATYPE + " " + p.VARNAME + " = "
+        if p.DATATYPE == INT:
+            val.code += "0"
+        elif p.DATATYPE == FLOAT:
+            val.code += "0.0"
+        elif p.DATATYPE == STRING:
+            val.code += "\"\""
+        elif p.DATATYPE == BOOL:
+            val.code += "false"
+        elif p.DATATYPE == CHAR:
+            val.code += "'0'"
         return val
+
+    @_("DATATYPE VARNAME ASSIGN expr")
+    def simple_init(self, p):
+        pass
 
     # if_statement -> IF ( expr ) { statements }
     @_("IF LPAREN expr RPAREN LBRACE statements RBRACE")
@@ -482,7 +513,7 @@ if __name__ == '__main__':
     lex = lexer.Lexer()
     parser = Parser()
 
-    with open(TEST_SUITES_DIR + "TACtest.sq", 'r') as f:
+    with open(TEST_SUITES_DIR + "TACtest2.sq", 'r') as f:
         text = f.read()
 
     parser.parse(lex.tokenize(text))

@@ -145,6 +145,8 @@ class AstNode:
             left, right = head.left, head.right
             relop = head.value
 
+            print(left.code, right.code)
+
             AstNode.generateCode(left, get_new_label, get_new_temp)
             AstNode.generateCode(right, get_new_label, get_new_temp)
 
