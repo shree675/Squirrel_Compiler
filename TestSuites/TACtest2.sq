@@ -1,5 +1,5 @@
 void @start(){
-    while(true || false){
-        int i;
+    for(int i;i<=k;i=i+k){
+        int j;
     }
 }
