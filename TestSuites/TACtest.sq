@@ -2,13 +2,16 @@ int @start(){
     if(false || true && false){
         int i;
     }
-    elif(false || false){
+    elif(a>=b && c!=d){
         int j;
+        j=a+b+c;
     }
-    elif(false){
+    elif(!false || false){
         int k;
+        k=a+b*c;
     }
     else{
         int x;
+        x=-a/(b+c)%d;
     }
 }

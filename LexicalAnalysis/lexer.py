@@ -1,9 +1,10 @@
 from sly import Lexer as SlyLexer
 
+
 class Lexer(SlyLexer):
 
     tokens = {PLUS, MINUS, MULT, DIVIDE, MOD, ASSIGN, LPAREN, RPAREN, LSQB, RSQB, COMMA, INTVAL, FLOATVAL, CHARVAL, STRINGVAL, BOOLVAL,
-              LBRACE, RBRACE, SEMICOL, COLON, VARNAME, IF, ELSE, WHILE, FOR, ELIF, RETURN, BREAK, CONTINUE, FUNCNAME, DATATYPE, RELOP1, RELOP2, AND, OR, NOT, INPUT, OUTPUT, SWITCH, CASE, DEFAULT, FUZZY }
+              LBRACE, RBRACE, SEMICOL, COLON, VARNAME, IF, ELSE, WHILE, FOR, ELIF, RETURN, BREAK, CONTINUE, FUNCNAME, DATATYPE, RELOP1, RELOP2, AND, OR, NOT, INPUT, OUTPUT, SWITCH, CASE, DEFAULT, FUZZY}
 
     ignore = ' \t'
     ignore_comment = r'``(.|\n)[^``]*``'
@@ -15,7 +16,6 @@ class Lexer(SlyLexer):
     MULT = r'\*'
     DIVIDE = r'/'
     MOD = r'%'
-    NOT = r'!'
     LPAREN = r'\('
     RPAREN = r'\)'
     LBRACE = r'{'
@@ -24,6 +24,7 @@ class Lexer(SlyLexer):
     RSQB = r'\]'
     RELOP1 = r'<=|>=|<|>'
     RELOP2 = r'==|!='
+    NOT = r'!'
     ASSIGN = r'='
     AND = r'&&'
     OR = r'\|\|'
@@ -62,6 +63,7 @@ class Lexer(SlyLexer):
     def error(self, t):
         print("----Illegal character '%s'----" % t.value[0])
         self.index += 1
+
 
 if __name__ == '__main__':
     test_case = open('../TestSuites/Palindrome.sq', 'r')

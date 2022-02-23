@@ -97,10 +97,15 @@ class Parser(SlyParser):
         self.scope_id_stack = [0, 1]
 
         self.num_labels = 0
+        self.num_temp = 0
 
     def get_new_label(self):
         self.num_labels += 1
         return "L" + str(self.num_labels - 1)
+
+    def get_new_temp(self):
+        self.num_temp += 1
+        return "t" + str(self.num_temp - 1)
 
     start = "program"
     tokens = lexer.Lexer.tokens
@@ -125,7 +130,7 @@ class Parser(SlyParser):
     @_('methods')
     def program(self, p):
         val = AstNode(Operator.A_ROOT, left=p.methods)
-        AstNode.generateCode(val, self.get_new_label)
+        AstNode.generateCode(val, self.get_new_label, self.get_new_temp)
 
     # methods -> methods method
     @_('methods method')
@@ -139,7 +144,6 @@ class Parser(SlyParser):
     # method -> DATATYPE FUNCNAME ( params ) { statements }
     @_('DATATYPE FUNCNAME LPAREN params RPAREN LBRACE statements RBRACE')
     def method(self, p):
-        # return AstNode(Operator.A_FUNC,left=p.params,right=p.statements)
         return AstNode(Operator.A_FUNC, left=p.params, right=p.statements, next_label=self.get_new_label())
 
     # params -> DATATYPE VARNAME, params | e
@@ -169,7 +173,7 @@ class Parser(SlyParser):
 
     @_('assignment_statement SEMICOL')
     def statement(self, p):
-        pass
+        return p.assignment_statement
 
     @_('io_statement SEMICOL')
     def statement(self, p):
@@ -303,27 +307,27 @@ class Parser(SlyParser):
             expr1.code
             t = expr0.addr + expr1.addr
         '''
-        pass
+        return AstNode(Operator.A_PLUS, left=p.expr0, right=p.expr1)
 
     @_('expr MINUS expr')
     def expr(self, p):
-        pass
+        return AstNode(Operator.A_MINUS, left=p.expr0, right=p.expr1)
 
     @_('expr MULT expr')
     def expr(self, p):
-        pass
+        return AstNode(Operator.A_MULTIPLY, left=p.expr0, right=p.expr1)
 
     @_('expr DIVIDE expr')
     def expr(self, p):
-        pass
+        return AstNode(Operator.A_DIVIDE, left=p.expr0, right=p.expr1)
 
     @_('expr MOD expr')
     def expr(self, p):
-        pass
+        return AstNode(Operator.A_MODULO, left=p.expr0, right=p.expr1)
 
     @_('MINUS expr %prec UMINUS')
     def expr(self, p):
-        pass
+        return AstNode(Operator.A_NEGATE, left=p.expr)
 
     @_('LPAREN expr RPAREN %prec PAREN')
     def expr(self, p):
@@ -331,19 +335,11 @@ class Parser(SlyParser):
 
     @_('expr RELOP1 expr')
     def expr(self, p):
-        return str('('+p.expr0+p[1]+p.expr1+')')
+        return AstNode(Operator.A_RELOP1, left=p.expr0, right=p.expr1, value=p.RELOP1)
 
     @_('expr RELOP2 expr')
     def expr(self, p):
-        return str('('+p.expr0+p[1]+p.expr1+')')
-
-    @_("COMMA")
-    def b1_open(self, p):
-        pass
-
-    @_('')
-    def b2_open(self, p):
-        print("b2_open")
+        return AstNode(Operator.A_RELOP2, left=p.expr0, right=p.expr1, value=p.RELOP2)
 
     @_('expr AND expr')
     def expr(self, p):
@@ -353,18 +349,13 @@ class Parser(SlyParser):
     def expr(self, p):
         return AstNode(Operator.A_OR, left=p.expr0, right=p.expr1)
 
-    @_('NOT expr %prec NOT')
+    @_('NOT expr')
     def expr(self, p):
-        print('NOT expr %prec NOT')
-        return str('(!'+p.expr+')')
+        return AstNode(Operator.A_NOT, left=p.expr)
 
     @_('VARNAME')
     def expr(self, p):
-        print("varname : " + p.VARNAME)
-        return {
-            "addr": p.VARNAME,
-            "code": ""
-        }
+        return AstNode(Operator.A_VARIABLE, value=p.VARNAME)
 
     # expr -> constant
     @_('constant')
@@ -375,8 +366,6 @@ class Parser(SlyParser):
     @_('LPAREN DATATYPE RPAREN expr %prec TYPECASTING')
     def expr(self, p):
         return str('('+p[0]+p[1]+p[2]+p[3]+')')
-
-# -----------------------------------------------------------------------------------------
 
     # arr_variable -> VARNAME [INTVAL] | VARNAME [INTVAL][INTVAL] | VARNAME [VARNAME] | VARNAME [VARNAME][VARNAME] | VARNAME [INTVAL][VARNAME] | VARNAME [VARNAME][INTVAL]
     @_('VARNAME LSQB INTVAL RSQB')
@@ -412,14 +401,15 @@ class Parser(SlyParser):
     # assignment_statement -> left_value = expr
     @_('left_value ASSIGN expr')
     def assignment_statement(self, p):
-        return {
-            "code": p.expr["code"] + str(p.left_value + '=' + p.expr["addr"]) + "\n"
-        }
+        try:
+            return AstNode(Operator.A_ASSIGN_STMT, left=p.left_value[1], right=p.expr)
+        except:
+            return AstNode(Operator.A_ASSIGN_STMT, left=p.left_value, right=p.expr)
 
     # left_value -> VARNAME | array_variable
     @_('VARNAME')
     def left_value(self, p):
-        return str(p[0])
+        return ["varname", str(p[0])]
 
     @_('array_variable')
     def left_value(self, p):
