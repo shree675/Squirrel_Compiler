@@ -5,10 +5,16 @@
 ✓ statements -> statement statements | e //not sure if this epsilon will cause issues - this leads to empty blocks
 params -> DATATYPE VARNAME, params | e
 
+✓ params -> params_rec | e
+✓ params_rec -> DATATYPE VARNAME COMMA params_rec | DATATYPE VARNAME
+
 statement -> declaration_statement SEMICOL | assignment_statement SEMICOL | io_statement SEMICOL | jump_statement SEMICOL | selection_statement | iteration_statement
 
 declaration_statement -> simple_init | array_init
 simple_init -> DATATYPE VARNAME | DATATYPE VARNAME = expr
+
+# TODO : empty list not permitted 
+# TODO : write rules for global variables
 
 array_init -> DATATYPE VARNAME [INTVAL] = { array_list } | DATATYPE VARNAME [INTVAL? ] [INTVAL] = { array_list } 
 array_list = constant, array_list | constant

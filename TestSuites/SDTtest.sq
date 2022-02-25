@@ -1,20 +1,22 @@
 
-int a;
+void @start(int e){
+    int a;
 
-if (z) {
+    if (z) {
 
-    int b;
+        int b;
 
-    if(z) {
-        int c;
+        if(z) {
+            int c;
 
+            if(z) {
+                int d;
+            }
+        }
+    
         if(z) {
             int d;
         }
-    }
     
-    if(z) {
-        int d;
     }
-    
 }
