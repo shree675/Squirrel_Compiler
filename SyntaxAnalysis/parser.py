@@ -3,8 +3,9 @@ from AstNode import Operator, AstNode
 from LexicalAnalysis import lexer
 import os
 
-TEST_SUITES_DIR = "..\\TestSuites\\" if os.getcwd().endswith(
-    "SyntaxAnalysis") else "TestSuites//"
+TEST_SUITES_DIR = os.path.join("..", "TestSuites") if os.getcwd().endswith(
+    "SyntaxAnalysis") else os.path.join("TestSuites")
+
 
 INT = "int"
 FLOAT = "float"
@@ -112,6 +113,23 @@ class Parser(SlyParser):
     def get_new_temp(self):
         self.num_temp += 1
         return "t" + str(self.num_temp - 1)
+    
+    def push_to_ST(self, data_type, varname):
+
+        repeated_vars = list(filter(
+                        lambda var : var["scope"] == self.scope_id_stack[-1] and var["identifier_name"]== varname ,
+                        self.symbol_table
+        ))
+        if len(repeated_vars) > 0:
+            print("Error: Variable already declared in current scope")
+            raise Exception(f"Error : variable \"{varname}\" already declared in current scope")
+
+        self.symbol_table.append({
+            "identifier_name" : varname,
+            "type" : data_type,
+            "scope" : self.scope_id_stack[-1],
+            "parent_scope": self.scope_id_stack[-2]
+        })
 
     start = "program"
     tokens = lexer.Lexer.tokens
@@ -138,6 +156,9 @@ class Parser(SlyParser):
         val = AstNode(Operator.A_ROOT, left=p.methods)
         AstNode.generateCode(val, self.get_new_label, self.get_new_temp)
 
+        print(val.code)
+        print(self.symbol_table)
+
     # methods -> methods method
     @_('methods method')
     def methods(self, p):
@@ -148,18 +169,31 @@ class Parser(SlyParser):
         return AstNode(Operator.A_NODE, left=p.method)
 
     # method -> DATATYPE FUNCNAME ( params ) { statements }
-    @_('DATATYPE FUNCNAME LPAREN params RPAREN LBRACE statements RBRACE')
+    @_('DATATYPE FUNCNAME LPAREN scope_open params RPAREN LBRACE statements RBRACE scope_close')
     def method(self, p):
         return AstNode(Operator.A_FUNC, left=p.params, right=p.statements, next_label=self.get_new_label())
 
-    # params -> DATATYPE VARNAME, params | e
-    @_('DATATYPE VARNAME COMMA params')
+    # params -> DATATYPE VARNAME COMMA params | e
+
+    # params -> params_rec | e
+    # params_rec -> DATATYPE VARNAME COMMA params_rec | DATATYPE VARNAME
+
+    @_('params_rec')
     def params(self, p):
         return None
 
     @_('empty')
     def params(self, p):
         return None
+
+    @_('DATATYPE VARNAME COMMA params_rec')
+    def params_rec(self, p):
+        self.push_to_ST(p.DATATYPE, p.VARNAME) 
+
+    @_('DATATYPE VARNAME')
+    def params_rec(self, p):
+        self.push_to_ST(p.DATATYPE, p.VARNAME) 
+
 
     # statements -> statements statement
     @_("statements statement")
@@ -201,7 +235,7 @@ class Parser(SlyParser):
         return p.for_statement
 
     # while_statement -> WHILE ( expr ) { statements }
-    @_('WHILE LPAREN expr RPAREN LBRACE statements RBRACE')
+    @_('WHILE LPAREN expr RPAREN LBRACE scope_open statements RBRACE scope_close')
     def while_statement(self, p):
         return AstNode(Operator.A_WHILE, left=p.expr, right=p.statements)
 
@@ -213,7 +247,7 @@ class Parser(SlyParser):
     '''
 
     # for_statement -> FOR ( for_init ; expr ; assignment_statement ) { statements }
-    @_('FOR LPAREN for_init SEMICOL expr SEMICOL assignment_statement RPAREN LBRACE statements RBRACE')
+    @_('FOR LPAREN scope_open for_init SEMICOL expr SEMICOL assignment_statement RPAREN LBRACE statements RBRACE scope_close')
     def for_statement(self, p):
         node_1 = AstNode(Operator.A_NODE, left=p.statements,
                          right=p.assignment_statement)
@@ -234,6 +268,7 @@ class Parser(SlyParser):
     def selection_statement(self, p):
         return p.if_statement
 
+    # TODO : ST for array_init
     # declaration_statement -> simple_init | array_init
     @_("simple_init")
     def declaration_statement(self, p):
@@ -243,20 +278,7 @@ class Parser(SlyParser):
     @_("DATATYPE VARNAME")
     def simple_init(self, p):
 
-        repeated_vars = filter(
-                        lambda var : var["scope"] == self.scope_id_stack[-1] and var["identifier_name"]== p.VARNAME ,
-                        self.symbol_table
-        )
-        if len(repeated_vars) > 0:
-            print("Error: Variable already declared in current scope")
-            raise Exception(f"Error : variable \"{p.VARNAME}\" already declared in current scope")
-
-        self.symbol_table.append({
-            "identifier_name" : p.VARNAME,
-            "type" : p.DATATYPE,
-            "scope" : self.scope_id_stack[-1],
-            "parent_scope": self.scope_id_stack[-2]
-        })
+        self.push_to_ST(p.DATATYPE, p.VARNAME)
 
         val = AstNode(Operator.A_DECL, left=p.VARNAME)
         val.code = p.DATATYPE + " " + p.VARNAME + " = "
@@ -541,7 +563,7 @@ if __name__ == '__main__':
     lex = lexer.Lexer()
     parser = Parser()
 
-    with open(TEST_SUITES_DIR + "TACtest2.sq", 'r') as f:
+    with open(os.path.join(TEST_SUITES_DIR , "SDTtest.sq"), 'r') as f:
         text = f.read()
 
     parser.parse(lex.tokenize(text))
