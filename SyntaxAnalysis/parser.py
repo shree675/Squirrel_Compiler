@@ -242,6 +242,22 @@ class Parser(SlyParser):
     # simple_init -> DATATYPE VARNAME | DATATYPE VARNAME = expr
     @_("DATATYPE VARNAME")
     def simple_init(self, p):
+
+        repeated_vars = filter(
+                        lambda var : var["scope"] == self.scope_id_stack[-1] and var["identifier_name"]== p.VARNAME ,
+                        self.symbol_table
+        )
+        if len(repeated_vars) > 0:
+            print("Error: Variable already declared in current scope")
+            raise Exception(f"Error : variable \"{p.VARNAME}\" already declared in current scope")
+
+        self.symbol_table.append({
+            "identifier_name" : p.VARNAME,
+            "type" : p.DATATYPE,
+            "scope" : self.scope_id_stack[-1],
+            "parent_scope": self.scope_id_stack[-2]
+        })
+
         val = AstNode(Operator.A_DECL, left=p.VARNAME)
         val.code = p.DATATYPE + " " + p.VARNAME + " = "
         if p.DATATYPE == INT:
@@ -261,32 +277,44 @@ class Parser(SlyParser):
         pass
 
     # if_statement -> IF ( expr ) { statements }
-    @_("IF LPAREN expr RPAREN LBRACE statements RBRACE")
+    @_("IF LPAREN expr RPAREN LBRACE scope_open statements RBRACE scope_close ")
     def if_statement(self, p):
         return AstNode(Operator.A_IF, left=p.expr, right=p.statements)
 
     # if_statement -> IF ( expr ) { statements } else { statements }
-    @_("IF LPAREN expr RPAREN LBRACE statements RBRACE ELSE LBRACE statements RBRACE")
+    @_("IF LPAREN expr RPAREN LBRACE scope_open statements RBRACE scope_close ELSE LBRACE scope_open statements RBRACE scope_close")
     def if_statement(self, p):
         return AstNode(Operator.A_IFELSE, left=p.expr, mid=p.statements0, right=p.statements1)
 
     # if_statement -> IF ( expr ) { statements} elif
-    @_('IF LPAREN expr RPAREN LBRACE statements RBRACE elif_statement')
+    @_('IF LPAREN expr RPAREN LBRACE scope_open statements RBRACE scope_close elif_statement')
     def if_statement(self, p):
         return AstNode(Operator.A_IFELSE, left=p.expr, mid=p.statements, right=p.elif_statement)
 
     # elif -> ELIF ( expr ) { statements } elif | ELIF ( expr ) { statements } | ELIF ( expr ) { statements } ELSE { statements }
-    @_("ELIF LPAREN expr RPAREN LBRACE statements RBRACE elif_statement")
+    @_("ELIF LPAREN expr RPAREN LBRACE scope_open statements RBRACE scope_close elif_statement")
     def elif_statement(self, p):
         return AstNode(Operator.A_ELIFMULTIPLE, left=p.expr, mid=p.statements, right=p.elif_statement)
 
-    @_("ELIF LPAREN expr RPAREN LBRACE statements RBRACE")
+    @_("ELIF LPAREN expr RPAREN LBRACE scope_open statements RBRACE scope_close")
     def elif_statement(self, p):
         return AstNode(Operator.A_ELIFSINGLE, left=p.expr, right=p.statements)
 
-    @_("ELIF LPAREN expr RPAREN LBRACE statements RBRACE ELSE LBRACE statements RBRACE")
+    @_("ELIF LPAREN expr RPAREN LBRACE scope_open statements RBRACE scope_close ELSE LBRACE scope_open statements RBRACE scope_close")
     def elif_statement(self, p):
         return AstNode(Operator.A_IFELIFELSE, left=p.expr, mid=p.statements0, right=p.statements1)
+    
+# ------------------- SCOPING RULES -------------------------
+    @_("")
+    def scope_open(self, p):
+        self.scope_id_stack.append(self.id)
+        self.id += 1
+    
+    @_("")
+    def scope_close(self, p):
+        self.scope_id_stack.pop()
+
+# ----------------------------------------------------------
 
     # io_statement -> input_statement | output_statement
     @_('input_statement')
