@@ -27,7 +27,8 @@ class Operator(Enum):
     A_RETURN = "return"
     A_BREAK = "break"
     A_VARIABLE = "var"
-    A_BOOLCONST = "const"
+    A_BOOLCONST = "bool const"
+    A_INTCONST = "int const"
     A_FUNC = "func"
     A_NODE = "node"
     A_ROOT = "root"
@@ -39,6 +40,13 @@ class Operator(Enum):
     A_ELIFMULTIPLE = "elif multiple"
     A_IFELIFELSE = "if elif else"
     A_ASSIGN_STMT = "assign stmt"
+    A_SWITCH = "switch"
+    A_CASESINGLE = "case single"
+    A_CASEMULTIPLE = "case multiple"
+    A_DEFAULT = "case default"
+    A_SWITCHPARENT = "switch parent"
+    A_IFPARENT = "if parent"
+    A_FORPARENT = "for parent"
 
 
 class AstNode:
@@ -88,7 +96,8 @@ class AstNode:
                 AstNode.generateCode(left, get_new_label, get_new_temp)
                 head.code = left.code + "\n"
                 AstNode.generateCode(right, get_new_label, get_new_temp)
-                head.code += left.next + ":\n" + right.code + "\n" + head.next + ":"
+                # head.code += left.next + ":\n" + right.code + "\n" + head.next + ":"
+                head.code += left.next + ":\n" + right.code
             elif left:
                 head.next = get_new_label()
                 left.next = get_new_label()
@@ -144,8 +153,6 @@ class AstNode:
 
             left, right = head.left, head.right
             relop = head.value
-
-            print(left.code, right.code)
 
             AstNode.generateCode(left, get_new_label, get_new_temp)
             AstNode.generateCode(right, get_new_label, get_new_temp)
@@ -203,6 +210,77 @@ class AstNode:
 
         # ------------------------------------------------------------
 
+        elif head.operator == Operator.A_SWITCHPARENT or head.operator == Operator.A_IFPARENT or head.operator == Operator.A_FORPARENT:
+
+            left = head.left
+
+            head.next = get_new_label()
+            left.next = head.next
+
+            AstNode.generateCode(left, get_new_label, get_new_temp)
+
+            head.code = left.code + '\n' + left.next + ":\n"
+
+        # ------------------------------------------------------------
+
+        elif head.operator == Operator.A_SWITCH:
+
+            left, right = head.left, head.right
+
+            head.value = left
+            right.value = head.value
+            right.next = head.next
+
+            # AstNode.generateCode(left, get_new_label, get_new_temp)
+            AstNode.generateCode(right, get_new_label, get_new_temp)
+
+            # head.code = left.code + "\n" + right.code
+            head.code = left + "\n" + right.code
+
+        # ------------------------------------------------------------
+
+        elif head.operator == Operator.A_CASEMULTIPLE:
+
+            single, multiple = head.left, head.right
+
+            multiple.next = head.next
+            multiple.value = head.value
+            single.value = head.value
+            single.next = head.next
+
+            AstNode.generateCode(single, get_new_label, get_new_temp)
+            AstNode.generateCode(multiple, get_new_label, get_new_temp)
+
+            head.code = single.code + "\n" + multiple.code
+
+        # ------------------------------------------------------------
+
+        elif head.operator == Operator.A_CASESINGLE:
+
+            constant, statements = head.left, head.right
+
+            statements.next = get_new_label()
+
+            AstNode.generateCode(constant, get_new_label, get_new_temp)
+            AstNode.generateCode(statements, get_new_label, get_new_temp)
+
+            head.code = "ifFalse " + head.value + " == " + constant.value + " goto " + statements.next + "\n" + \
+                statements.code + "\n" + "goto " + head.next + "\n" + statements.next + ":\n"
+
+        # ------------------------------------------------------------
+
+        elif head.operator == Operator.A_DEFAULT:
+
+            statements = head.left
+
+            statements.next = head.next
+
+            AstNode.generateCode(statements, get_new_label, get_new_temp)
+
+            head.code = statements.code + "\n" + "goto " + head.next
+
+        # ------------------------------------------------------------
+
         elif head.operator == Operator.A_WHILE:
 
             expr, statements = head.left, head.right
@@ -217,6 +295,24 @@ class AstNode:
 
             head.code = begin + ":\n" + expr.code + "\n" + expr.true + ":\n" + statements.code + "\n" + \
                 "goto " + begin
+
+        # ------------------------------------------------------------
+
+        elif head.operator == Operator.A_FOR:
+
+            left, mid, right = head.left, head.mid, head.right
+
+            begin = get_new_label()
+            left.true = get_new_label()
+            left.false = head.next
+            mid.next = begin
+
+            AstNode.generateCode(left, get_new_label, get_new_temp)
+            AstNode.generateCode(mid, get_new_label, get_new_temp)
+            AstNode.generateCode(right, get_new_label, get_new_temp)
+
+            head.code = begin + ":\n" + left.code + "\n" + left.true + ":\n" + right.code + "\n" + \
+                mid.code + "\n" + "goto " + begin
 
         # ------------------------------------------------------------
 
@@ -319,7 +415,7 @@ class AstNode:
 
         # --------------------------------------------------------------------
 
-        elif head.operator == Operator.A_VARIABLE:
+        elif head.operator == Operator.A_VARIABLE or head.operator == Operator.A_INTCONST:
 
             head.code = ""
 

@@ -1,38 +1,27 @@
 
-L6:
-int a = 0
-L5:
-L5:
-
+L4:
+int i = 0
 L7:
+L8:
+
+
+if i <= k goto L9
+goto L6
+L9:
 
 L13:
-int b = 0
+int j = 0
 L12:
-L12:
 
-L14:
 
-L18:
-int c = 0
-L17:
-L17:
+t1 = a + b
+j = t1
 
-L19:
 
-L21:
-int d = 0
-L20:
-L15:
-L10:
-L10:
+t0 = i + k
+i = t0
+goto L8
+L6:
 
-L22:
-
-L24:
-int d = 0
-L23:
-L8:
-L3:
 L2:
 return
