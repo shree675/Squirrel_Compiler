@@ -469,7 +469,7 @@ class Parser(SlyParser):
     # expr -> constant
     @_('constant')
     def expr(self, p):
-        return AstNode(Operator.A_BOOLCONST, value=p.constant)
+        return AstNode(p.constant[0], value=p.constant[1])
 
     # expr -> (DATATYPE) expr
     @_('LPAREN DATATYPE RPAREN expr %prec TYPECASTING')
@@ -528,23 +528,24 @@ class Parser(SlyParser):
     # constant -> INTVAL | FLOATVAL | CHARVAL | STRINGVAL | BOOLVAL
     @_('INTVAL')
     def constant(self, p):
-        return AstNode(Operator.A_INTCONST, value=p.INTVAL)
+        # return AstNode(Operator.A_INTCONST, value=p.INTVAL)
+        return [Operator.A_INTCONST, p.INTVAL]
 
     @_('FLOATVAL')
     def constant(self, p):
-        return str(p[0])
+        return [Operator.A_FLOATCONST, p.FLOATVAL]
 
     @_('CHARVAL')
     def constant(self, p):
-        return str(p[0])
+        return [Operator.A_CHARCONST, p.CHARVAL]
 
     @_('STRINGVAL')
     def constant(self, p):
-        return str(p[0])
+        return [Operator.A_STRINGCONST, p.STRINGVAL]
 
     @_('BOOLVAL')
     def constant(self, p):
-        return p.BOOLVAL
+        return [Operator.A_BOOLCONST, p.BOOLVAL]
 
     # expr -> function_call
     @_('function_call')
@@ -593,7 +594,7 @@ if __name__ == '__main__':
     lex = lexer.Lexer()
     parser = Parser()
 
-    with open(os.path.join(TEST_SUITES_DIR, "TACtest3.sq"), 'r') as f:
+    with open(os.path.join(TEST_SUITES_DIR, "TACtest.sq"), 'r') as f:
         text = f.read()
 
     parser.parse(lex.tokenize(text))

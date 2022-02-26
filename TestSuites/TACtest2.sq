@@ -1,7 +1,11 @@
 void @start(){
-    switch(a){
-        case (1): i=j+k;
-        case (2): int j;
+    switch(var1){
+        case (20.5): switch(var2){
+                        case (50): int n;
+                        default: int a;
+                    }
+        case (true): int j;
+                     int q;
         default: int k;
     }
 }

@@ -29,6 +29,9 @@ class Operator(Enum):
     A_VARIABLE = "var"
     A_BOOLCONST = "bool const"
     A_INTCONST = "int const"
+    A_FLOATCONST = "float const"
+    A_STRINGCONST = "string const"
+    A_CHARCONST = "char const"
     A_FUNC = "func"
     A_NODE = "node"
     A_ROOT = "root"
@@ -70,12 +73,14 @@ class AstNode:
 
     @staticmethod
     def generateCode(head, get_new_label, get_new_temp):
+
         if head is None:
             return
 
         # --------------------------------------------------
 
         if head.operator == Operator.A_ROOT:
+
             AstNode.generateCode(head.left, get_new_label, get_new_temp)
             head.code = head.left.code
 
@@ -231,11 +236,9 @@ class AstNode:
             right.value = head.value
             right.next = head.next
 
-            # AstNode.generateCode(left, get_new_label, get_new_temp)
             AstNode.generateCode(right, get_new_label, get_new_temp)
 
-            # head.code = left.code + "\n" + right.code
-            head.code = left + "\n" + right.code
+            head.code = right.code
 
         # ------------------------------------------------------------
 
@@ -261,10 +264,9 @@ class AstNode:
 
             statements.next = get_new_label()
 
-            AstNode.generateCode(constant, get_new_label, get_new_temp)
             AstNode.generateCode(statements, get_new_label, get_new_temp)
 
-            head.code = "ifFalse " + head.value + " == " + constant.value + " goto " + statements.next + "\n" + \
+            head.code = "ifFalse " + head.value + " == " + constant[1] + " goto " + statements.next + "\n" + \
                 statements.code + "\n" + "goto " + head.next + "\n" + statements.next + ":\n"
 
         # ------------------------------------------------------------
@@ -408,14 +410,17 @@ class AstNode:
 
         elif head.operator == Operator.A_BOOLCONST:
 
-            if head.value == "true":
-                head.code = "goto " + head.true
-            elif head.value == "false":
-                head.code = "goto " + head.false
+            if head.value == "switch":
+                head.code = ""
+            else:
+                if head.value == "true":
+                    head.code = "goto " + head.true
+                elif head.value == "false":
+                    head.code = "goto " + head.false
 
         # --------------------------------------------------------------------
 
-        elif head.operator == Operator.A_VARIABLE or head.operator == Operator.A_INTCONST:
+        elif head.operator == Operator.A_VARIABLE or head.operator == Operator.A_INTCONST or head.operator == Operator.A_STRINGCONST or head.operator == Operator.A_CHARCONST or head.operator == Operator.A_FLOATCONST:
 
             head.code = ""
 
