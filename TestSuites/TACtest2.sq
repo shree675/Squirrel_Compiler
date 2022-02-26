@@ -1,5 +1,7 @@
 void @start(){
-    for(int i;i<=k;i=i+k){
-        int j;
+    switch(a){
+        case (1): i=j+k;
+        case (2): int j;
+        default: int k;
     }
 }

@@ -1,0 +1,6 @@
+void @start() {
+    for(int i; i <= k; i=i+k){
+        int j;
+        j=a+b;
+    }
+}

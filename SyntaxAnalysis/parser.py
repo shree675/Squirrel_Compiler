@@ -1,3 +1,4 @@
+from operator import le
 from sly import Parser as SlyParser
 from AstNode import Operator, AstNode
 from LexicalAnalysis import lexer
@@ -113,21 +114,22 @@ class Parser(SlyParser):
     def get_new_temp(self):
         self.num_temp += 1
         return "t" + str(self.num_temp - 1)
-    
+
     def push_to_ST(self, data_type, varname):
 
         repeated_vars = list(filter(
-                        lambda var : var["scope"] == self.scope_id_stack[-1] and var["identifier_name"]== varname ,
-                        self.symbol_table
+            lambda var: var["scope"] == self.scope_id_stack[-1] and var["identifier_name"] == varname,
+            self.symbol_table
         ))
         if len(repeated_vars) > 0:
             print("Error: Variable already declared in current scope")
-            raise Exception(f"Error : variable \"{varname}\" already declared in current scope")
+            raise Exception(
+                f"Error : variable \"{varname}\" already declared in current scope")
 
         self.symbol_table.append({
-            "identifier_name" : varname,
-            "type" : data_type,
-            "scope" : self.scope_id_stack[-1],
+            "identifier_name": varname,
+            "type": data_type,
+            "scope": self.scope_id_stack[-1],
             "parent_scope": self.scope_id_stack[-2]
         })
 
@@ -188,14 +190,14 @@ class Parser(SlyParser):
 
     @_('DATATYPE VARNAME COMMA params_rec')
     def params_rec(self, p):
-        self.push_to_ST(p.DATATYPE, p.VARNAME) 
+        self.push_to_ST(p.DATATYPE, p.VARNAME)
 
     @_('DATATYPE VARNAME')
     def params_rec(self, p):
-        self.push_to_ST(p.DATATYPE, p.VARNAME) 
-
+        self.push_to_ST(p.DATATYPE, p.VARNAME)
 
     # statements -> statements statement
+
     @_("statements statement")
     def statements(self, p):
         return AstNode(Operator.A_NODE, left=p.statements, right=p.statement)
@@ -232,28 +234,20 @@ class Parser(SlyParser):
 
     @_('for_statement')
     def iteration_statement(self, p):
-        return p.for_statement
+        return AstNode(Operator.A_FORPARENT, left=p.for_statement)
 
     # while_statement -> WHILE ( expr ) { statements }
     @_('WHILE LPAREN expr RPAREN LBRACE scope_open statements RBRACE scope_close')
     def while_statement(self, p):
         return AstNode(Operator.A_WHILE, left=p.expr, right=p.statements)
 
-    '''
-                        A_NODE
-                    1           A_NODE
-                           2          A_NODE
-                                  4            3
-    '''
-
     # for_statement -> FOR ( for_init ; expr ; assignment_statement ) { statements }
     @_('FOR LPAREN scope_open for_init SEMICOL expr SEMICOL assignment_statement RPAREN LBRACE statements RBRACE scope_close')
     def for_statement(self, p):
-        node_1 = AstNode(Operator.A_NODE, left=p.statements,
-                         right=p.assignment_statement)
-        node_2 = AstNode(Operator.A_NODE, left=p.expr, right=node_1)
-        node_3 = AstNode(Operator.A_NODE, left=p.for_init, right=node_2)
-        return node_3
+        node_1 = AstNode(Operator.A_FOR, left=p.expr,
+                         mid=p.assignment_statement, right=p.statements)
+        node_2 = AstNode(Operator.A_NODE, left=p.for_init, right=node_1)
+        return node_2
 
     # for_init -> declaration_statement | assignment_statement
     @_('declaration_statement')
@@ -266,7 +260,11 @@ class Parser(SlyParser):
 
     @_("if_statement")
     def selection_statement(self, p):
-        return p.if_statement
+        return AstNode(Operator.A_IFPARENT, p.if_statement)
+
+    @_('switch_statement')
+    def selection_statement(self, p):
+        return AstNode(Operator.A_SWITCHPARENT, left=p.switch_statement)
 
     # TODO : ST for array_init
     # declaration_statement -> simple_init | array_init
@@ -325,13 +323,45 @@ class Parser(SlyParser):
     @_("ELIF LPAREN expr RPAREN LBRACE scope_open statements RBRACE scope_close ELSE LBRACE scope_open statements RBRACE scope_close")
     def elif_statement(self, p):
         return AstNode(Operator.A_IFELIFELSE, left=p.expr, mid=p.statements0, right=p.statements1)
-    
+
+    # switch_statement -> SWITCH ( left_value ) { case_statements }
+    @_('SWITCH LPAREN left_value RPAREN LBRACE scope_open case_statements RBRACE scope_close')
+    def switch_statement(self, p):
+        # TODO: update this
+        try:
+            return AstNode(Operator.A_SWITCH, left=p.left_value[1], right=p.case_statements)
+        except:
+            return AstNode(Operator.A_SWITCH, left=p.left_value, right=p.case_statements)
+
+    # case_statements -> case_statement case_statements | case_statement | default_statement
+    @_('case_statement case_statements')
+    def case_statements(self, p):
+        return AstNode(Operator.A_CASEMULTIPLE, left=p.case_statement, right=p.case_statements)
+
+    @_('case_statement')
+    def case_statements(self, p):
+        return p.case_statement
+
+    @_('default_statement')
+    def case_statements(self, p):
+        return p.default_statement
+
+    # case_statement -> CASE ( constant ) COLON statements
+    @_('CASE LPAREN constant RPAREN COLON scope_open statements scope_close')
+    def case_statement(self, p):
+        return AstNode(Operator.A_CASESINGLE, left=p.constant, right=p.statements)
+
+    # default_statement -> DEFAULT COLON statements
+    @_('DEFAULT COLON scope_open statements scope_close')
+    def default_statement(self, p):
+        return AstNode(Operator.A_DEFAULT, left=p.statements)
+
 # ------------------- SCOPING RULES -------------------------
     @_("")
     def scope_open(self, p):
         self.scope_id_stack.append(self.id)
         self.id += 1
-    
+
     @_("")
     def scope_close(self, p):
         self.scope_id_stack.pop()
@@ -498,7 +528,7 @@ class Parser(SlyParser):
     # constant -> INTVAL | FLOATVAL | CHARVAL | STRINGVAL | BOOLVAL
     @_('INTVAL')
     def constant(self, p):
-        return str(p[0])
+        return AstNode(Operator.A_INTCONST, value=p.INTVAL)
 
     @_('FLOATVAL')
     def constant(self, p):
@@ -563,7 +593,7 @@ if __name__ == '__main__':
     lex = lexer.Lexer()
     parser = Parser()
 
-    with open(os.path.join(TEST_SUITES_DIR , "SDTtest.sq"), 'r') as f:
+    with open(os.path.join(TEST_SUITES_DIR, "TACtest3.sq"), 'r') as f:
         text = f.read()
 
     parser.parse(lex.tokenize(text))
