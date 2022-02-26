@@ -2,5 +2,11 @@ void @start() {
     for(int i; i <= k; i=i+k){
         int j;
         j=a+b;
+        for(int a;a!=2;a=a+1){
+            if(j%a==0){
+                j=j/a;
+                a=1;
+            }
+        }
     }
 }
