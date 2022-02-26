@@ -7,15 +7,6 @@ import os
 TEST_SUITES_DIR = os.path.join("..", "TestSuites") if os.getcwd().endswith(
     "SyntaxAnalysis") else os.path.join("TestSuites")
 
-
-INT = "int"
-FLOAT = "float"
-STRING = "string"
-BOOL = "bool"
-CHAR = "char"
-
-print(os.getcwd())
-
 '''
 symbol_table : {
     'identifier_name' : {
@@ -278,23 +269,14 @@ class Parser(SlyParser):
 
         self.push_to_ST(p.DATATYPE, p.VARNAME)
 
-        val = AstNode(Operator.A_DECL, left=p.VARNAME)
-        val.code = p.DATATYPE + " " + p.VARNAME + " = "
-        if p.DATATYPE == INT:
-            val.code += "0"
-        elif p.DATATYPE == FLOAT:
-            val.code += "0.0"
-        elif p.DATATYPE == STRING:
-            val.code += "\"\""
-        elif p.DATATYPE == BOOL:
-            val.code += "false"
-        elif p.DATATYPE == CHAR:
-            val.code += "'0'"
-        return val
+        return AstNode(Operator.A_DECL, left=[p.DATATYPE, p.VARNAME])
 
     @_("DATATYPE VARNAME ASSIGN expr")
     def simple_init(self, p):
-        pass
+
+        self.push_to_ST(p.DATATYPE, p.VARNAME)
+
+        return AstNode(Operator.A_DECL, left=[p.DATATYPE, p.VARNAME], right=p.expr)
 
     # if_statement -> IF ( expr ) { statements }
     @_("IF LPAREN expr RPAREN LBRACE scope_open statements RBRACE scope_close ")
