@@ -1,5 +1,11 @@
 from enum import Enum
 
+INT = "int"
+FLOAT = "float"
+STRING = "string"
+BOOL = "bool"
+CHAR = "char"
+
 
 class Operator(Enum):
     A_AND = "&&"
@@ -405,6 +411,33 @@ class AstNode:
                 AstNode.generateCode(expr, get_new_label, get_new_temp)
 
                 head.code = expr.code + "\n" + varname + " = " + expr.value
+
+        # --------------------------------------------------------------------
+
+        elif head.operator == Operator.A_DECL:
+
+            left = head.left
+
+            if head.right is not None:
+                right = head.right
+
+                AstNode.generateCode(right, get_new_label, get_new_temp)
+
+                head.code = right.code + "\n" + \
+                    left[0] + " " + left[1] + " = " + right.value + "\n"
+
+            else:
+                head.code = left[0] + " " + left[1] + " = "
+                if left[0] == INT:
+                    head.code += "0"
+                elif left[0] == FLOAT:
+                    head.code += "0.0"
+                elif left[0] == STRING:
+                    head.code += "\"\""
+                elif left[0] == BOOL:
+                    head.code += "false"
+                elif left[0] == CHAR:
+                    head.code += "'0'"
 
         # --------------------------------------------------------------------
 
