@@ -1,81 +1,52 @@
 
-L4:
-goto L8
-L8:
-goto L9
-L9:
-goto L7
-L6:
+L16:
+int arr[24]
+arr[0]=1
+arr[4]=2
+arr[8]=12
+arr[12]=5
+arr[16]=6
+arr[20]=7
+
+L15:
+char charArray[5]
+charArray[0]='a'
+charArray[1]='b'
+charArray[2]='c'
+charArray[3]='d'
+charArray[4]='e'
+
+L13:
+bool boolArray[2]
+boolArray[0]=true
+boolArray[1]=false
 
 L11:
-int i = 0
-goto L5
+float floatArray[12]
+floatArray[0]=1.1
+floatArray[4]=2.2
+floatArray[8]=3.3
+
+L9:
+int specialArray[24]
+specialArray[0]=1
+specialArray[4]=2
+specialArray[8]=3
+specialArray[12]=4
+specialArray[16]=5
+specialArray[20]=6
+
 L7:
+char specialArrayChar[2]
+specialArrayChar[0]='a'
+specialArrayChar[1]='b'
 
-
-if a >= b goto L14
-goto L13
-L14:
-
-
-if c != d goto L12
-goto L13
-L12:
-
-L20:
-
-
-t0 = a + b
-
-if t0 == c goto L22
-goto L21
-L22:
-
-L24:
-int ab = 0
-L21:
-
-L19:
-int j = 0
-L17:
-
-
-t2 = a + b
-
-t1 = t2 + c
-j = t1
-goto L5
-L13:
-goto L25
-L27:
-goto L26
-L25:
-
-L31:
-int k = 0
-L30:
-
-
-
-t4 = b * c
-t3 = a + t4
-k = t3
-goto L5
-L26:
-
-L35:
-int x = 0
-L34:
-
-t7 =  - a
-
-
-t8 = b + c
-t6 = t7 / t8
-
-t5 = t6 % d
-x = t5
 L5:
+bool specialArrayBool[4]
+specialArrayBool[0]=true
+specialArrayBool[1]=false
+specialArrayBool[2]=true
+specialArrayBool[3]=false
 
 L2:
 return

@@ -121,7 +121,7 @@ class Parser(SlyParser):
         self.symbol_table.append({
             "identifier_name": varname,
             "type": data_type,
-            "dimension" : dimension,
+            "dimension": dimension,
             "scope": self.scope_id_stack[-1],
             "parent_scope": self.scope_id_stack[-2]
         })
@@ -265,6 +265,10 @@ class Parser(SlyParser):
     def declaration_statement(self, p):
         return p.simple_init
 
+    @_("array_init")
+    def declaration_statement(self, p):
+        return p.array_init
+
     # simple_init -> DATATYPE VARNAME | DATATYPE VARNAME = expr
     @_("DATATYPE VARNAME")
     def simple_init(self, p):
@@ -282,29 +286,35 @@ class Parser(SlyParser):
 
 # ----------------------- ARRAY INIT ---------------------------
 
-    # array_init -> DATATYPE VARNAME [INTVAL] = { array_list } 
+    # array_init -> DATATYPE VARNAME [INTVAL] = { array_list }
     # if array_list is empty, then the corresponding ASTNode will be None
-    @_("DATATYPE VARNAME LSQB INTVAL RSQB ASSIGN LBARCE array_list RBARCE")
+    @_("DATATYPE VARNAME LSQB INTVAL RSQB ASSIGN LBRACE array_list RBRACE")
     def array_init(self, p):
 
-        self.push_to_ST(p.DATATYPE, p.VARNAME, [p.INTVAL])
+        self.push_to_ST(p.DATATYPE, p.VARNAME, [int(p.INTVAL)])
 
-        return AstNode(Operator.A_ARR_DECL, left=[p.DATATYPE, p.VARNAME, [p.INTVAL]], right=p.array_list)
+        return AstNode(Operator.A_ARR_DECL, left=[p.DATATYPE, p.VARNAME, [int(p.INTVAL)]], right=p.array_list)
 
-    # array_init -> DATATYPE VARNAME [INTVAL] [INTVAL] = { array_list } 
+    # array_init -> DATATYPE VARNAME [INTVAL] [INTVAL] = { array_list }
     @_("DATATYPE VARNAME LSQB INTVAL RSQB LSQB INTVAL RSQB ASSIGN LBRACE array_list RBRACE")
     def array_init(self, p):
 
-    # array_init -> DATATYPE VARNAME [] [INTVAL] = { array_list } 
+        self.push_to_ST(p.DATATYPE, p.VARNAME, [int(p[3]), int(p[6])])
+
+        return AstNode(Operator.A_ARR_DECL, left=[p.DATATYPE, p.VARNAME, [int(p[3]), int(p[6])]], right=p.array_list)
+
+    # array_init -> DATATYPE VARNAME [] [INTVAL] = { array_list }
     @_("DATATYPE VARNAME LSQB RSQB LSQB INTVAL RSQB ASSIGN LBRACE array_list RBRACE")
     def array_init(self, p):
 
-# ---------------------------------------------------------------------------
+        self.push_to_ST(p.DATATYPE, p.VARNAME, [-1, int(p[5])])
 
+        return AstNode(Operator.A_ARR_DECL, left=[p.DATATYPE, p.VARNAME, [-1, int(p[5])]], right=p.array_list)
 
 # ------------------- ARRAY LIST ---------------------------------------
 
     # array_list = constant, array_list | constant
+
     @_("array_list_rec")
     def array_list(self, p):
         return p.array_list_rec
@@ -621,7 +631,7 @@ if __name__ == '__main__':
     lex = lexer.Lexer()
     parser = Parser()
 
-    with open(os.path.join(TEST_SUITES_DIR, "TACtest4.sq"), 'r') as f:
+    with open(os.path.join(TEST_SUITES_DIR, "ArrayInittest.sq"), 'r') as f:
         text = f.read()
 
     parser.parse(lex.tokenize(text))

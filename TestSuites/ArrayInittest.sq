@@ -1,24 +1,18 @@
 
 void @start(){
 
-    int a[2][3] = {1,2,3,4,5,6};
+    int arr[3][2] = {1,2,12,5,6,7};
 
-    ``
-       int a[24]
-       a[0] = 1
-       a[4] = 2
-       a[8] = 3
-       a[12] = 4
-       a[16] = 5
-       a[20] = 6
+    char charArray[5] = {'a', 'b', 'c', 'd', 'e'};
 
+    bool boolArray[1][2] = {true, false};
 
+    float floatArray[3] = {1.1, 2.2, 3.3};
 
-        f(a,b)
+    int specialArray[][3] = {1,2,3,4,5,6};
 
-        param a
-        param b
-        call f,2
-    ``
+    char specialArrayChar[][2] = {'a', 'b'};
+
+    bool specialArrayBool[][2] = {true, false, true, false};
 }
 
