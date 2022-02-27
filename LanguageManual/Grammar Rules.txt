@@ -17,11 +17,13 @@ simple_init -> DATATYPE VARNAME | DATATYPE VARNAME = expr
 # TODO : write rules for global variables
 
 array_init -> DATATYPE VARNAME [INTVAL] = { array_list } | DATATYPE VARNAME [INTVAL? ] [INTVAL] = { array_list } 
-array_list = constant, array_list | constant
+
+array_list -> array_list_rec | e
+array_list_rec -> constant, array_list_rec | constant
 
 constant -> INTVAL | FLOATVAL | CHARVAL | STRINGVAL | BOOLVAL
 
-arr_variable -> VARNAME [INTVAL] | VARNAME [INTVAL][INTVAL] | VARNAME [VARNAME] | VARNAME [VARNAME][VARNAME] | VARNAME [INTVAL][VARNAME] | VARNAME [VARNAME][INTVAL]
+array_variable -> VARNAME [INTVAL] | VARNAME [INTVAL][INTVAL] | VARNAME [VARNAME] | VARNAME [VARNAME][VARNAME] | VARNAME [INTVAL][VARNAME] | VARNAME [VARNAME][INTVAL]
 ✓ assignment_statement -> left_value = expr
 left_value -> VARNAME | array_variable
 
@@ -59,3 +61,8 @@ argument_list -> expr, argument_list | e
 
 Problems :
 1. case statements may need {} for multiple statements
+2. Implement dimensions in ST
+3. ref TACtest4
+4. During the Semantic analysis check the size of the array
+5. During the Semantic analysis check VARNAME length in declaration_statement
+6. Elegant error messages eg : col, row numbers of the error

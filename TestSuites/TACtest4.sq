@@ -1,0 +1,23 @@
+int @start(){
+    if(a || b==1 && c){
+        int i;
+
+        c += 2
+    }
+}
+
+`
+b==1
+    * code :  "if b == 1 goto L1"
+    * val : ==
+
+b 
+    * code : ""
+    * val : b
+
+need to use ST to get the new type of the variable
+c
+    * code : "if c == true goto L1"
+    * val : c
+
+`

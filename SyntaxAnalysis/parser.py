@@ -106,7 +106,8 @@ class Parser(SlyParser):
         self.num_temp += 1
         return "t" + str(self.num_temp - 1)
 
-    def push_to_ST(self, data_type, varname):
+    # dimension = [2, 3] =>  2 rows, 3 cols
+    def push_to_ST(self, data_type, varname, dimension):
 
         repeated_vars = list(filter(
             lambda var: var["scope"] == self.scope_id_stack[-1] and var["identifier_name"] == varname,
@@ -120,6 +121,7 @@ class Parser(SlyParser):
         self.symbol_table.append({
             "identifier_name": varname,
             "type": data_type,
+            "dimension" : dimension,
             "scope": self.scope_id_stack[-1],
             "parent_scope": self.scope_id_stack[-2]
         })
@@ -181,11 +183,11 @@ class Parser(SlyParser):
 
     @_('DATATYPE VARNAME COMMA params_rec')
     def params_rec(self, p):
-        self.push_to_ST(p.DATATYPE, p.VARNAME)
+        self.push_to_ST(p.DATATYPE, p.VARNAME, [])
 
     @_('DATATYPE VARNAME')
     def params_rec(self, p):
-        self.push_to_ST(p.DATATYPE, p.VARNAME)
+        self.push_to_ST(p.DATATYPE, p.VARNAME, [])
 
     # statements -> statements statement
 
@@ -267,16 +269,59 @@ class Parser(SlyParser):
     @_("DATATYPE VARNAME")
     def simple_init(self, p):
 
-        self.push_to_ST(p.DATATYPE, p.VARNAME)
+        self.push_to_ST(p.DATATYPE, p.VARNAME, [])
 
         return AstNode(Operator.A_DECL, left=[p.DATATYPE, p.VARNAME])
 
     @_("DATATYPE VARNAME ASSIGN expr")
     def simple_init(self, p):
 
-        self.push_to_ST(p.DATATYPE, p.VARNAME)
+        self.push_to_ST(p.DATATYPE, p.VARNAME, [])
 
         return AstNode(Operator.A_DECL, left=[p.DATATYPE, p.VARNAME], right=p.expr)
+
+# ----------------------- ARRAY INIT ---------------------------
+
+    # array_init -> DATATYPE VARNAME [INTVAL] = { array_list } 
+    # if array_list is empty, then the corresponding ASTNode will be None
+    @_("DATATYPE VARNAME LSQB INTVAL RSQB ASSIGN LBARCE array_list RBARCE")
+    def array_init(self, p):
+
+        self.push_to_ST(p.DATATYPE, p.VARNAME, [p.INTVAL])
+
+        return AstNode(Operator.A_ARR_DECL, left=[p.DATATYPE, p.VARNAME, [p.INTVAL]], right=p.array_list)
+
+    # array_init -> DATATYPE VARNAME [INTVAL] [INTVAL] = { array_list } 
+    @_("DATATYPE VARNAME LSQB INTVAL RSQB LSQB INTVAL RSQB ASSIGN LBRACE array_list RBRACE")
+    def array_init(self, p):
+
+    # array_init -> DATATYPE VARNAME [] [INTVAL] = { array_list } 
+    @_("DATATYPE VARNAME LSQB RSQB LSQB INTVAL RSQB ASSIGN LBRACE array_list RBRACE")
+    def array_init(self, p):
+
+# ---------------------------------------------------------------------------
+
+
+# ------------------- ARRAY LIST ---------------------------------------
+
+    # array_list = constant, array_list | constant
+    @_("array_list_rec")
+    def array_list(self, p):
+        return p.array_list_rec
+
+    @_("empty")
+    def array_list(self, p):
+        return None
+
+    @_("constant")
+    def array_list_rec(self, p):
+        return AstNode(Operator.A_ARR_LITERAL, left=p.constant)
+
+    @_("constant COMMA array_list_rec")
+    def array_list_rec(self, p):
+        return AstNode(Operator.A_ARR_LITERAL, left=p.constant, right=p.array_list_rec)
+
+# ---------------------------------------------------------------------------
 
     # if_statement -> IF ( expr ) { statements }
     @_("IF LPAREN expr RPAREN LBRACE scope_open statements RBRACE scope_close ")
@@ -576,7 +621,7 @@ if __name__ == '__main__':
     lex = lexer.Lexer()
     parser = Parser()
 
-    with open(os.path.join(TEST_SUITES_DIR, "TACtest.sq"), 'r') as f:
+    with open(os.path.join(TEST_SUITES_DIR, "TACtest4.sq"), 'r') as f:
         text = f.read()
 
     parser.parse(lex.tokenize(text))

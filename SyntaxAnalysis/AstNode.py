@@ -1,4 +1,5 @@
 from enum import Enum
+import math
 
 INT = "int"
 FLOAT = "float"
@@ -38,10 +39,12 @@ class Operator(Enum):
     A_FLOATCONST = "float const"
     A_STRINGCONST = "string const"
     A_CHARCONST = "char const"
+    A_ARR_LITERAL = "arr literal"
     A_FUNC = "func"
     A_NODE = "node"
     A_ROOT = "root"
     A_DECL = "decl"
+    A_ARR_DECL = "array_decl"
     A_IFELSE = "if else"
     A_CONTINUE = "continue"
     A_IFELIF = "if elif"
@@ -139,6 +142,9 @@ class AstNode:
             AstNode.generateCode(left, get_new_label, get_new_temp)
             AstNode.generateCode(right, get_new_label, get_new_temp)
 
+            if(not left.value):
+                left.code = f"left.val == true"
+            
             head.code = left.code + "\n" + left.true + ":" + "\n" + right.code
 
         # ------------------------------------------------------------
@@ -198,6 +204,9 @@ class AstNode:
 
             AstNode.generateCode(expr, get_new_label, get_new_temp)
             AstNode.generateCode(statements, get_new_label, get_new_temp)
+
+            # print("code : ", expr.code)
+            # print("val : ", expr.value)
 
             head.code = expr.code + "\n" + expr.true + ":\n" + statements.code
 
@@ -418,7 +427,9 @@ class AstNode:
 
             left = head.left
 
+            # to distinguish between init and declaration
             if head.right is not None:
+                # initialization
                 right = head.right
 
                 AstNode.generateCode(right, get_new_label, get_new_temp)
@@ -427,6 +438,7 @@ class AstNode:
                     left[0] + " " + left[1] + " = " + right.value + "\n"
 
             else:
+                # declaration
                 head.code = left[0] + " " + left[1] + " = "
                 if left[0] == INT:
                     head.code += "0"
@@ -439,6 +451,53 @@ class AstNode:
                 elif left[0] == CHAR:
                     head.code += "'0'"
 
+        # --------------------------------------------------------------------
+
+        elif head.operator == Operator.A_ARR_DECL:
+
+            # only-declaration is not possible with array
+            left_list, array_list = head.left, head.right
+
+            AstNode.generateCode(array_list, get_new_label, get_new_temp)
+
+            size = 0
+
+            if left_list[0] == INT:
+                size = 4
+            elif left_list[0] == CHAR:
+                size = 1
+            elif left_list[0] == FLOAT:
+                size = 4
+            elif left_list[0] == BOOL:
+                size = 1
+
+
+
+            head.code = f"{left_list[0]} {left_list[1]}[{size * math.prod(left_list[2]) }] \n"
+
+            for i in range(len(array_list)):
+                head.code += f"{left_list[1]}[{i*size}]={array_list.value[i]}\n"
+
+
+            # create the code here
+            
+
+        # --------------------------------------------------------------------
+
+        elif head.operator == Operator.A_ARR_LITERAL:
+
+            # if right is None 
+            left, right = head.left, head.right
+
+            if right == None:
+                head.value = [left[1]]
+                head.code = ""
+
+            else:
+                AstNode.generateCode(right, get_new_label, get_new_temp)
+                head.value = [left[1], *right.value]
+                head.code = ""
+            
         # --------------------------------------------------------------------
 
         elif head.operator == Operator.A_BOOLCONST:
@@ -456,5 +515,7 @@ class AstNode:
         elif head.operator == Operator.A_VARIABLE or head.operator == Operator.A_INTCONST or head.operator == Operator.A_STRINGCONST or head.operator == Operator.A_CHARCONST or head.operator == Operator.A_FLOATCONST:
 
             head.code = ""
+
+            # print("value head : ", head.value)
 
         # --------------------------------------------------------------------
