@@ -144,7 +144,7 @@ class AstNode:
 
             if(not left.value):
                 left.code = f"left.val == true"
-            
+
             head.code = left.code + "\n" + left.true + ":" + "\n" + right.code
 
         # ------------------------------------------------------------
@@ -204,9 +204,6 @@ class AstNode:
 
             AstNode.generateCode(expr, get_new_label, get_new_temp)
             AstNode.generateCode(statements, get_new_label, get_new_temp)
-
-            # print("code : ", expr.code)
-            # print("val : ", expr.value)
 
             head.code = expr.code + "\n" + expr.true + ":\n" + statements.code
 
@@ -453,6 +450,7 @@ class AstNode:
 
         # --------------------------------------------------------------------
 
+        # semantic checks here for the size of the array on the left and on the right
         elif head.operator == Operator.A_ARR_DECL:
 
             # only-declaration is not possible with array
@@ -461,7 +459,6 @@ class AstNode:
             AstNode.generateCode(array_list, get_new_label, get_new_temp)
 
             size = 0
-
             if left_list[0] == INT:
                 size = 4
             elif left_list[0] == CHAR:
@@ -471,22 +468,24 @@ class AstNode:
             elif left_list[0] == BOOL:
                 size = 1
 
+            if left_list[2][0] == -1:
+                # size is not specified
+                total_size = len(array_list.value)
+                if total_size % left_list[2][1] != 0:
+                    raise Exception(
+                        "Semantic error: The number of array elements is incorrect")
+                actual_size = total_size//left_list[2][1]
+                left_list[2][0] = actual_size
 
+            head.code = f"{left_list[0]} {left_list[1]}[{int(math.prod(left_list[2]))*size}]\n"
 
-            head.code = f"{left_list[0]} {left_list[1]}[{size * math.prod(left_list[2]) }] \n"
-
-            for i in range(len(array_list)):
+            for i in range(len(array_list.value)):
                 head.code += f"{left_list[1]}[{i*size}]={array_list.value[i]}\n"
-
-
-            # create the code here
-            
 
         # --------------------------------------------------------------------
 
         elif head.operator == Operator.A_ARR_LITERAL:
 
-            # if right is None 
             left, right = head.left, head.right
 
             if right == None:
@@ -497,7 +496,7 @@ class AstNode:
                 AstNode.generateCode(right, get_new_label, get_new_temp)
                 head.value = [left[1], *right.value]
                 head.code = ""
-            
+
         # --------------------------------------------------------------------
 
         elif head.operator == Operator.A_BOOLCONST:
@@ -515,7 +514,5 @@ class AstNode:
         elif head.operator == Operator.A_VARIABLE or head.operator == Operator.A_INTCONST or head.operator == Operator.A_STRINGCONST or head.operator == Operator.A_CHARCONST or head.operator == Operator.A_FLOATCONST:
 
             head.code = ""
-
-            # print("value head : ", head.value)
 
         # --------------------------------------------------------------------
