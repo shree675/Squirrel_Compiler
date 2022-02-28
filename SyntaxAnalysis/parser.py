@@ -7,108 +7,29 @@ import os
 TEST_SUITES_DIR = os.path.join("..", "TestSuites") if os.getcwd().endswith(
     "SyntaxAnalysis") else os.path.join("TestSuites")
 
-'''
-symbol_table : {
-    'identifier_name' : {
-        'type' : 'int',
-        'size' : 4,
-        'line_no' : 1,
-        'scope' : 'global',
-}
-
-{ id -> 1
-    
-    int age = 0;
-
-    { id -> 2
-
-        int age = 1;
-
-        { id -> 3
-
-        }
-
-        { id -> 4
-
-        int a;
-
-        }
-      
-    }
-}
-
-symbol_table : [
-    {
-        identifier_name : 'age',
-        ....details,
-        scope: 1
-        parent_scope: 0
-    },
-    {
-        identifier_name : 'age',
-        ....details,
-        scope: 2
-        parent_scope: 1
-    }
-]
-
-
-global = {
-
-    variable : {
-        "age" :{ info about age}
-        "name" : { info about name}
-    }
-
-    sub_scopes : {
-        "sub_scope_1" : {
-            parent_scope : global
-            variable : {
-                "age" :{ info about age}
-                "name" : { info about name}
-            }
-            sub_scopes : {
-            
-            }
-        }
-
-        "sub_scope_2" : {
-            parent_scope : global
-            variable : {
-                "age" :{ info about age}
-                "name" : { info about name}
-            }
-            sub_scopes : {
-            
-            }
-        }
-    }
-}
-
-'''
-
-
 class Parser(SlyParser):
 
     def __init__(self):
         self.symbol_table = []
-        self.id = 2
+        self.id = 2 # start from 2, as 1 is reserved for global scope
         self.scope_id_stack = [0, 1]
-
         self.num_labels = 0
         self.num_temp = 0
 
     def get_new_label(self):
+        """Generates and returns a new label, globally unique"""
         self.num_labels += 1
         return "L" + str(self.num_labels - 1)
 
     def get_new_temp(self):
+        """Generates and returns a new temporary variable, globally unique"""
         self.num_temp += 1
         return "t" + str(self.num_temp - 1)
 
     # dimension = [2, 3] =>  2 rows, 3 cols
     def push_to_ST(self, data_type, varname, dimension):
-
+        """Pushes a new variable to the symbol table"""
+        # check if the variable already exists in the same scope
         repeated_vars = list(filter(
             lambda var: var["scope"] == self.scope_id_stack[-1] and var["identifier_name"] == varname,
             self.symbol_table
@@ -117,7 +38,7 @@ class Parser(SlyParser):
             print("Error: Variable already declared in current scope")
             raise Exception(
                 f"Error : variable \"{varname}\" already declared in current scope")
-
+        #else append the variable to the symbol table
         self.symbol_table.append({
             "identifier_name": varname,
             "type": data_type,
@@ -126,11 +47,13 @@ class Parser(SlyParser):
             "parent_scope": self.scope_id_stack[-2]
         })
 
-    start = "program"
+    """The rest of this file conforms to the specifications of SLY, the parsing library used by this project.
+    Each function corresponds to a production rule in the grammar. The rule is mentioned as a comment just above 
+    corresponding function. SLY works on SDDs, so the body of the method is executed after the entire production is matched"""
+
+    start = "program" # start symbol of the grammar
     tokens = lexer.Lexer.tokens
-
-    debugfile = 'parser.out'
-
+    debugfile = 'parser.out' # SLY parser writes debug information to this file
     precedence = (
         ('left', 'COMMA'),
         ('right', 'ASSIGN'),
@@ -140,17 +63,17 @@ class Parser(SlyParser):
         ('left', 'RELOP1'),
         ('left', 'PLUS', 'MINUS'),
         ('left', 'MULT', 'DIVIDE', 'MOD'),
-        ('right', 'TYPECASTING'),         # fictitious token
-        ('right', 'UMINUS', 'NOT'),       # fictitious token
-        ('right', 'PAREN')                # fictitious token
+        ('right', 'TYPECASTING'),         # fictitious token used to handle special precedence rules
+        ('right', 'UMINUS', 'NOT'),       # fictitious token used to handle special precedence rules
+        ('right', 'PAREN')                # fictitious token used to handle special precedence rules
     )
 
     # program -> methods
     @_('methods')
     def program(self, p):
+        """Starting production, top of the parsing tree, calls the recursive generateCode() method"""
         val = AstNode(Operator.A_ROOT, left=p.methods)
-        AstNode.generateCode(val, self.get_new_label, self.get_new_temp)
-
+        AstNode.generateCode(val, self.get_new_label, self.get_new_temp, self.symbol_table)
         print(val.code)
         print(self.symbol_table)
 
@@ -169,7 +92,6 @@ class Parser(SlyParser):
         return AstNode(Operator.A_FUNC, left=p.params, right=p.statements, next_label=self.get_new_label())
 
     # params -> DATATYPE VARNAME COMMA params | e
-
     # params -> params_rec | e
     # params_rec -> DATATYPE VARNAME COMMA params_rec | DATATYPE VARNAME
 
@@ -190,7 +112,6 @@ class Parser(SlyParser):
         self.push_to_ST(p.DATATYPE, p.VARNAME, [])
 
     # statements -> statements statement
-
     @_("statements statement")
     def statements(self, p):
         return AstNode(Operator.A_NODE, left=p.statements, right=p.statement)
@@ -272,16 +193,12 @@ class Parser(SlyParser):
     # simple_init -> DATATYPE VARNAME | DATATYPE VARNAME = expr
     @_("DATATYPE VARNAME")
     def simple_init(self, p):
-
         self.push_to_ST(p.DATATYPE, p.VARNAME, [])
-
         return AstNode(Operator.A_DECL, left=[p.DATATYPE, p.VARNAME])
 
     @_("DATATYPE VARNAME ASSIGN expr")
     def simple_init(self, p):
-
         self.push_to_ST(p.DATATYPE, p.VARNAME, [])
-
         return AstNode(Operator.A_DECL, left=[p.DATATYPE, p.VARNAME], right=p.expr)
 
 # ----------------------- ARRAY INIT ---------------------------
@@ -290,25 +207,19 @@ class Parser(SlyParser):
     # if array_list is empty, then the corresponding ASTNode will be None
     @_("DATATYPE VARNAME LSQB INTVAL RSQB ASSIGN LBRACE array_list RBRACE")
     def array_init(self, p):
-
         self.push_to_ST(p.DATATYPE, p.VARNAME, [int(p.INTVAL)])
-
         return AstNode(Operator.A_ARR_DECL, left=[p.DATATYPE, p.VARNAME, [int(p.INTVAL)]], right=p.array_list)
 
     # array_init -> DATATYPE VARNAME [INTVAL] [INTVAL] = { array_list }
     @_("DATATYPE VARNAME LSQB INTVAL RSQB LSQB INTVAL RSQB ASSIGN LBRACE array_list RBRACE")
     def array_init(self, p):
-
         self.push_to_ST(p.DATATYPE, p.VARNAME, [int(p[3]), int(p[6])])
-
         return AstNode(Operator.A_ARR_DECL, left=[p.DATATYPE, p.VARNAME, [int(p[3]), int(p[6])]], right=p.array_list)
 
     # array_init -> DATATYPE VARNAME [] [INTVAL] = { array_list }
     @_("DATATYPE VARNAME LSQB RSQB LSQB INTVAL RSQB ASSIGN LBRACE array_list RBRACE")
     def array_init(self, p):
-
         self.push_to_ST(p.DATATYPE, p.VARNAME, [-1, int(p[5])])
-
         return AstNode(Operator.A_ARR_DECL, left=[p.DATATYPE, p.VARNAME, [-1, int(p[5])]], right=p.array_list)
 
 # ------------------- ARRAY LIST ---------------------------------------
@@ -631,7 +542,7 @@ if __name__ == '__main__':
     lex = lexer.Lexer()
     parser = Parser()
 
-    with open(os.path.join(TEST_SUITES_DIR, "ArrayInittest.sq"), 'r') as f:
+    with open(os.path.join(TEST_SUITES_DIR, "SemanticTest1.sq"), 'r') as f:
         text = f.read()
 
     parser.parse(lex.tokenize(text))

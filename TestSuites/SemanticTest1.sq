@@ -1,0 +1,9 @@
+void @start() {
+    int a = 3;
+    float b = 3.4;
+    ``bool c = true;
+    char d = 'a';
+    string e = "hello";``
+    int f;
+    f = a + b;
+}

@@ -1,0 +1,78 @@
+Symbol Table Specification
+
+symbol_table : {
+    'identifier_name' : {
+        'type' : 'int',
+        'size' : 4,
+        'line_no' : 1,
+        'scope' : 'global',
+}
+
+{ id -> 1
+    
+    int age = 0;
+
+    { id -> 2
+
+        int age = 1;
+
+        { id -> 3
+
+        }
+
+        { id -> 4
+
+        int a;
+
+        }
+      
+    }
+}
+
+symbol_table : [
+    {
+        identifier_name : 'age',
+        ....details,
+        scope: 1
+        parent_scope: 0
+    },
+    {
+        identifier_name : 'age',
+        ....details,
+        scope: 2
+        parent_scope: 1
+    }
+]
+
+
+global = {
+
+    variable : {
+        "age" :{ info about age}
+        "name" : { info about name}
+    }
+
+    sub_scopes : {
+        "sub_scope_1" : {
+            parent_scope : global
+            variable : {
+                "age" :{ info about age}
+                "name" : { info about name}
+            }
+            sub_scopes : {
+            
+            }
+        }
+
+        "sub_scope_2" : {
+            parent_scope : global
+            variable : {
+                "age" :{ info about age}
+                "name" : { info about name}
+            }
+            sub_scopes : {
+            
+            }
+        }
+    }
+}

@@ -1,0 +1,20 @@
+List of Operators
+
+UnaryOperator
+-
+!
+_________________
+- : -int, -float (works as is)
+  : -str (Error)
+  : -bool, -char  (cast to int)
+! : !bool (works as is)
+  : !str (Error)
+  : !int, !char, !float (cast to bool)
+
+BinaryOperator
+* /
+%
++ -
+> < >= <= == !=
+&& || 
+=
