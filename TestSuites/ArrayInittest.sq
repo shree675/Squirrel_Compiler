@@ -9,10 +9,8 @@ void @start(){
 
     float floatArray[3] = {1.1, 2.2, 3.3};
 
-    int specialArray[][3] = {1,2,3,4,5,6};
+    int specialArray[2][3][2] = {1,2,3,4,5,6,1,2,3,4,5,6};
 
-    char specialArrayChar[][2] = {'a', 'b'};
-
-    bool specialArrayBool[][2] = {true, false, true, false};
+    char specialArrayChar[1][2] = {'a', 'b'};
 }
 

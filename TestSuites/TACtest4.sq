@@ -1,8 +1,13 @@
 int @start(){
-    if(a || b==1 && c){
+    if(a + b == c){
         int i;
-
-        c += 2
+        c = 2;
+    }
+    elif(5){
+        int j;
+    }
+    else{
+        int k;
     }
 }
 
