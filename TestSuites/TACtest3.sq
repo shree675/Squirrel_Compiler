@@ -1,5 +1,5 @@
 void @start() {
-    for(int i; i <= k; i=i+k){
+    for(int i; i; i=i+k){
         int j;
         j=a+b;
         for(int a;a!=2;a=a+1){
@@ -8,5 +8,12 @@ void @start() {
                 a=1;
             }
         }
+    }
+
+    int x;
+    int y;
+    while(x+y){
+        x=x+1;
+        y=y+1;
     }
 }

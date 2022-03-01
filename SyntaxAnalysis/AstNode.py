@@ -8,6 +8,7 @@ STRING = "string"
 BOOL = "bool"
 CHAR = "char"
 
+
 class Operator(Enum):
     A_AND = "&&"
     A_OR = "||"
@@ -59,8 +60,14 @@ class Operator(Enum):
     A_SWITCHPARENT = "switch parent"
     A_IFPARENT = "if parent"
     A_FORPARENT = "for parent"
+    A_BOOL = "bool"
+    A_ARRAY_REC = "array rec"
+    A_ARRAY_VARIABLE_REC = "array variable rec"
+    A_ARRAY_VARIABLE = "array variable"
+
 
 typeChecker = TypeChecker()
+
 
 class AstNode:
     '''
@@ -74,7 +81,8 @@ class AstNode:
         self.mid = mid
         self.right = right
         self.value = value
-        self.data_type = data_type  #undefined datatype is called 'fuzzy', default initialization
+        # undefined datatype is called 'fuzzy', default initialization
+        self.data_type = data_type
         self.true = None
         self.false = None
         self.code = None
@@ -91,7 +99,8 @@ class AstNode:
         if head.operator == Operator.A_ROOT:
 
             #typeChecker.check(head, symbol_table)
-            AstNode.generateCode(head.left, get_new_label, get_new_temp, symbol_table)
+            AstNode.generateCode(head.left, get_new_label,
+                                 get_new_temp, symbol_table)
             head.code = head.left.code
 
             with open("output.tac", "w") as f:
@@ -108,15 +117,18 @@ class AstNode:
                 head.next = get_new_label()
                 right.next = head.next
                 left.next = get_new_label()
-                AstNode.generateCode(left, get_new_label, get_new_temp, symbol_table)
+                AstNode.generateCode(left, get_new_label,
+                                     get_new_temp, symbol_table)
                 head.code = left.code + "\n"
-                AstNode.generateCode(right, get_new_label, get_new_temp, symbol_table)
+                AstNode.generateCode(right, get_new_label,
+                                     get_new_temp, symbol_table)
                 # head.code += left.next + ":\n" + right.code + "\n" + head.next + ":"
                 head.code += left.next + ":\n" + right.code
             elif left:
                 head.next = get_new_label()
                 left.next = get_new_label()
-                AstNode.generateCode(left, get_new_label, get_new_temp, symbol_table)
+                AstNode.generateCode(left, get_new_label,
+                                     get_new_temp, symbol_table)
                 head.code = left.code
 
         # ------------------------------------------------------------
@@ -124,7 +136,8 @@ class AstNode:
         elif head.operator == Operator.A_FUNC:
             params, statements = head.left, head.right
 
-            AstNode.generateCode(statements, get_new_label, get_new_temp, symbol_table)
+            AstNode.generateCode(statements, get_new_label,
+                                 get_new_temp, symbol_table)
 
             head.code = statements.code + "\n" + head.next + ":\n" + "return\n"
 
@@ -135,16 +148,24 @@ class AstNode:
             left, right = head.left, head.right
             true, false = head.true, head.false
 
+            if left.operator == Operator.A_VARIABLE:
+                left = AstNode(Operator.A_BOOL, left=left)
+
+            if right.operator == Operator.A_VARIABLE:
+                right = AstNode(Operator.A_BOOL, left=right)
+
             left.true = get_new_label()
             left.false = false
             right.true = true
             right.false = false
 
-            AstNode.generateCode(left, get_new_label, get_new_temp, symbol_table)
-            AstNode.generateCode(right, get_new_label, get_new_temp, symbol_table)
+            AstNode.generateCode(left, get_new_label,
+                                 get_new_temp, symbol_table)
+            AstNode.generateCode(right, get_new_label,
+                                 get_new_temp, symbol_table)
 
-            if(not left.value):
-                left.code = f"left.val == true"
+            # if not left.value:
+            #     left.code = f"left.value == true"
 
             head.code = left.code + "\n" + left.true + ":" + "\n" + right.code
 
@@ -155,13 +176,21 @@ class AstNode:
             left, right = head.left, head.right
             true, false = head.true, head.false
 
+            if left.operator == Operator.A_VARIABLE:
+                left = AstNode(Operator.A_BOOL, left=left)
+
+            if right.operator == Operator.A_VARIABLE:
+                right = AstNode(Operator.A_BOOL, left=right)
+
             left.true = true
             left.false = get_new_label()
             right.true = true
             right.false = false
 
-            AstNode.generateCode(left, get_new_label, get_new_temp, symbol_table)
-            AstNode.generateCode(right, get_new_label, get_new_temp, symbol_table)
+            AstNode.generateCode(left, get_new_label,
+                                 get_new_temp, symbol_table)
+            AstNode.generateCode(right, get_new_label,
+                                 get_new_temp, symbol_table)
 
             head.code = left.code + "\n" + left.false + ":" + "\n" + right.code
 
@@ -172,8 +201,10 @@ class AstNode:
             left, right = head.left, head.right
             relop = head.value
 
-            AstNode.generateCode(left, get_new_label, get_new_temp, symbol_table)
-            AstNode.generateCode(right, get_new_label, get_new_temp, symbol_table)
+            AstNode.generateCode(left, get_new_label,
+                                 get_new_temp, symbol_table)
+            AstNode.generateCode(right, get_new_label,
+                                 get_new_temp, symbol_table)
 
             head.code = left.code + "\n" + right.code + "\n" + \
                 "if " + left.value + " " + relop + " " + right.value + " goto " + head.true + \
@@ -186,25 +217,44 @@ class AstNode:
             left = head.left
             true, false = head.true, head.false
 
+            if left.operator == Operator.A_VARIABLE:
+                left = AstNode(Operator.A_BOOL, left=left)
+
             left.true = false
             left.false = true
 
-            AstNode.generateCode(left, get_new_label, get_new_temp, symbol_table)
+            AstNode.generateCode(left, get_new_label,
+                                 get_new_temp, symbol_table)
 
             head.code = left.code
 
         # ------------------------------------------------------------
 
         elif head.operator == Operator.A_IF or head.operator == Operator.A_ELIFSINGLE:
-
             expr, statements = head.left, head.right
+
+            if expr.operator == Operator.A_VARIABLE or expr.operator == Operator.A_INTCONST:
+                expr = AstNode(Operator.A_BOOL, left=expr)
+
+            elif expr.operator == Operator.A_FLOATCONST or expr.operator == Operator.A_STRINGCONST:
+                expr = AstNode(Operator.A_BOOL, left=expr)
+
+            elif expr.operator == Operator.A_CHARCONST:
+                expr = AstNode(Operator.A_BOOL, left=expr)
+
+            elif expr.operator == Operator.A_PLUS or expr.operator == Operator.A_MINUS or \
+                    expr.operator == Operator.A_MULTIPLY or expr.operator == Operator.A_DIVIDE or \
+                    expr.operator == Operator.A_MODULO:
+                expr = AstNode(Operator.A_BOOL, left=expr)
 
             expr.true = get_new_label()
             expr.false = head.next
             statements.next = head.next
 
-            AstNode.generateCode(expr, get_new_label, get_new_temp, symbol_table)
-            AstNode.generateCode(statements, get_new_label, get_new_temp, symbol_table)
+            AstNode.generateCode(expr, get_new_label,
+                                 get_new_temp, symbol_table)
+            AstNode.generateCode(statements, get_new_label,
+                                 get_new_temp, symbol_table)
 
             head.code = expr.code + "\n" + expr.true + ":\n" + statements.code
 
@@ -214,14 +264,31 @@ class AstNode:
 
             expr, statements1, statements2 = head.left, head.mid, head.right
 
+            if expr.operator == Operator.A_VARIABLE or expr.operator == Operator.A_INTCONST:
+                expr = AstNode(Operator.A_BOOL, left=expr)
+
+            elif expr.operator == Operator.A_FLOATCONST or expr.operator == Operator.A_STRINGCONST:
+                expr = AstNode(Operator.A_BOOL, left=expr)
+
+            elif expr.operator == Operator.A_CHARCONST:
+                expr = AstNode(Operator.A_BOOL, left=expr)
+
+            elif expr.operator == Operator.A_PLUS or expr.operator == Operator.A_MINUS or \
+                    expr.operator == Operator.A_MULTIPLY or expr.operator == Operator.A_DIVIDE or \
+                    expr.operator == Operator.A_MODULO:
+                expr = AstNode(Operator.A_BOOL, left=expr)
+
             expr.true = get_new_label()
             expr.false = get_new_label()
             statements1.next = head.next
             statements2.next = head.next
 
-            AstNode.generateCode(expr, get_new_label, get_new_temp, symbol_table)
-            AstNode.generateCode(statements1, get_new_label, get_new_temp, symbol_table)
-            AstNode.generateCode(statements2, get_new_label, get_new_temp, symbol_table)
+            AstNode.generateCode(expr, get_new_label,
+                                 get_new_temp, symbol_table)
+            AstNode.generateCode(statements1, get_new_label,
+                                 get_new_temp, symbol_table)
+            AstNode.generateCode(statements2, get_new_label,
+                                 get_new_temp, symbol_table)
 
             head.code = expr.code + "\n" + expr.true + ":\n" + statements1.code + "\n" + \
                 "goto " + head.next + "\n" + expr.false + ":\n" + statements2.code
@@ -235,7 +302,8 @@ class AstNode:
             head.next = get_new_label()
             left.next = head.next
 
-            AstNode.generateCode(left, get_new_label, get_new_temp, symbol_table)
+            AstNode.generateCode(left, get_new_label,
+                                 get_new_temp, symbol_table)
 
             head.code = left.code + '\n' + left.next + ":\n"
 
@@ -249,7 +317,8 @@ class AstNode:
             right.value = head.value
             right.next = head.next
 
-            AstNode.generateCode(right, get_new_label, get_new_temp, symbol_table)
+            AstNode.generateCode(right, get_new_label,
+                                 get_new_temp, symbol_table)
 
             head.code = right.code
 
@@ -264,8 +333,10 @@ class AstNode:
             single.value = head.value
             single.next = head.next
 
-            AstNode.generateCode(single, get_new_label, get_new_temp, symbol_table)
-            AstNode.generateCode(multiple, get_new_label, get_new_temp, symbol_table)
+            AstNode.generateCode(single, get_new_label,
+                                 get_new_temp, symbol_table)
+            AstNode.generateCode(multiple, get_new_label,
+                                 get_new_temp, symbol_table)
 
             head.code = single.code + "\n" + multiple.code
 
@@ -277,7 +348,8 @@ class AstNode:
 
             statements.next = get_new_label()
 
-            AstNode.generateCode(statements, get_new_label, get_new_temp, symbol_table)
+            AstNode.generateCode(statements, get_new_label,
+                                 get_new_temp, symbol_table)
 
             head.code = "ifFalse " + head.value + " == " + constant[1] + " goto " + statements.next + "\n" + \
                 statements.code + "\n" + "goto " + head.next + "\n" + statements.next + ":\n"
@@ -290,7 +362,8 @@ class AstNode:
 
             statements.next = head.next
 
-            AstNode.generateCode(statements, get_new_label, get_new_temp, symbol_table)
+            AstNode.generateCode(statements, get_new_label,
+                                 get_new_temp, symbol_table)
 
             head.code = statements.code + "\n" + "goto " + head.next
 
@@ -300,13 +373,29 @@ class AstNode:
 
             expr, statements = head.left, head.right
 
+            if expr.operator == Operator.A_VARIABLE or expr.operator == Operator.A_INTCONST:
+                expr = AstNode(Operator.A_BOOL, left=expr)
+
+            elif expr.operator == Operator.A_FLOATCONST or expr.operator == Operator.A_STRINGCONST:
+                expr = AstNode(Operator.A_BOOL, left=expr)
+
+            elif expr.operator == Operator.A_CHARCONST:
+                expr = AstNode(Operator.A_BOOL, left=expr)
+
+            elif expr.operator == Operator.A_PLUS or expr.operator == Operator.A_MINUS or \
+                    expr.operator == Operator.A_MULTIPLY or expr.operator == Operator.A_DIVIDE or \
+                    expr.operator == Operator.A_MODULO:
+                expr = AstNode(Operator.A_BOOL, left=expr)
+
             begin = get_new_label()
             expr.true = get_new_label()
             expr.false = head.next
             statements.next = begin
 
-            AstNode.generateCode(expr, get_new_label, get_new_temp, symbol_table)
-            AstNode.generateCode(statements, get_new_label, get_new_temp, symbol_table)
+            AstNode.generateCode(expr, get_new_label,
+                                 get_new_temp, symbol_table)
+            AstNode.generateCode(statements, get_new_label,
+                                 get_new_temp, symbol_table)
 
             head.code = begin + ":\n" + expr.code + "\n" + expr.true + ":\n" + statements.code + "\n" + \
                 "goto " + begin
@@ -317,14 +406,31 @@ class AstNode:
 
             left, mid, right = head.left, head.mid, head.right
 
+            if left.operator == Operator.A_VARIABLE or left.operator == Operator.A_INTCONST:
+                left = AstNode(Operator.A_BOOL, left=left)
+
+            elif left.operator == Operator.A_FLOATCONST or left.operator == Operator.A_STRINGCONST:
+                left = AstNode(Operator.A_BOOL, left=left)
+
+            elif left.operator == Operator.A_CHARCONST:
+                left = AstNode(Operator.A_BOOL, left=left)
+
+            elif left.operator == Operator.A_PLUS or left.operator == Operator.A_MINUS or \
+                    left.operator == Operator.A_MULTIPLY or left.operator == Operator.A_DIVIDE or \
+                    left.operator == Operator.A_MODULO:
+                left = AstNode(Operator.A_BOOL, left=left)
+
             begin = get_new_label()
             left.true = get_new_label()
             left.false = head.next
             mid.next = begin
 
-            AstNode.generateCode(left, get_new_label, get_new_temp, symbol_table)
-            AstNode.generateCode(mid, get_new_label, get_new_temp, symbol_table)
-            AstNode.generateCode(right, get_new_label, get_new_temp, symbol_table)
+            AstNode.generateCode(left, get_new_label,
+                                 get_new_temp, symbol_table)
+            AstNode.generateCode(mid, get_new_label,
+                                 get_new_temp, symbol_table)
+            AstNode.generateCode(right, get_new_label,
+                                 get_new_temp, symbol_table)
 
             head.code = begin + ":\n" + left.code + "\n" + left.true + ":\n" + right.code + "\n" + \
                 mid.code + "\n" + "goto " + begin
@@ -337,8 +443,10 @@ class AstNode:
 
             head.value = get_new_temp()
 
-            AstNode.generateCode(expr0, get_new_label, get_new_temp, symbol_table)
-            AstNode.generateCode(expr1, get_new_label, get_new_temp, symbol_table)
+            AstNode.generateCode(expr0, get_new_label,
+                                 get_new_temp, symbol_table)
+            AstNode.generateCode(expr1, get_new_label,
+                                 get_new_temp, symbol_table)
 
             head.code = expr0.code + "\n" + expr1.code + "\n" + \
                 head.value + " = " + expr0.value + " + " + expr1.value
@@ -352,7 +460,8 @@ class AstNode:
             if(expr1 == None):
                 head.value = get_new_temp()
 
-                AstNode.generateCode(expr0, get_new_label, get_new_temp, symbol_table)
+                AstNode.generateCode(expr0, get_new_label,
+                                     get_new_temp, symbol_table)
 
                 head.code = expr0.code + "\n" +  \
                     head.value + " = " + " - " + expr0.value
@@ -360,8 +469,10 @@ class AstNode:
             else:
                 head.value = get_new_temp()
 
-                AstNode.generateCode(expr0, get_new_label, get_new_temp, symbol_table)
-                AstNode.generateCode(expr1, get_new_label, get_new_temp, symbol_table)
+                AstNode.generateCode(expr0, get_new_label,
+                                     get_new_temp, symbol_table)
+                AstNode.generateCode(expr1, get_new_label,
+                                     get_new_temp, symbol_table)
 
                 head.code = expr0.code + "\n" + expr1.code + "\n" + \
                     head.value + " = " + expr0.value + " - " + expr1.value
@@ -374,8 +485,10 @@ class AstNode:
 
             head.value = get_new_temp()
 
-            AstNode.generateCode(expr0, get_new_label, get_new_temp, symbol_table)
-            AstNode.generateCode(expr1, get_new_label, get_new_temp, symbol_table)
+            AstNode.generateCode(expr0, get_new_label,
+                                 get_new_temp, symbol_table)
+            AstNode.generateCode(expr1, get_new_label,
+                                 get_new_temp, symbol_table)
 
             head.code = expr0.code + "\n" + expr1.code + "\n" + \
                 head.value + " = " + expr0.value + " * " + expr1.value
@@ -388,8 +501,10 @@ class AstNode:
 
             head.value = get_new_temp()
 
-            AstNode.generateCode(expr0, get_new_label, get_new_temp, symbol_table)
-            AstNode.generateCode(expr1, get_new_label, get_new_temp, symbol_table)
+            AstNode.generateCode(expr0, get_new_label,
+                                 get_new_temp, symbol_table)
+            AstNode.generateCode(expr1, get_new_label,
+                                 get_new_temp, symbol_table)
 
             head.code = expr0.code + "\n" + expr1.code + "\n" + \
                 head.value + " = " + expr0.value + " / " + expr1.value
@@ -402,8 +517,10 @@ class AstNode:
 
             head.value = get_new_temp()
 
-            AstNode.generateCode(expr0, get_new_label, get_new_temp, symbol_table)
-            AstNode.generateCode(expr1, get_new_label, get_new_temp, symbol_table)
+            AstNode.generateCode(expr0, get_new_label,
+                                 get_new_temp, symbol_table)
+            AstNode.generateCode(expr1, get_new_label,
+                                 get_new_temp, symbol_table)
 
             head.code = expr0.code + "\n" + expr1.code + "\n" + \
                 head.value + " = " + expr0.value + " % " + expr1.value
@@ -415,74 +532,100 @@ class AstNode:
             if type(head.left) == str:
                 varname, expr = head.left, head.right
 
-                
-                AstNode.generateCode(expr, get_new_label, get_new_temp, symbol_table)
-                typeChecker.check(head,symbol_table)
+                AstNode.generateCode(expr, get_new_label,
+                                     get_new_temp, symbol_table)
+                typeChecker.check(head, symbol_table)
                 head.code = expr.code + "\n" + varname + " = " + expr.value
 
         # --------------------------------------------------------------------
 
-        elif head.operator == Operator.A_DECL:
+        # elif head.operator == Operator.A_DECL:
 
-            left = head.left
+        #     left = head.left
 
-            # to distinguish between init and declaration
-            if head.right is not None:
-                # initialization
-                right = head.right
+        #     # to distinguish between init and declaration
+        #     if head.right is not None:
+        #         # initialization
+        #         right = head.right
 
-                AstNode.generateCode(right, get_new_label, get_new_temp, symbol_table)
+        #         AstNode.generateCode(right, get_new_label,
+        #                              get_new_temp, symbol_table)
 
-                head.code = right.code + "\n" + \
-                    left[0] + " " + left[1] + " = " + right.value + "\n"
+        #         head.code = right.code + "\n" + \
+        #             left[0] + " " + left[1] + " = " + right.value + "\n"
 
-            else:
-                # declaration
-                head.code = left[0] + " " + left[1] + " = "
-                if left[0] == INT:
-                    head.code += "0"
-                elif left[0] == FLOAT:
-                    head.code += "0.0"
-                elif left[0] == STRING:
-                    head.code += "\"\""
-                elif left[0] == BOOL:
-                    head.code += "false"
-                elif left[0] == CHAR:
-                    head.code += "'0'"
+        #     else:
+        #         # declaration
+        #         head.code = left[0] + " " + left[1] + " = "
+        #         if left[0] == INT:
+        #             head.code += "0"
+        #         elif left[0] == FLOAT:
+        #             head.code += "0.0"
+        #         elif left[0] == STRING:
+        #             head.code += "\"\""
+        #         elif left[0] == BOOL:
+        #             head.code += "false"
+        #         elif left[0] == CHAR:
+        #             head.code += "'0'"
+
+        # # --------------------------------------------------------------------
+
+        # # semantic checks here for the size of the array on the left and on the right
+        # elif head.operator == Operator.A_ARR_DECL:
+
+        #     # only-declaration is not possible with array
+        #     left_list, array_list = head.left, head.right
+
+            # AstNode.generateCode(array_list, get_new_label,
+            #                      get_new_temp, symbol_table)
+
+            # size = 0
+            # if left_list[0] == INT:
+            #     size = 4
+            # elif left_list[0] == CHAR:
+            #     size = 1
+            # elif left_list[0] == FLOAT:
+            #     size = 4
+            # elif left_list[0] == BOOL:
+            #     size = 1
+
+        #     if left_list[2][0] == -1:
+        #         # size is not specified
+        #         total_size = len(array_list.value)
+        #         if total_size % left_list[2][1] != 0:
+        #             raise Exception(
+        #                 "Semantic error: The number of array elements is incorrect")
+        #         actual_size = total_size//left_list[2][1]
+        #         left_list[2][0] = actual_size
+
+            # head.code = f"{left_list[0]} {left_list[1]}[{int(math.prod(left_list[2]))*size}]\n"
+
+            # for i in range(len(array_list.value)):
+            #     head.code += f"{left_list[1]}[{i*size}]={array_list.value[i]}\n"
 
         # --------------------------------------------------------------------
 
-        # semantic checks here for the size of the array on the left and on the right
         elif head.operator == Operator.A_ARR_DECL:
 
-            # only-declaration is not possible with array
-            left_list, array_list = head.left, head.right
+            array_rec, array_list = head.left, head.right
 
-            AstNode.generateCode(array_list, get_new_label, get_new_temp, symbol_table)
+            AstNode.generateCode(array_list, get_new_label,
+                                 get_new_temp, symbol_table)
 
             size = 0
-            if left_list[0] == INT:
+            if head.data_type == INT:
                 size = 4
-            elif left_list[0] == CHAR:
+            elif head.data_type == CHAR:
                 size = 1
-            elif left_list[0] == FLOAT:
+            elif head.data_type == FLOAT:
                 size = 4
-            elif left_list[0] == BOOL:
+            elif head.data_type == BOOL:
                 size = 1
 
-            if left_list[2][0] == -1:
-                # size is not specified
-                total_size = len(array_list.value)
-                if total_size % left_list[2][1] != 0:
-                    raise Exception(
-                        "Semantic error: The number of array elements is incorrect")
-                actual_size = total_size//left_list[2][1]
-                left_list[2][0] = actual_size
-
-            head.code = f"{left_list[0]} {left_list[1]}[{int(math.prod(left_list[2]))*size}]\n"
+            head.code = f"{head.data_type} {head.value}[{int(math.prod(array_rec.value))*size}]\n"
 
             for i in range(len(array_list.value)):
-                head.code += f"{left_list[1]}[{i*size}]={array_list.value[i]}\n"
+                head.code += f"{head.value}[{i*size}]={array_list.value[i]}\n"
 
         # --------------------------------------------------------------------
 
@@ -495,7 +638,8 @@ class AstNode:
                 head.code = ""
 
             else:
-                AstNode.generateCode(right, get_new_label, get_new_temp, symbol_table)
+                AstNode.generateCode(right, get_new_label,
+                                     get_new_temp, symbol_table)
                 head.value = [left[1], *right.value]
                 head.code = ""
 
@@ -503,7 +647,7 @@ class AstNode:
 
         elif head.operator == Operator.A_BOOLCONST:
 
-            if head.value == "switch":
+            if head.value == "switch" or head.true == None or head.false == None:
                 head.code = ""
             else:
                 if head.value == "true":
@@ -518,3 +662,32 @@ class AstNode:
             head.code = ""
 
         # --------------------------------------------------------------------
+
+        elif head.operator == Operator.A_BOOL:
+
+            left = head.left
+
+            AstNode.generateCode(left, get_new_label,
+                                 get_new_temp, symbol_table)
+
+            # left variable type is assumed to be "int" or "float"
+            # for other types we need to generate code accordingly after semantic analysis
+            # for bool : a == true
+            # for char : a != '\0'
+            # for string : a != ""
+
+            if left.operator == Operator.A_VARIABLE:
+                head.code = left.code + "\n" + \
+                    "if " + left.value + " " + "!=" + " " + "0" + " goto " + head.true + \
+                    "\n" + "goto " + head.false
+            else:
+                if left.operator == Operator.A_INTCONST and left.value == "0":
+                    head.code = "goto " + head.false
+                elif left.operator == Operator.A_STRINGCONST and left.value == "":
+                    head.code = "goto " + head.false
+                elif left.operator == Operator.A_CHARCONST and left.value == "'\\0'":
+                    head.code = "goto " + head.false
+                elif left.operator == Operator.A_FLOATCONST and left.value == "0.0":
+                    head.code = "goto " + head.false
+                else:
+                    head.code = "goto " + head.true

@@ -1,4 +1,3 @@
-from operator import le
 from sly import Parser as SlyParser
 from AstNode import Operator, AstNode
 from LexicalAnalysis import lexer
@@ -7,11 +6,12 @@ import os
 TEST_SUITES_DIR = os.path.join("..", "TestSuites") if os.getcwd().endswith(
     "SyntaxAnalysis") else os.path.join("TestSuites")
 
+
 class Parser(SlyParser):
 
     def __init__(self):
         self.symbol_table = []
-        self.id = 2 # start from 2, as 1 is reserved for global scope
+        self.id = 2  # start from 2, as 1 is reserved for global scope
         self.scope_id_stack = [0, 1]
         self.num_labels = 0
         self.num_temp = 0
@@ -38,7 +38,7 @@ class Parser(SlyParser):
             print("Error: Variable already declared in current scope")
             raise Exception(
                 f"Error : variable \"{varname}\" already declared in current scope")
-        #else append the variable to the symbol table
+        # else append the variable to the symbol table
         self.symbol_table.append({
             "identifier_name": varname,
             "type": data_type,
@@ -51,9 +51,9 @@ class Parser(SlyParser):
     Each function corresponds to a production rule in the grammar. The rule is mentioned as a comment just above 
     corresponding function. SLY works on SDDs, so the body of the method is executed after the entire production is matched"""
 
-    start = "program" # start symbol of the grammar
+    start = "program"  # start symbol of the grammar
     tokens = lexer.Lexer.tokens
-    debugfile = 'parser.out' # SLY parser writes debug information to this file
+    debugfile = 'parser.out'  # SLY parser writes debug information to this file
     precedence = (
         ('left', 'COMMA'),
         ('right', 'ASSIGN'),
@@ -63,9 +63,12 @@ class Parser(SlyParser):
         ('left', 'RELOP1'),
         ('left', 'PLUS', 'MINUS'),
         ('left', 'MULT', 'DIVIDE', 'MOD'),
-        ('right', 'TYPECASTING'),         # fictitious token used to handle special precedence rules
-        ('right', 'UMINUS', 'NOT'),       # fictitious token used to handle special precedence rules
-        ('right', 'PAREN')                # fictitious token used to handle special precedence rules
+        # fictitious token used to handle special precedence rules
+        ('right', 'TYPECASTING'),
+        # fictitious token used to handle special precedence rules
+        ('right', 'UMINUS', 'NOT'),
+        # fictitious token used to handle special precedence rules
+        ('right', 'PAREN')
     )
 
     # program -> methods
@@ -73,8 +76,9 @@ class Parser(SlyParser):
     def program(self, p):
         """Starting production, top of the parsing tree, calls the recursive generateCode() method"""
         val = AstNode(Operator.A_ROOT, left=p.methods)
-        AstNode.generateCode(val, self.get_new_label, self.get_new_temp, self.symbol_table)
-        print(val.code)
+        AstNode.generateCode(val, self.get_new_label,
+                             self.get_new_temp, self.symbol_table)
+        # print(val.code)
         print(self.symbol_table)
 
     # methods -> methods method
@@ -203,24 +207,39 @@ class Parser(SlyParser):
 
 # ----------------------- ARRAY INIT ---------------------------
 
-    # array_init -> DATATYPE VARNAME [INTVAL] = { array_list }
-    # if array_list is empty, then the corresponding ASTNode will be None
-    @_("DATATYPE VARNAME LSQB INTVAL RSQB ASSIGN LBRACE array_list RBRACE")
-    def array_init(self, p):
-        self.push_to_ST(p.DATATYPE, p.VARNAME, [int(p.INTVAL)])
-        return AstNode(Operator.A_ARR_DECL, left=[p.DATATYPE, p.VARNAME, [int(p.INTVAL)]], right=p.array_list)
+    # # array_init -> DATATYPE VARNAME [INTVAL] = { array_list }
+    # # if array_list is empty, then the corresponding ASTNode will be None
+    # @_("DATATYPE VARNAME LSQB INTVAL RSQB ASSIGN LBRACE array_list RBRACE")
+    # def array_init(self, p):
+    #     self.push_to_ST(p.DATATYPE, p.VARNAME, [int(p.INTVAL)])
+    #     return AstNode(Operator.A_ARR_DECL, left=[p.DATATYPE, p.VARNAME, [int(p.INTVAL)]], right=p.array_list)
 
-    # array_init -> DATATYPE VARNAME [INTVAL] [INTVAL] = { array_list }
-    @_("DATATYPE VARNAME LSQB INTVAL RSQB LSQB INTVAL RSQB ASSIGN LBRACE array_list RBRACE")
-    def array_init(self, p):
-        self.push_to_ST(p.DATATYPE, p.VARNAME, [int(p[3]), int(p[6])])
-        return AstNode(Operator.A_ARR_DECL, left=[p.DATATYPE, p.VARNAME, [int(p[3]), int(p[6])]], right=p.array_list)
+    # # array_init -> DATATYPE VARNAME [INTVAL] [INTVAL] = { array_list }
+    # @_("DATATYPE VARNAME LSQB INTVAL RSQB LSQB INTVAL RSQB ASSIGN LBRACE array_list RBRACE")
+    # def array_init(self, p):
+    #     self.push_to_ST(p.DATATYPE, p.VARNAME, [int(p[3]), int(p[6])])
+    #     return AstNode(Operator.A_ARR_DECL, left=[p.DATATYPE, p.VARNAME, [int(p[3]), int(p[6])]], right=p.array_list)
 
-    # array_init -> DATATYPE VARNAME [] [INTVAL] = { array_list }
-    @_("DATATYPE VARNAME LSQB RSQB LSQB INTVAL RSQB ASSIGN LBRACE array_list RBRACE")
+    # # array_init -> DATATYPE VARNAME [] [INTVAL] = { array_list }
+    # @_("DATATYPE VARNAME LSQB RSQB LSQB INTVAL RSQB ASSIGN LBRACE array_list RBRACE")
+    # def array_init(self, p):
+    #     self.push_to_ST(p.DATATYPE, p.VARNAME, [-1, int(p[5])])
+    #     return AstNode(Operator.A_ARR_DECL, left=[p.DATATYPE, p.VARNAME, [-1, int(p[5])], self.scope_id_stack[-1]], right=p.array_list)
+
+    # array_init -> DATATYPE VARNAME array_rec [INTVAL] = { array_list }
+    @_("DATATYPE VARNAME array_rec ASSIGN LBRACE array_list RBRACE")
     def array_init(self, p):
-        self.push_to_ST(p.DATATYPE, p.VARNAME, [-1, int(p[5])])
-        return AstNode(Operator.A_ARR_DECL, left=[p.DATATYPE, p.VARNAME, [-1, int(p[5])]], right=p.array_list)
+        self.push_to_ST(p.DATATYPE, p.VARNAME, p.array_rec.value)
+        return AstNode(Operator.A_ARR_DECL, left=p.array_rec, right=p.array_list, data_type=p.DATATYPE, value=p.VARNAME)
+
+    # array_rec -> array_rec [INTVAL] | e
+    @_("array_rec LSQB INTVAL RSQB")
+    def array_rec(self, p):
+        return AstNode(Operator.A_ARRAY_REC, left=p.array_rec, value=[*p.array_rec.value, int(p.INTVAL)])
+
+    @_("LSQB INTVAL RSQB")
+    def array_rec(self, p):
+        return AstNode(Operator.A_ARRAY_REC, value=[int(p.INTVAL)])
 
 # ------------------- ARRAY LIST ---------------------------------------
 
@@ -424,36 +443,20 @@ class Parser(SlyParser):
     def expr(self, p):
         return str('('+p[0]+p[1]+p[2]+p[3]+')')
 
-    # arr_variable -> VARNAME [INTVAL] | VARNAME [INTVAL][INTVAL] | VARNAME [VARNAME] | VARNAME [VARNAME][VARNAME] | VARNAME [INTVAL][VARNAME] | VARNAME [VARNAME][INTVAL]
-    @_('VARNAME LSQB INTVAL RSQB')
+    # array_variable -> VARNAME array_variable_rec
+    @_('VARNAME array_variable_rec')
     def array_variable(self, p):
-        '''return {
-            "code"
-            "addr"
-            "rows"
-            "columns"
-        }'''
-        return str('('+p[0]+'['+p[2]+']'+')')
+        return AstNode(Operator.A_ARRAY_VARIABLE, left=p.array_variable_rec, value=p.VARNAME)
 
-    @_('VARNAME LSQB INTVAL RSQB LSQB INTVAL RSQB')
-    def array_variable(self, p):
-        return str('('+p[0]+'['+p[2]+']['+p[5]+']'+')')
+    # array_variable_rec -> array_variable_rec [expr] | [expr]
+    @_('LSQB expr RSQB array_variable_rec')
+    def array_variable_rec(self, p):
+        return AstNode(Operator.A_ARRAY_VARIABLE_REC, left=p.array_variable_rec, right=p.expr)
 
-    @_('VARNAME LSQB VARNAME RSQB')
-    def array_variable(self, p):
-        return str('('+p[0]+'['+p[2]+']'+')')
-
-    @_('VARNAME LSQB VARNAME RSQB LSQB INTVAL RSQB')
-    def array_variable(self, p):
-        return str('('+p[0]+'['+p[2]+']['+p[5]+']'+')')
-
-    @_('VARNAME LSQB INTVAL RSQB LSQB VARNAME RSQB')
-    def array_variable(self, p):
-        return str('('+p[0]+'['+p[2]+']['+p[5]+']'+')')
-
-    @_('VARNAME LSQB VARNAME RSQB LSQB VARNAME RSQB')
-    def array_variable(self, p):
-        return str('('+p[0]+'['+p[2]+']['+p[5]+']'+')')
+    @_('empty')
+    def array_variable_rec(self, p):
+        # return AstNode(Operator.A_ARRAY_VARIABLE_REC, left=p.expr)
+        pass
 
     # assignment_statement -> left_value = expr
     @_('left_value ASSIGN expr')
@@ -472,6 +475,11 @@ class Parser(SlyParser):
     @_('array_variable')
     def left_value(self, p):
         return str(p[0])
+
+    # array_variable -> VARNAME [expr] | VARNAME [expr][expr]
+    @_('VARNAME LSQB expr RSQB')
+    def array_variable(self, p):
+        return AstNode(Operator.A_ARR_SINGLE, left=p.VARNAME, right=p.expr)
 
     # constant -> INTVAL | FLOATVAL | CHARVAL | STRINGVAL | BOOLVAL
     @_('INTVAL')
@@ -542,7 +550,7 @@ if __name__ == '__main__':
     lex = lexer.Lexer()
     parser = Parser()
 
-    with open(os.path.join(TEST_SUITES_DIR, "SemanticTest1.sq"), 'r') as f:
+    with open(os.path.join(TEST_SUITES_DIR, "ArrayInittest.sq"), 'r') as f:
         text = f.read()
 
     parser.parse(lex.tokenize(text))
