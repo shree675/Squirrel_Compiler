@@ -16,18 +16,12 @@ simple_init -> DATATYPE VARNAME | DATATYPE VARNAME = expr
 # TODO : empty list not permitted 
 # TODO : write rules for global variables
 
-// array_init -> DATATYPE VARNAME [INTVAL] = { array_list } | DATATYPE VARNAME [INTVAL?] [INTVAL] = { array_list } 
-array_init -> DATATYPE VARNAME array_rec [INTVAL] = { array_list }
-array_rec -> array_rec [INTVAL] | e
+array_init -> DATATYPE array_variable = { array_list }
+array_variable -> VARNAME [ expr ] | array_variable [ expr ]
 
-array_list -> array_list_rec | e
-array_list_rec -> constant, array_list_rec | constant
+array_list -> array_list, expr | expr
 
 constant -> INTVAL | FLOATVAL | CHARVAL | STRINGVAL | BOOLVAL
-
-// array_variable -> VARNAME [INTVAL] | VARNAME [INTVAL][INTVAL] | VARNAME [VARNAME] | VARNAME [VARNAME][VARNAME] | VARNAME [INTVAL][VARNAME] | VARNAME [VARNAME][INTVAL]
-array_variable -> VARNAME array_variable_rec
-array_variable_rec -> array_variable_rec [expr] | [expr]
 
 ✓ assignment_statement -> left_value = expr
 left_value -> VARNAME | array_variable

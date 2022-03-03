@@ -205,61 +205,32 @@ class Parser(SlyParser):
         self.push_to_ST(p.DATATYPE, p.VARNAME, [])
         return AstNode(Operator.A_DECL, left=[p.DATATYPE, p.VARNAME], right=p.expr)
 
-# ----------------------- ARRAY INIT ---------------------------
+# ----------------------- ARRAY INIT ---------------------------------
 
-    # # array_init -> DATATYPE VARNAME [INTVAL] = { array_list }
-    # # if array_list is empty, then the corresponding ASTNode will be None
-    # @_("DATATYPE VARNAME LSQB INTVAL RSQB ASSIGN LBRACE array_list RBRACE")
-    # def array_init(self, p):
-    #     self.push_to_ST(p.DATATYPE, p.VARNAME, [int(p.INTVAL)])
-    #     return AstNode(Operator.A_ARR_DECL, left=[p.DATATYPE, p.VARNAME, [int(p.INTVAL)]], right=p.array_list)
-
-    # # array_init -> DATATYPE VARNAME [INTVAL] [INTVAL] = { array_list }
-    # @_("DATATYPE VARNAME LSQB INTVAL RSQB LSQB INTVAL RSQB ASSIGN LBRACE array_list RBRACE")
-    # def array_init(self, p):
-    #     self.push_to_ST(p.DATATYPE, p.VARNAME, [int(p[3]), int(p[6])])
-    #     return AstNode(Operator.A_ARR_DECL, left=[p.DATATYPE, p.VARNAME, [int(p[3]), int(p[6])]], right=p.array_list)
-
-    # # array_init -> DATATYPE VARNAME [] [INTVAL] = { array_list }
-    # @_("DATATYPE VARNAME LSQB RSQB LSQB INTVAL RSQB ASSIGN LBRACE array_list RBRACE")
-    # def array_init(self, p):
-    #     self.push_to_ST(p.DATATYPE, p.VARNAME, [-1, int(p[5])])
-    #     return AstNode(Operator.A_ARR_DECL, left=[p.DATATYPE, p.VARNAME, [-1, int(p[5])], self.scope_id_stack[-1]], right=p.array_list)
-
-    # array_init -> DATATYPE VARNAME array_rec [INTVAL] = { array_list }
-    @_("DATATYPE VARNAME array_rec ASSIGN LBRACE array_list RBRACE")
+    # array_init -> DATATYPE VARNAME array_variable = { array_list }
+    @_("DATATYPE array_variable ASSIGN LBRACE array_list RBRACE")
     def array_init(self, p):
-        self.push_to_ST(p.DATATYPE, p.VARNAME, p.array_rec.value)
-        return AstNode(Operator.A_ARR_DECL, left=p.array_rec, right=p.array_list, data_type=p.DATATYPE, value=p.VARNAME)
+        pass
 
-    # array_rec -> array_rec [INTVAL] | e
-    @_("array_rec LSQB INTVAL RSQB")
-    def array_rec(self, p):
-        return AstNode(Operator.A_ARRAY_REC, left=p.array_rec, value=[*p.array_rec.value, int(p.INTVAL)])
+    # array_variable -> VARNAME [expr]
+    @_("VARNAME LSQB expr RSQB")
+    def array_variable(self, p):
+        pass
 
-    @_("LSQB INTVAL RSQB")
-    def array_rec(self, p):
-        return AstNode(Operator.A_ARRAY_REC, value=[int(p.INTVAL)])
+    # array_variable [expr]
+    @_("array_variable LSQB expr RSQB")
+    def array_variable(self, p):
+        pass
 
-# ------------------- ARRAY LIST ---------------------------------------
-
-    # array_list = constant, array_list | constant
-
-    @_("array_list_rec")
+    # array_list -> array_list, expr
+    @_("array_list COMMA expr")
     def array_list(self, p):
-        return p.array_list_rec
+        pass
 
-    @_("empty")
+    # array_list -> expr
+    @_("expr")
     def array_list(self, p):
-        return None
-
-    @_("constant")
-    def array_list_rec(self, p):
-        return AstNode(Operator.A_ARR_LITERAL, left=p.constant)
-
-    @_("constant COMMA array_list_rec")
-    def array_list_rec(self, p):
-        return AstNode(Operator.A_ARR_LITERAL, left=p.constant, right=p.array_list_rec)
+        pass
 
 # ---------------------------------------------------------------------------
 
@@ -443,21 +414,6 @@ class Parser(SlyParser):
     def expr(self, p):
         return str('('+p[0]+p[1]+p[2]+p[3]+')')
 
-    # array_variable -> VARNAME array_variable_rec
-    @_('VARNAME array_variable_rec')
-    def array_variable(self, p):
-        return AstNode(Operator.A_ARRAY_VARIABLE, left=p.array_variable_rec, value=p.VARNAME)
-
-    # array_variable_rec -> array_variable_rec [expr] | [expr]
-    @_('LSQB expr RSQB array_variable_rec')
-    def array_variable_rec(self, p):
-        return AstNode(Operator.A_ARRAY_VARIABLE_REC, left=p.array_variable_rec, right=p.expr)
-
-    @_('empty')
-    def array_variable_rec(self, p):
-        # return AstNode(Operator.A_ARRAY_VARIABLE_REC, left=p.expr)
-        pass
-
     # assignment_statement -> left_value = expr
     @_('left_value ASSIGN expr')
     def assignment_statement(self, p):
@@ -475,11 +431,6 @@ class Parser(SlyParser):
     @_('array_variable')
     def left_value(self, p):
         return str(p[0])
-
-    # array_variable -> VARNAME [expr] | VARNAME [expr][expr]
-    @_('VARNAME LSQB expr RSQB')
-    def array_variable(self, p):
-        return AstNode(Operator.A_ARR_SINGLE, left=p.VARNAME, right=p.expr)
 
     # constant -> INTVAL | FLOATVAL | CHARVAL | STRINGVAL | BOOLVAL
     @_('INTVAL')
