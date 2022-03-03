@@ -226,7 +226,7 @@ class Parser(SlyParser):
     # array_variable [expr]
     @_("array_variable LSQB INTVAL RSQB")
     def array_variable(self, p):
-        return AstNode(Operator.A_ARRAY_REC, left=p.array_variable, value={"list": [*p.array_variable.value["list"],int(p.INTVAL)], "varname": p.array_variable.value["varname"]})
+        return AstNode(Operator.A_ARRAY_REC, left=p.array_variable, value={"list": [*p.array_variable.value["list"], int(p.INTVAL)], "varname": p.array_variable.value["varname"]})
 
     # array_list -> array_list, expr
     @_("array_list COMMA constant")
