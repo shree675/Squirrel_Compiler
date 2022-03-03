@@ -1,4 +1,4 @@
-✓ program -> methods
+✓ program -> simple_init program | methods
 ✓ methods -> methods method | method
 
 ✓ method -> DATATYPE FUNCNAME ( params ) { statements }

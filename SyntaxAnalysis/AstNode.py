@@ -539,34 +539,34 @@ class AstNode:
 
         # --------------------------------------------------------------------
 
-        # elif head.operator == Operator.A_DECL:
+        elif head.operator == Operator.A_DECL:
 
-        #     left = head.left
+            left = head.left
 
-        #     # to distinguish between init and declaration
-        #     if head.right is not None:
-        #         # initialization
-        #         right = head.right
+            # to distinguish between init and declaration
+            if head.right is not None:
+                # initialization
+                right = head.right
 
-        #         AstNode.generateCode(right, get_new_label,
-        #                              get_new_temp, symbol_table)
+                AstNode.generateCode(right, get_new_label,
+                                     get_new_temp, symbol_table)
 
-        #         head.code = right.code + "\n" + \
-        #             left[0] + " " + left[1] + " = " + right.value + "\n"
+                head.code = right.code + "\n" + \
+                    left[0] + " " + left[1] + " = " + right.value + "\n"
 
-        #     else:
-        #         # declaration
-        #         head.code = left[0] + " " + left[1] + " = "
-        #         if left[0] == INT:
-        #             head.code += "0"
-        #         elif left[0] == FLOAT:
-        #             head.code += "0.0"
-        #         elif left[0] == STRING:
-        #             head.code += "\"\""
-        #         elif left[0] == BOOL:
-        #             head.code += "false"
-        #         elif left[0] == CHAR:
-        #             head.code += "'0'"
+            else:
+                # declaration
+                head.code = left[0] + " " + left[1] + " = "
+                if left[0] == INT:
+                    head.code += "0"
+                elif left[0] == FLOAT:
+                    head.code += "0.0"
+                elif left[0] == STRING:
+                    head.code += "\"\""
+                elif left[0] == BOOL:
+                    head.code += "false"
+                elif left[0] == CHAR:
+                    head.code += "'0'"
 
         # # --------------------------------------------------------------------
 
@@ -622,7 +622,7 @@ class AstNode:
             elif head.data_type == BOOL:
                 size = 1
 
-            head.code = f"{head.data_type} {head.value}[{int(math.prod(array_rec.value))*size}]\n"
+            head.code = f"{head.data_type} {head.value}[{int(math.prod(array_rec.value['list']))*size}]\n"
 
             for i in range(len(array_list.value)):
                 head.code += f"{head.value}[{i*size}]={array_list.value[i]}\n"
@@ -638,12 +638,28 @@ class AstNode:
                 head.code = ""
 
             else:
-                AstNode.generateCode(right, get_new_label,
+                AstNode.generateCode(left, get_new_label,
                                      get_new_temp, symbol_table)
-                head.value = [left[1], *right.value]
+                head.value = [*left.value, right[1]]
                 head.code = ""
 
         # --------------------------------------------------------------------
+
+        # elif head.operator == Operator.A_ARRAY_REC:
+
+        #     left, right = head.left, head.right
+
+        #     if right == None:
+        #         head.value = [left[1]]
+        #         head.code = ""
+
+        #     else:
+        #         AstNode.generateCode(left, get_new_label,
+        #                              get_new_temp, symbol_table)
+        #         head.value = [right[1], *left.value]
+        #         head.code = ""
+
+        # # --------------------------------------------------------------------
 
         elif head.operator == Operator.A_BOOLCONST:
 

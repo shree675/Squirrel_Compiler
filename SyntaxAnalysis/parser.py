@@ -71,6 +71,10 @@ class Parser(SlyParser):
         ('right', 'PAREN')
     )
 
+    @_('simple_init program')
+    def program(self, p):
+        pass
+
     # program -> methods
     @_('methods')
     def program(self, p):
@@ -210,27 +214,29 @@ class Parser(SlyParser):
     # array_init -> DATATYPE VARNAME array_variable = { array_list }
     @_("DATATYPE array_variable ASSIGN LBRACE array_list RBRACE")
     def array_init(self, p):
-        pass
+        self.push_to_ST(
+            p.DATATYPE, p.array_variable.value["varname"], p.array_variable.value["list"])
+        return AstNode(Operator.A_ARR_DECL, left=p.array_variable, right=p.array_list, data_type=p.DATATYPE, value=p.array_variable.value["varname"])
 
     # array_variable -> VARNAME [expr]
-    @_("VARNAME LSQB expr RSQB")
+    @_("VARNAME LSQB INTVAL RSQB")
     def array_variable(self, p):
-        pass
+        return AstNode(Operator.A_ARRAY_REC, value={"list": [int(p.INTVAL)], "varname": p.VARNAME})
 
     # array_variable [expr]
-    @_("array_variable LSQB expr RSQB")
+    @_("array_variable LSQB INTVAL RSQB")
     def array_variable(self, p):
-        pass
+        return AstNode(Operator.A_ARRAY_REC, left=p.array_variable, value={"list": [*p.array_variable.value["list"],int(p.INTVAL)], "varname": p.array_variable.value["varname"]})
 
     # array_list -> array_list, expr
-    @_("array_list COMMA expr")
+    @_("array_list COMMA constant")
     def array_list(self, p):
-        pass
+        return AstNode(Operator.A_ARR_LITERAL, left=p.array_list, right=p.constant)
 
     # array_list -> expr
-    @_("expr")
+    @_("constant")
     def array_list(self, p):
-        pass
+        return AstNode(Operator.A_ARR_LITERAL, left=p.constant)
 
 # ---------------------------------------------------------------------------
 
