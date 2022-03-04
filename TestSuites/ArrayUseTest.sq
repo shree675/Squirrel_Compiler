@@ -1,0 +1,16 @@
+void @start() {
+    int arr[3][2][2] = {1,2,3,4,5,6,1,2,3,4,5,6};
+    arr[i][j][k]=10;
+
+    char charArray[5] = {'a', 'b', 'c', 'd', 'e'};
+    charArray[i] = 'f';
+
+    int a;
+    int b;
+    int c=18;
+
+    float floatArray[2][3] = {1.1, 2.2, 3.3, 4.4, 5.5, 6.6};
+    floatArray[a+b][j] = 7.7;
+
+    a=floatArray[i][j];
+}

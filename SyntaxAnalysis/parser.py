@@ -71,9 +71,9 @@ class Parser(SlyParser):
         ('right', 'PAREN')
     )
 
-    @_('simple_init program')
-    def program(self, p):
-        pass
+    # @_('simple_init program')
+    # def program(self, p):
+    #     pass
 
     # program -> methods
     @_('methods')
@@ -188,7 +188,6 @@ class Parser(SlyParser):
     def selection_statement(self, p):
         return AstNode(Operator.A_SWITCHPARENT, left=p.switch_statement)
 
-    # TODO : ST for array_init
     # declaration_statement -> simple_init | array_init
     @_("simple_init")
     def declaration_statement(self, p):
@@ -226,7 +225,7 @@ class Parser(SlyParser):
     # array_variable [expr]
     @_("array_variable LSQB INTVAL RSQB")
     def array_variable(self, p):
-        return AstNode(Operator.A_ARRAY_REC, left=p.array_variable, value={"list": [*p.array_variable.value["list"],int(p.INTVAL)], "varname": p.array_variable.value["varname"]})
+        return AstNode(Operator.A_ARRAY_REC, left=p.array_variable, value={"list": [*p.array_variable.value["list"], int(p.INTVAL)], "varname": p.array_variable.value["varname"]})
 
     # array_list -> array_list, expr
     @_("array_list COMMA constant")
@@ -237,6 +236,18 @@ class Parser(SlyParser):
     @_("constant")
     def array_list(self, p):
         return AstNode(Operator.A_ARR_LITERAL, left=p.constant)
+
+# ---------------------------------------------------------------------------
+
+    # array_variable -> VARNAME [expr]
+    @_("VARNAME LSQB expr RSQB")
+    def array_var_use(self, p):
+        return AstNode(Operator.A_ARR_EXPR_REC, left=p.expr, value={"varname": p.VARNAME, "val": "", "index": 1, "scope": self.id-1})
+
+    # array_variable [expr]
+    @_("array_var_use LSQB expr RSQB")
+    def array_var_use(self, p):
+        return AstNode(Operator.A_ARR_EXPR_REC, left=p.array_var_use, right=p.expr, value={"varname": p.array_var_use.value["varname"], "val": "", "index": p.array_var_use.value["index"]+1, "scope": self.id-1})
 
 # ---------------------------------------------------------------------------
 
@@ -410,6 +421,10 @@ class Parser(SlyParser):
     def expr(self, p):
         return AstNode(Operator.A_VARIABLE, value=p.VARNAME)
 
+    @_('array_var_use')
+    def expr(self, p):
+        return AstNode(Operator.A_ARREXPR_VARIABLE, left=p.array_var_use)
+
     # expr -> constant
     @_('constant')
     def expr(self, p):
@@ -423,10 +438,9 @@ class Parser(SlyParser):
     # assignment_statement -> left_value = expr
     @_('left_value ASSIGN expr')
     def assignment_statement(self, p):
-        # TODO: update this
-        try:
+        if type(p.left_value) == list:
             return AstNode(Operator.A_ASSIGN_STMT, left=p.left_value[1], right=p.expr)
-        except:
+        else:
             return AstNode(Operator.A_ASSIGN_STMT, left=p.left_value, right=p.expr)
 
     # left_value -> VARNAME | array_variable
@@ -434,9 +448,9 @@ class Parser(SlyParser):
     def left_value(self, p):
         return ["varname", str(p[0])]
 
-    @_('array_variable')
+    @_('array_var_use')
     def left_value(self, p):
-        return str(p[0])
+        return AstNode(Operator.A_ARREXPR_VARIABLE, left=p.array_var_use)
 
     # constant -> INTVAL | FLOATVAL | CHARVAL | STRINGVAL | BOOLVAL
     @_('INTVAL')
@@ -507,7 +521,7 @@ if __name__ == '__main__':
     lex = lexer.Lexer()
     parser = Parser()
 
-    with open(os.path.join(TEST_SUITES_DIR, "ArrayInittest.sq"), 'r') as f:
+    with open(os.path.join(TEST_SUITES_DIR, "ArrayUseTest.sq"), 'r') as f:
         text = f.read()
 
     parser.parse(lex.tokenize(text))

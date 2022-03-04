@@ -17,14 +17,15 @@ simple_init -> DATATYPE VARNAME | DATATYPE VARNAME = expr
 # TODO : write rules for global variables
 
 array_init -> DATATYPE array_variable = { array_list }
-array_variable -> VARNAME [ expr ] | array_variable [ expr ]
+array_variable -> VARNAME [ INTVAL ] | array_variable [ INTVAL ]
+array_var_use -> VARNAME [ expr ] | array_var_use [ expr ]
 
 array_list -> array_list, expr | expr
 
 constant -> INTVAL | FLOATVAL | CHARVAL | STRINGVAL | BOOLVAL
 
 ✓ assignment_statement -> left_value = expr
-left_value -> VARNAME | array_variable
+left_value -> VARNAME | array_var_use
 
 io_statement -> input_statement | output_statement
 input_statement -> INPUT ( left_value )
@@ -62,3 +63,12 @@ Problems :
 2. During the Semantic analysis check the size of the array
 3. During the Semantic analysis check VARNAME length in declaration_statement
 4. Elegant error messages eg : col, row numbers of the error
+
+arr[i][j]
+arr[3][2]
+================
+t0=i*2
+t1=j
+t2=t0+t1
+t3=t2*4
+arr[t2]
