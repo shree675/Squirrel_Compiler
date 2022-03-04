@@ -64,6 +64,8 @@ class Operator(Enum):
     A_ARRAY_REC = "array rec"
     A_ARRAY_VARIABLE_REC = "array variable rec"
     A_ARRAY_VARIABLE = "array variable"
+    A_ARREXPR_VARIABLE = "array expr variable"
+    A_ARR_EXPR_REC = "array expr rec"
 
 
 typeChecker = TypeChecker()
@@ -527,6 +529,94 @@ class AstNode:
 
         # --------------------------------------------------------------------
 
+        # semantic analysis is required here
+
+        elif head.operator == Operator.A_ARREXPR_VARIABLE:
+
+            array_variable = head.left
+
+            AstNode.generateCode(array_variable, get_new_label,
+                                 get_new_temp, symbol_table)
+
+            temp = get_new_temp()
+
+            variable = list(filter(
+                lambda var: var["scope"] == array_variable.value["scope"] and var["identifier_name"] == array_variable.value["varname"],
+                symbol_table
+            ))
+            data_type = variable[0]["type"]
+            if data_type == INT:
+                size = 4
+            elif data_type == CHAR:
+                size = 1
+            elif data_type == FLOAT:
+                size = 4
+            elif data_type == BOOL:
+                size = 1
+
+            head.value = array_variable.value["varname"] + "[" + temp + "]"
+            head.code = array_variable.code + "\n" + \
+                temp + " = " + array_variable.value["val"] + " * " + str(size)
+
+        # --------------------------------------------------------------------
+
+        # semantic analysis is required here
+
+        elif head.operator == Operator.A_ARR_EXPR_REC:
+
+            if head.right is not None:
+                array_var_use, expr = head.left, head.right
+
+                AstNode.generateCode(array_var_use, get_new_label,
+                                     get_new_temp, symbol_table)
+                AstNode.generateCode(expr, get_new_label,
+                                     get_new_temp, symbol_table)
+
+                temp = get_new_temp()
+                head.value["val"] = get_new_temp()
+                index = head.value["index"]
+                variable = list(filter(
+                    lambda var: var["scope"] == head.value["scope"] and var["identifier_name"] == head.value["varname"],
+                    symbol_table
+                ))
+                i = len(variable[0]["dimension"])-index
+                dimension = variable[0]["dimension"][i]
+
+                if i == 0:
+                    head.code = array_var_use.code + "\n" + expr.code + "\n" + temp + " = " + expr.value + "\n" + \
+                        head.value["val"] + " = " + \
+                        array_var_use.value["val"] + " + " + temp
+                else:
+                    head.code = array_var_use.code + "\n" + expr.code + "\n" + temp + " = " + expr.value + " * " + str(dimension) + "\n" + \
+                        head.value["val"] + " = " + \
+                        array_var_use.value["val"] + " + " + temp
+
+            else:
+                expr = head.left
+
+                AstNode.generateCode(expr, get_new_label,
+                                     get_new_temp, symbol_table)
+
+                index = head.value["index"]
+                variable = list(filter(
+                    lambda var: var["scope"] == head.value["scope"] and var["identifier_name"] == head.value["varname"],
+                    symbol_table
+                ))
+                i = len(variable[0]["dimension"])-index
+                dimension = variable[0]["dimension"][len(
+                    variable[0]["dimension"])-index]
+
+                if i == 0:
+                    head.value["val"] = expr.value
+                    head.code = expr.code
+                else:
+                    head.value["val"] = get_new_temp()
+                    head.code = expr.code + "\n" + \
+                        head.value["val"] + " = " + \
+                        expr.value + " * " + str(dimension)
+
+        # --------------------------------------------------------------------
+
         elif head.operator == Operator.A_ASSIGN_STMT:
 
             if type(head.left) == str:
@@ -536,6 +626,18 @@ class AstNode:
                                      get_new_temp, symbol_table)
                 typeChecker.check(head, symbol_table)
                 head.code = expr.code + "\n" + varname + " = " + expr.value
+
+            else:
+                left_value, expr = head.left, head.right
+
+                AstNode.generateCode(
+                    left_value, get_new_label, get_new_temp, symbol_table)
+                AstNode.generateCode(expr, get_new_label,
+                                     get_new_temp, symbol_table)
+                typeChecker.check(head, symbol_table)
+
+                head.code = left_value.code + "\n" + expr.code + \
+                    "\n" + left_value.value + " = " + expr.value
 
         # --------------------------------------------------------------------
 
@@ -567,41 +669,6 @@ class AstNode:
                     head.code += "false"
                 elif left[0] == CHAR:
                     head.code += "'0'"
-
-        # # --------------------------------------------------------------------
-
-        # # semantic checks here for the size of the array on the left and on the right
-        # elif head.operator == Operator.A_ARR_DECL:
-
-        #     # only-declaration is not possible with array
-        #     left_list, array_list = head.left, head.right
-
-            # AstNode.generateCode(array_list, get_new_label,
-            #                      get_new_temp, symbol_table)
-
-            # size = 0
-            # if left_list[0] == INT:
-            #     size = 4
-            # elif left_list[0] == CHAR:
-            #     size = 1
-            # elif left_list[0] == FLOAT:
-            #     size = 4
-            # elif left_list[0] == BOOL:
-            #     size = 1
-
-        #     if left_list[2][0] == -1:
-        #         # size is not specified
-        #         total_size = len(array_list.value)
-        #         if total_size % left_list[2][1] != 0:
-        #             raise Exception(
-        #                 "Semantic error: The number of array elements is incorrect")
-        #         actual_size = total_size//left_list[2][1]
-        #         left_list[2][0] = actual_size
-
-            # head.code = f"{left_list[0]} {left_list[1]}[{int(math.prod(left_list[2]))*size}]\n"
-
-            # for i in range(len(array_list.value)):
-            #     head.code += f"{left_list[1]}[{i*size}]={array_list.value[i]}\n"
 
         # --------------------------------------------------------------------
 
@@ -644,22 +711,6 @@ class AstNode:
                 head.code = ""
 
         # --------------------------------------------------------------------
-
-        # elif head.operator == Operator.A_ARRAY_REC:
-
-        #     left, right = head.left, head.right
-
-        #     if right == None:
-        #         head.value = [left[1]]
-        #         head.code = ""
-
-        #     else:
-        #         AstNode.generateCode(left, get_new_label,
-        #                              get_new_temp, symbol_table)
-        #         head.value = [right[1], *left.value]
-        #         head.code = ""
-
-        # # --------------------------------------------------------------------
 
         elif head.operator == Operator.A_BOOLCONST:
 

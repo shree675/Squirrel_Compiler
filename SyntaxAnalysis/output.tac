@@ -1,14 +1,32 @@
 
-L14:
-int arr[24]
+L22:
+int arr[48]
 arr[0]=1
 arr[4]=2
-arr[8]=12
-arr[12]=5
-arr[16]=6
-arr[20]=7
+arr[8]=3
+arr[12]=4
+arr[16]=5
+arr[20]=6
+arr[24]=1
+arr[28]=2
+arr[32]=3
+arr[36]=4
+arr[40]=5
+arr[44]=6
 
-L13:
+L21:
+
+t0 = i * 2
+
+t1 = j * 2
+t2 = t0 + t1
+
+t3 = k
+t4 = t2 + t3
+t5 = t4 * 4
+
+arr[t5] = 10
+L19:
 char charArray[5]
 charArray[0]='a'
 charArray[1]='b'
@@ -16,36 +34,46 @@ charArray[2]='c'
 charArray[3]='d'
 charArray[4]='e'
 
+L17:
+
+t6 = i * 1
+
+charArray[t6] = 'f'
+L15:
+int a = 0
+L13:
+int b = 0
 L11:
-bool boolArray[2]
-boolArray[0]=true
-boolArray[1]=false
+
+int c = 18
 
 L9:
-float floatArray[12]
+float floatArray[24]
 floatArray[0]=1.1
 floatArray[4]=2.2
 floatArray[8]=3.3
+floatArray[12]=4.4
+floatArray[16]=5.5
+floatArray[20]=6.6
 
 L7:
-int specialArray[48]
-specialArray[0]=1
-specialArray[4]=2
-specialArray[8]=3
-specialArray[12]=4
-specialArray[16]=5
-specialArray[20]=6
-specialArray[24]=1
-specialArray[28]=2
-specialArray[32]=3
-specialArray[36]=4
-specialArray[40]=5
-specialArray[44]=6
 
+
+t7 = a + b
+t8 = t7 * 3
+
+t9 = j
+t10 = t8 + t9
+t11 = t10 * 4
+
+floatArray[t11] = 7.7
 L5:
-char specialArrayChar[2]
-specialArrayChar[0]='a'
-specialArrayChar[1]='b'
 
+t12 = i * 3
+
+t13 = j
+t14 = t12 + t13
+t15 = t14 * 4
+a = floatArray[t15]
 L2:
 return
