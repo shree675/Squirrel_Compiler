@@ -1,4 +1,4 @@
-from TypeChecker import TypeChecker
+#from SemanticAnalysis import TypeChecker
 from enum import Enum
 import math
 
@@ -68,7 +68,7 @@ class Operator(Enum):
     A_ARR_EXPR_REC = "array expr rec"
 
 
-typeChecker = TypeChecker()
+#typeChecker = TypeChecker.TypeChecker()
 
 
 class AstNode:
@@ -90,6 +90,8 @@ class AstNode:
         self.code = None
         self.next = next_label
 
+        print("Value", self.value, "Datatype", self.data_type)
+
     @staticmethod
     def generateCode(head, get_new_label, get_new_temp, symbol_table):
 
@@ -105,6 +107,7 @@ class AstNode:
                                  get_new_temp, symbol_table)
             head.code = head.left.code
 
+            # TODO: place this output file in the Output folder and rename the file
             with open("output.tac", "w") as f:
                 f.write(head.code)
 
@@ -618,13 +621,13 @@ class AstNode:
         # --------------------------------------------------------------------
 
         elif head.operator == Operator.A_ASSIGN_STMT:
+            # TODO: Code to check types and TAC for implicit/explicit casting
 
             if type(head.left) == str:
                 varname, expr = head.left, head.right
 
                 AstNode.generateCode(expr, get_new_label,
                                      get_new_temp, symbol_table)
-                typeChecker.check(head, symbol_table)
                 head.code = expr.code + "\n" + varname + " = " + expr.value
 
             else:
@@ -634,7 +637,7 @@ class AstNode:
                     left_value, get_new_label, get_new_temp, symbol_table)
                 AstNode.generateCode(expr, get_new_label,
                                      get_new_temp, symbol_table)
-                typeChecker.check(head, symbol_table)
+
 
                 head.code = left_value.code + "\n" + expr.code + \
                     "\n" + left_value.value + " = " + expr.value

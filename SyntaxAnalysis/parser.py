@@ -1,5 +1,6 @@
 from sly import Parser as SlyParser
 from AstNode import Operator, AstNode
+from SemanticAnalysis import TypeChecker
 from LexicalAnalysis import lexer
 import os
 
@@ -15,6 +16,7 @@ class Parser(SlyParser):
         self.scope_id_stack = [0, 1]
         self.num_labels = 0
         self.num_temp = 0
+        self.type_checker = TypeChecker.TypeChecker(self.symbol_table)
 
     def get_new_label(self):
         """Generates and returns a new label, globally unique"""
@@ -46,6 +48,19 @@ class Parser(SlyParser):
             "scope": self.scope_id_stack[-1],
             "parent_scope": self.scope_id_stack[-2]
         })
+
+    def get_data_type(self, varname):
+        """Returns the data type of the variable with the given name"""
+        # check if the variable exists in the current scope
+        var = list(filter(
+            lambda var: var["scope"] == self.scope_id_stack[-1] and var["identifier_name"] == varname,
+            self.symbol_table
+        ))
+        if len(var) == 0:
+            print("Error: Variable not declared in current scope")
+            raise Exception(
+                f"Error : variable \"{varname}\" not declared in current scope")
+        return var[0]["type"]
 
     """The rest of this file conforms to the specifications of SLY, the parsing library used by this project.
     Each function corresponds to a production rule in the grammar. The rule is mentioned as a comment just above 
@@ -201,12 +216,14 @@ class Parser(SlyParser):
     @_("DATATYPE VARNAME")
     def simple_init(self, p):
         self.push_to_ST(p.DATATYPE, p.VARNAME, [])
-        return AstNode(Operator.A_DECL, left=[p.DATATYPE, p.VARNAME])
+        data_type = self.get_data_type(p.VARNAME)
+        return AstNode(Operator.A_DECL, left=[p.DATATYPE, p.VARNAME], data_type=data_type)
 
     @_("DATATYPE VARNAME ASSIGN expr")
     def simple_init(self, p):
         self.push_to_ST(p.DATATYPE, p.VARNAME, [])
-        return AstNode(Operator.A_DECL, left=[p.DATATYPE, p.VARNAME], right=p.expr)
+        data_type = self.get_data_type(p.VARNAME)
+        return AstNode(Operator.A_DECL, left=[p.DATATYPE, p.VARNAME], right=p.expr, data_type=data_type)
 
 # ----------------------- ARRAY INIT ---------------------------------
 
@@ -215,6 +232,7 @@ class Parser(SlyParser):
     def array_init(self, p):
         self.push_to_ST(
             p.DATATYPE, p.array_variable.value["varname"], p.array_variable.value["list"])
+        #data_type = self.get_data_type(p.VARNAME)
         return AstNode(Operator.A_ARR_DECL, left=p.array_variable, right=p.array_list, data_type=p.DATATYPE, value=p.array_variable.value["varname"])
 
     # array_variable -> VARNAME [expr]
@@ -371,27 +389,33 @@ class Parser(SlyParser):
             expr1.code
             t = expr0.addr + expr1.addr
         '''
-        return AstNode(Operator.A_PLUS, left=p.expr0, right=p.expr1)
+        data_type = self.type_checker.return_datatype(left_type=p.expr0.data_type, right_type=p.expr1.data_type, operator=Operator.A_PLUS)
+        return AstNode(Operator.A_PLUS, left=p.expr0, right=p.expr1, data_type=data_type)
 
     @_('expr MINUS expr')
     def expr(self, p):
-        return AstNode(Operator.A_MINUS, left=p.expr0, right=p.expr1)
+        data_type = self.type_checker.return_datatype(left_type=p.expr0.data_type, right_type=p.expr1.data_type, operator=Operator.A_MINUS)
+        return AstNode(Operator.A_MINUS, left=p.expr0, right=p.expr1, data_type=data_type)
 
     @_('expr MULT expr')
     def expr(self, p):
-        return AstNode(Operator.A_MULTIPLY, left=p.expr0, right=p.expr1)
+        data_type = self.type_checker.return_datatype(left_type=p.expr0.data_type, right_type=p.expr1.data_type, operator=Operator.A_MULTIPLY)
+        return AstNode(Operator.A_MULTIPLY, left=p.expr0, right=p.expr1, data_type=data_type)
 
     @_('expr DIVIDE expr')
     def expr(self, p):
-        return AstNode(Operator.A_DIVIDE, left=p.expr0, right=p.expr1)
+        data_type = self.type_checker.return_datatype(left_type=p.expr0.data_type, right_type=p.expr1.data_type, operator=Operator.A_DIVIDE)
+        return AstNode(Operator.A_DIVIDE, left=p.expr0, right=p.expr1, data_type=data_type)
 
     @_('expr MOD expr')
     def expr(self, p):
-        return AstNode(Operator.A_MODULO, left=p.expr0, right=p.expr1)
+        data_type = self.type_checker.return_datatype(left_type=p.expr0.data_type, right_type=p.expr1.data_type, operator=Operator.A_MODULO)
+        return AstNode(Operator.A_MODULO, left=p.expr0, right=p.expr1, data_type=data_type)
 
     @_('MINUS expr %prec UMINUS')
     def expr(self, p):
-        return AstNode(Operator.A_NEGATE, left=p.expr)
+        data_type = self.type_checker.return_datatype(left_type=p.expr.data_type, operator=Operator.A_NEGATE)
+        return AstNode(Operator.A_NEGATE, left=p.expr, data_type=data_type)
 
     @_('LPAREN expr RPAREN %prec PAREN')
     def expr(self, p):
@@ -399,37 +423,49 @@ class Parser(SlyParser):
 
     @_('expr RELOP1 expr')
     def expr(self, p):
-        return AstNode(Operator.A_RELOP1, left=p.expr0, right=p.expr1, value=p.RELOP1)
+        data_type = self.type_checker.return_datatype(left_type=p.expr.data_type, right_type=p.expr1.data_type, operator=Operator.A_RELOP1)
+        return AstNode(Operator.A_RELOP1, left=p.expr0, right=p.expr1, value=p.RELOP1, data_type=data_type)
 
     @_('expr RELOP2 expr')
     def expr(self, p):
-        return AstNode(Operator.A_RELOP2, left=p.expr0, right=p.expr1, value=p.RELOP2)
+        data_type = self.type_checker.return_datatype(left_type=p.expr.data_type, right_type=p.expr1.data_type, operator=Operator.A_RELOP2)
+        return AstNode(Operator.A_RELOP2, left=p.expr0, right=p.expr1, value=p.RELOP2, data_type=data_type)
 
     @_('expr AND expr')
     def expr(self, p):
-        return AstNode(Operator.A_AND, left=p.expr0, right=p.expr1)
+        data_type = self.type_checker.return_datatype(left_type=p.expr.data_type, right_type=p.expr1.data_type, operator=Operator.A_AND)
+        return AstNode(Operator.A_AND, left=p.expr0, right=p.expr1, data_type=data_type)
 
     @_('expr OR expr')
     def expr(self, p):
-        return AstNode(Operator.A_OR, left=p.expr0, right=p.expr1)
+        data_type = self.type_checker.return_datatype(left_type=p.expr.data_type, right_type=p.expr1.data_type, operator=Operator.A_OR)
+        return AstNode(Operator.A_OR, left=p.expr0, right=p.expr1, data_type=data_type)
 
     @_('NOT expr')
     def expr(self, p):
-        return AstNode(Operator.A_NOT, left=p.expr)
+        data_type = self.type_checker.return_datatype(left_type=p.expr.data_type, operator=Operator.A_NOT)
+        return AstNode(Operator.A_NOT, left=p.expr, data_type=data_type)
 
     @_('VARNAME')
     def expr(self, p):
-        return AstNode(Operator.A_VARIABLE, value=p.VARNAME)
+        # TODO: Test this - I think its sorted
+        # TODO: First check if this variable is already declared in symbol table or not, then find datatype from symbol table and pass it
+        data_type = self.get_data_type(p.VARNAME)
+        return AstNode(Operator.A_VARIABLE, value=p.VARNAME, data_type=data_type)
 
     @_('array_var_use')
     def expr(self, p):
-        return AstNode(Operator.A_ARREXPR_VARIABLE, left=p.array_var_use)
+        # TODO: find data type and pass it
+        return AstNode(Operator.A_ARREXPR_VARIABLE, left=p.array_var_use) # ,data_type=data_type
 
     # expr -> constant
     @_('constant')
     def expr(self, p):
-        return AstNode(p.constant[0], value=p.constant[1])
+        print("The const type", p.constant[0])
+        data_type = self.type_checker.return_datatype(operator=p.constant[0])
+        return AstNode(p.constant[0], value=p.constant[1], data_type=data_type)
 
+    # TODO: Do we need to do something here? - implement explicit casting rules?
     # expr -> (DATATYPE) expr
     @_('LPAREN DATATYPE RPAREN expr %prec TYPECASTING')
     def expr(self, p):
@@ -438,14 +474,24 @@ class Parser(SlyParser):
     # assignment_statement -> left_value = expr
     @_('left_value ASSIGN expr')
     def assignment_statement(self, p):
+
+        # Add code for implicit/explicit casting in Ast Node
         if type(p.left_value) == list:
+            #self.type_checker.check_datatype(left_type=p.left_value[1].data_type,right_type=p.expr.data_type)
             return AstNode(Operator.A_ASSIGN_STMT, left=p.left_value[1], right=p.expr)
         else:
+            #self.type_checker.check_datatype(left_type=p.left_value.data_type,right_type=p.expr.data_type)
             return AstNode(Operator.A_ASSIGN_STMT, left=p.left_value, right=p.expr)
 
     # left_value -> VARNAME | array_variable
     @_('VARNAME')
     def left_value(self, p):
+        """ Can we create a node for this as well? 
+        
+        data_type = self.get_data_type(p.VARNAME)
+        return AstNode(Operator.A_VARIABLE, value=p.VARNAME, data_type=data_type)
+    
+        """
         return ["varname", str(p[0])]
 
     @_('array_var_use')
@@ -521,7 +567,7 @@ if __name__ == '__main__':
     lex = lexer.Lexer()
     parser = Parser()
 
-    with open(os.path.join(TEST_SUITES_DIR, "ArrayUseTest.sq"), 'r') as f:
+    with open(os.path.join(TEST_SUITES_DIR, "SemanticTest1.sq"), 'r') as f:
         text = f.read()
 
     parser.parse(lex.tokenize(text))

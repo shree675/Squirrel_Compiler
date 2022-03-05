@@ -12,9 +12,26 @@ _________________
   : !int, !char, !float (cast to bool)
 
 BinaryOperator
-* /
-%
-+ -
-> < >= <= == !=
-&& || 
-=
+* / + - : int and int, float and float (works as is, output int or float) 
+        : int or bool or char and float (temporarily cast to float(via int), output float)
+        : str on either side (Error)
+        : bool or char and int (temporarily cast to int, output int)
+        
+> < >= <= == != : int and int, float and float (works as is)
+                        : int or bool or char and float (temporarily cast to float(via int))
+                        : str on either side (Error)
+                        : bool or char and int (temporarily cast to int)
+                        output always bool 
+
+%  : int and int (works as is)
+   : str or float on either side (Error)
+   : bool or char or int (temporarily cast to int)
+    output always int
+ 
+&& || : bool and bool (works as is)
+      : str or float on either side (Error)
+      : int or bool or char (temporarily cast to bool)
+        output always bool
+=     if lhs == rhs, where neither are string -> typecast permanently to lhs if required, else do nothing
+      if one is string but the other is not -> error 
+      if both are string, do nothing

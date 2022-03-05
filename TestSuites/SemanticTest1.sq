@@ -1,9 +1,12 @@
 void @start() {
     int a = 3;
     float b = 3.4;
+    int x = a + b;
     bool c = true;
     char d = 'a';
     string e = "hello";
+    string f3 = -"hello";
     int f;
     f = a + b;
+
 }
