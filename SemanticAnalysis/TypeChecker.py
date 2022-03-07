@@ -1,4 +1,6 @@
 from SyntaxAnalysis import AstNode
+import logging as logger
+logger.exception = logger.error
 
 class TypeChecker:
     def __init__(self, symbol_table):
@@ -7,7 +9,6 @@ class TypeChecker:
         #print('passed symbol table:', symbol_table)
         #Operator = AstNode.Operator
         
-
     """ @staticmethod
     def check(head, symbol_table):
         print("Check method")
@@ -19,14 +20,21 @@ class TypeChecker:
         print(self.symbol_table) """
 
     @staticmethod
-    def raise_error(datatype, operator):
-        raise Exception(
-                f"Error : Operator \"{operator}\" not defined on datatypr \"{data_type}\"")
-    @staticmethod
-    def check_datatype(left_type=None, right_type=None):
-        if (left_type == 'str' and right_type != 'str') or (left_type != 'str' and right_type == 'str'):
-            raise_error('str', '=')
-        return
+    def raise_error(data_type1=None, operator=None, data_type2=None, condition_type=None):
+        try:
+            if condition_type !=None:
+                raise Exception("TypeError: Expected type '{}' but got type '{}' in '{}'".format(condition_type, data_type1, operator.value))
+
+            elif(data_type2==None):
+                raise Exception(f"Semantic Error : Operator \"{operator.value}\" not defined on datatype \"{data_type1}\"")
+            else:
+                raise Exception(f"Semantic Error : Operator \"{operator.value}\" not defined on datatype \"{data_type1}\" and \"{data_type2}\"")
+        except Exception as ex:
+            logger.exception(ex)
+            quit()
+            #logger.exception(f"Looks like they have a problem: {ex}", exc_info=False)
+        """ raise Exception(
+                f"Error : Operator \"{operator.value}\" not defined on datatype \"{data_type}\"") """
 
     @staticmethod
     def return_datatype(left_type=None, right_type=None, operator=AstNode.Operator.A_INTCONST):
@@ -35,8 +43,6 @@ class TypeChecker:
         does implicit typecasting wherever required, then returns the resulting datatype"""
         #print("Return datatype")
         Operator = AstNode.Operator
-        """ if Operator.A_INTCONST == operator:
-            print("YAY") """
         #print("ISINSTANR")
         #print(isinstance(operator, type)))
         #print(AstNode.Operator)
@@ -44,27 +50,32 @@ class TypeChecker:
         #print(AstNode.Operator.A_NEGATE, operator)
         #print(left_type, right_type, operator)
 
-        #print(type(operator), type(Operator.A_INTCONST))       
-        if str(operator) == str(Operator.A_INTCONST):
-            print("test")
+        #print(operator, type(Operator.A_INTCONST))       
+        if operator.value == Operator.A_INTCONST.value:
+            print("int const")
             return 'int'
-        elif operator == Operator.A_FLOATCONST:
+        elif operator.value is Operator.A_FLOATCONST.value:
+            print("float const")
             return 'float'
-        elif operator == Operator.A_STRINGCONST:
+        elif operator.value == Operator.A_STRINGCONST.value:
+            print("str const")
             return 'str'
-        elif operator == Operator.A_BOOLCONST:
+        elif operator.value == Operator.A_BOOLCONST.value:
+            print("bool const")
             return 'bool'
-        elif operator == Operator.A_CHARCONST:
+        elif operator.value == Operator.A_CHARCONST.value:
+            print("char const")
             return 'char'
         
         #------------------------------Unary Operators----------------------------------
-        elif operator == Operator.A_NEGATE:
+        elif operator.value == Operator.A_NEGATE.value:
             if left_type == 'int':
                 return 'int'
             elif left_type == 'float':
                 return 'float'
             elif left_type == 'str':
-                raise_error(left_type, operator)
+                print("This is the operator", operator)
+                TypeChecker.raise_error(left_type, operator)
             elif left_type == 'bool':
                 print("Implicitly casting from bool to int")
                 # TODO: Modify the symbol table here maybe?
@@ -74,7 +85,7 @@ class TypeChecker:
                 # TODO: Modify the symbol table here maybe?
                 return 'int'
 
-        elif operator == Operator.A_NOT:
+        elif operator.value == Operator.A_NOT.value:
             if left_type == 'int':
                 print("Implicitly casting from int to bool")
                 # TODO: Modify the symbol table here maybe?
@@ -91,7 +102,7 @@ class TypeChecker:
             elif left_type == 'char':
                 return 'bool'
         #------------------------------Binary Operators----------------------------------
-        elif operator == Operator.A_PLUS or operator == Operator.A_MINUS or operator == Operator.A_MULTIPLY or operator == Operator.A_DIVIDE:
+        elif operator.value == Operator.A_PLUS.value or operator.value == Operator.A_MINUS.value or operator.value == Operator.A_MULTIPLY.value or operator.value == Operator.A_DIVIDE.value:
             if left_type == 'str' or right_type == 'str':
                 raise_error('str', operator)
             elif left_type == 'int' and right_type == 'int':
@@ -106,7 +117,7 @@ class TypeChecker:
                 print("Implicitly casting to int")
                 # TODO: Modify the symbol table here maybe?
                 return 'int'
-        elif operator == Operator.A_MODULO:
+        elif operator.value == Operator.A_MODULO.value:
             if left_type == 'int' and right_type == 'int':
                 return 'int'
             elif left_type == 'float' or right_type == 'float' or left_type == 'str' or right_type == 'str':
@@ -115,7 +126,7 @@ class TypeChecker:
                 print("Implicitly casting to int")
                 # TODO: Modify the symbol table here maybe?
                 return 'int'
-        elif operator == Operator.A_RELOP1 or operator == Operator.A_RELOP2:
+        elif operator.value == Operator.A_RELOP1.value or operator.value == Operator.A_RELOP2.value:
             if left_type == 'int' and right_type == 'int':
                 return 'bool'
             elif left_type == 'float' and right_type == 'float':
@@ -131,7 +142,7 @@ class TypeChecker:
                 # TODO: Modify the symbol table here maybe?
                 return 'bool'
         
-        elif operator == Operator.A_AND or operator == Operator.A_OR:
+        elif operator.value == Operator.A_AND.value or operator.value == Operator.A_OR.value:
             if left_type == 'bool' and right_type == 'bool':
                 return 'bool'
             elif left_type == 'float' or right_type == 'float' or left_type == 'str' or right_type == 'str':
@@ -140,9 +151,37 @@ class TypeChecker:
                 print("Implicitly casting to bool")
                 # TODO: Modify the symbol table here maybe?
                 return 'bool'
-            
-
-
-
-            
+       
         return 'fuzzy'
+
+    @staticmethod
+    def check_datatype(expr_type=None, operator=AstNode.Operator.A_WHILE):
+        """This method checks the statement type, the datatypes of the expr, 
+        raises and error if the statement type is not defined on the datatype of the operands,
+        does implicit typecasting wherever required, then returns the resulting datatype"""
+        #print("Return datatype")
+        Operator = AstNode.Operator
+        condition_operators = [Operator.A_WHILE.value, Operator.A_IF.value, Operator.A_IFELSE.value, Operator.A_ELIFSINGLE.value, Operator.A_ELIFMULTIPLE.value, Operator.A_IFELIFELSE.value]
+
+        if operator.value in condition_operators:
+            print("bool condition check")
+            if expr_type == 'bool':
+                return
+            if expr_type == 'str':
+                TypeChecker.raise_error(data_type1='str',condition_type='bool', operator=operator)
+            if expr_type == 'int' or expr_type == 'char' or expr_type == 'float':
+                print("Implicitly casting to bool")
+                # TODO: Modify the symbol table here maybe?  
+        elif operator.value == Operator.A_ARR_EXPR_REC.value:
+            print("Array[expr] int type check")
+            if expr_type == 'int':
+                return
+            if expr_type == 'str':
+                TypeChecker.raise_error(data_type1='str',condition_type='int', operator=operator)
+            if expr_type == 'bool' or expr_type == 'char' or expr_type == 'float':
+                print("Implicitly casting to int")
+                # TODO: Modify the symbol table here maybe?    
+            else:
+                TypeChecker.raise_error(data_type1=expr_type,condition_type='int', operator=operator)       
+
+        return

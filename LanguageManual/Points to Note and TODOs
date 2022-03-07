@@ -1,0 +1,8 @@
+1. Semantic checks for function call parameters once functions grammar rules are implemented
+2. error in testcase: string f3 = -"hello";
+    Probably unary operator in declaration is not working
+3. What do we do about all the warnings?
+4. jump statements
+5. Explicit and implicit type casting TAC?
+6. Not able to do semantic analysis for for loop until the get_datatype method of the symbol table is implemented correctly - breaks in case of for loop
+7. 

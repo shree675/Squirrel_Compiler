@@ -1,15 +1,15 @@
 
-L4:
+L8:
+
+int a = 3
 
 L7:
 
-L8:
+float b = 0.5
 
-L6:
-
-L10:
-int i = 0
 L5:
 
+t0 =  - a
+b = t0
 L2:
 return

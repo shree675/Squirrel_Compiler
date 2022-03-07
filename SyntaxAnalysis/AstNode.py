@@ -26,7 +26,7 @@ class Operator(Enum):
     A_DIVIDE = "/"
     A_MODULO = "%"
     A_NOT = "!"
-    A_NEGATE = "-"
+    A_NEGATE = "uminus"
     A_ASSIGN = "="
     A_IF = "if"
     A_ELSE = "else"
@@ -90,7 +90,7 @@ class AstNode:
         self.code = None
         self.next = next_label
 
-        print("Value", self.value, "Datatype", self.data_type)
+        #print("Value", self.value, "Datatype", self.data_type)
 
     @staticmethod
     def generateCode(head, get_new_label, get_new_temp, symbol_table):

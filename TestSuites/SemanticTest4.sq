@@ -1,0 +1,8 @@
+int @start(){
+    if(false || true && false){
+        int i;
+    }
+    else{
+        int i;
+    }
+}

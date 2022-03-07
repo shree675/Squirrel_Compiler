@@ -3,6 +3,8 @@ from AstNode import Operator, AstNode
 from SemanticAnalysis import TypeChecker
 from LexicalAnalysis import lexer
 import os
+import logging as logger
+logger.exception = logger.error
 
 TEST_SUITES_DIR = os.path.join("..", "TestSuites") if os.getcwd().endswith(
     "SyntaxAnalysis") else os.path.join("TestSuites")
@@ -17,6 +19,15 @@ class Parser(SlyParser):
         self.num_labels = 0
         self.num_temp = 0
         self.type_checker = TypeChecker.TypeChecker(self.symbol_table)
+
+    @staticmethod
+    def error(message = "Syntax Error"):
+        """Function to raise custom errors for the parser, suppressing the stack trace, takes the error message as parameter"""
+        try:
+            raise Exception(message)   # raise exception with message
+        except Exception as ex:
+            logger.exception(ex)
+            quit()
 
     def get_new_label(self):
         """Generates and returns a new label, globally unique"""
@@ -37,9 +48,10 @@ class Parser(SlyParser):
             self.symbol_table
         ))
         if len(repeated_vars) > 0:
-            print("Error: Variable already declared in current scope")
+            Parser.error(f"Error : variable \"{varname}\" already declared in current scope")
+            """ print("Error: Variable already declared in current scope")
             raise Exception(
-                f"Error : variable \"{varname}\" already declared in current scope")
+                f"Error : variable \"{varname}\" already declared in current scope") """
         # else append the variable to the symbol table
         self.symbol_table.append({
             "identifier_name": varname,
@@ -52,15 +64,33 @@ class Parser(SlyParser):
     def get_data_type(self, varname):
         """Returns the data type of the variable with the given name"""
         # check if the variable exists in the current scope
-        var = list(filter(
-            lambda var: var["scope"] == self.scope_id_stack[-1] and var["identifier_name"] == varname,
-            self.symbol_table
-        ))
-        if len(var) == 0:
-            print("Error: Variable not declared in current scope")
-            raise Exception(
-                f"Error : variable \"{varname}\" not declared in current scope")
-        return var[0]["type"]
+        current_scope = self.scope_id_stack[-1]
+        parent_scope = self.scope_id_stack[-1]
+        
+        while current_scope >= 1:
+            var2 = list(filter(
+                            lambda var2: var2["scope"] == current_scope,
+                            self.symbol_table
+                        ))
+            #print(var2)
+            # TODO: Check the correctness of this method
+            if len(var2) == 0:
+                parent_scope = self.scope_id_stack[-2] #If there are no entries of variables in the current scope, no way to get parent scope, hence, assuming parent is second last entry
+            if parent_scope == self.scope_id_stack[-1]:
+                Parser.error("Error: There is a problem in this method")
+            else:
+                parent_scope = var2[0]["parent_scope"]
+
+            var = list(filter(
+                lambda var: var["scope"] == current_scope and var["identifier_name"] == varname,
+                self.symbol_table
+            ))
+            if len(var) > 0:
+                return var[0]["type"]
+            current_scope = parent_scope
+            
+
+        Parser.error(f"Error : variable \"{varname}\" not declared in current scope")
 
     """The rest of this file conforms to the specifications of SLY, the parsing library used by this project.
     Each function corresponds to a production rule in the grammar. The rule is mentioned as a comment just above 
@@ -98,7 +128,7 @@ class Parser(SlyParser):
         AstNode.generateCode(val, self.get_new_label,
                              self.get_new_temp, self.symbol_table)
         # print(val.code)
-        print(self.symbol_table)
+        print(*self.symbol_table, sep="\n")
 
     # methods -> methods method
     @_('methods method')
@@ -117,6 +147,7 @@ class Parser(SlyParser):
     # params -> DATATYPE VARNAME COMMA params | e
     # params -> params_rec | e
     # params_rec -> DATATYPE VARNAME COMMA params_rec | DATATYPE VARNAME
+    # TODO: Semantic checks for functions
 
     @_('params_rec')
     def params(self, p):
@@ -176,11 +207,17 @@ class Parser(SlyParser):
     # while_statement -> WHILE ( expr ) { statements }
     @_('WHILE LPAREN expr RPAREN LBRACE scope_open statements RBRACE scope_close')
     def while_statement(self, p):
+        #print("While", p.expr.value, p.expr.data_type)
+        # TODO: p.expr.dataype is available here, convert to bool here
+        self.type_checker.check_datatype(expr_type=p.expr.data_type, operator=Operator.A_WHILE)
         return AstNode(Operator.A_WHILE, left=p.expr, right=p.statements)
 
     # for_statement -> FOR ( for_init ; expr ; assignment_statement ) { statements }
+   
     @_('FOR LPAREN scope_open for_init SEMICOL expr SEMICOL assignment_statement RPAREN LBRACE statements RBRACE scope_close')
     def for_statement(self, p):
+        print("While", p.expr.value, p.expr.data_type)
+         # TODO: Do I need to add a semantic check here? Or will the while eventually handle it?
         node_1 = AstNode(Operator.A_FOR, left=p.expr,
                          mid=p.assignment_statement, right=p.statements)
         node_2 = AstNode(Operator.A_NODE, left=p.for_init, right=node_1)
@@ -235,16 +272,17 @@ class Parser(SlyParser):
         #data_type = self.get_data_type(p.VARNAME)
         return AstNode(Operator.A_ARR_DECL, left=p.array_variable, right=p.array_list, data_type=p.DATATYPE, value=p.array_variable.value["varname"])
 
-    # array_variable -> VARNAME [expr]
+    # array_variable -> VARNAME [INTVAL]
     @_("VARNAME LSQB INTVAL RSQB")
     def array_variable(self, p):
         return AstNode(Operator.A_ARRAY_REC, value={"list": [int(p.INTVAL)], "varname": p.VARNAME})
 
-    # array_variable [expr]
+    # array_variable [INTVAL]
     @_("array_variable LSQB INTVAL RSQB")
     def array_variable(self, p):
         return AstNode(Operator.A_ARRAY_REC, left=p.array_variable, value={"list": [*p.array_variable.value["list"], int(p.INTVAL)], "varname": p.array_variable.value["varname"]})
 
+    # TODO: Are we doing expr or constant here?
     # array_list -> array_list, expr
     @_("array_list COMMA constant")
     def array_list(self, p):
@@ -253,18 +291,26 @@ class Parser(SlyParser):
     # array_list -> expr
     @_("constant")
     def array_list(self, p):
-        return AstNode(Operator.A_ARR_LITERAL, left=p.constant)
+        #print("The const type", p.constant[0])
+        data_type = self.type_checker.return_datatype(operator=p.constant[0])
+        return AstNode(Operator.A_ARR_LITERAL, left=p.constant, data_type=data_type)
 
 # ---------------------------------------------------------------------------
 
     # array_variable -> VARNAME [expr]
     @_("VARNAME LSQB expr RSQB")
     def array_var_use(self, p):
+        # TODO: expr data type check
+        print("Array expr type", p.expr.value, p.expr.data_type)
+        self.type_checker.check_datatype(expr_type=p.expr.data_type, operator=Operator.A_ARR_EXPR_REC)
         return AstNode(Operator.A_ARR_EXPR_REC, left=p.expr, value={"varname": p.VARNAME, "val": "", "index": 1, "scope": self.id-1})
 
     # array_variable [expr]
     @_("array_var_use LSQB expr RSQB")
     def array_var_use(self, p):
+        # TODO: expr data type check
+        print("Array expr type", p.expr.value, p.expr.data_type)
+        self.type_checker.check_datatype(expr_type=p.expr.data_type, operator=Operator.A_ARR_EXPR_REC)
         return AstNode(Operator.A_ARR_EXPR_REC, left=p.array_var_use, right=p.expr, value={"varname": p.array_var_use.value["varname"], "val": "", "index": p.array_var_use.value["index"]+1, "scope": self.id-1})
 
 # ---------------------------------------------------------------------------
@@ -272,35 +318,54 @@ class Parser(SlyParser):
     # if_statement -> IF ( expr ) { statements }
     @_("IF LPAREN expr RPAREN LBRACE scope_open statements RBRACE scope_close ")
     def if_statement(self, p):
+        #print("IF", p.expr.value, p.expr.data_type)
+        # TODO: p.expr.dataype is available here, convert to bool here
+        self.type_checker.check_datatype(expr_type=p.expr.data_type, operator=Operator.A_IF)
         return AstNode(Operator.A_IF, left=p.expr, right=p.statements)
 
     # if_statement -> IF ( expr ) { statements } else { statements }
     @_("IF LPAREN expr RPAREN LBRACE scope_open statements RBRACE scope_close ELSE LBRACE scope_open statements RBRACE scope_close")
     def if_statement(self, p):
+        #print("IF", p.expr.value, p.expr.data_type)
+        # TODO: p.expr.dataype is available here, convert to bool here
+        self.type_checker.check_datatype(expr_type=p.expr.data_type, operator=Operator.A_IFELSE)
         return AstNode(Operator.A_IFELSE, left=p.expr, mid=p.statements0, right=p.statements1)
 
     # if_statement -> IF ( expr ) { statements} elif
     @_('IF LPAREN expr RPAREN LBRACE scope_open statements RBRACE scope_close elif_statement')
     def if_statement(self, p):
+        #print("IF", p.expr.value, p.expr.data_type)
+        # TODO: p.expr.dataype is available here, convert to bool here
+        self.type_checker.check_datatype(expr_type=p.expr.data_type, operator=Operator.A_IFELSE)
         return AstNode(Operator.A_IFELSE, left=p.expr, mid=p.statements, right=p.elif_statement)
 
     # elif -> ELIF ( expr ) { statements } elif | ELIF ( expr ) { statements } | ELIF ( expr ) { statements } ELSE { statements }
     @_("ELIF LPAREN expr RPAREN LBRACE scope_open statements RBRACE scope_close elif_statement")
     def elif_statement(self, p):
+        #print("IF", p.expr.value, p.expr.data_type)
+        # TODO: p.expr.dataype is available here, convert to bool here
+        self.type_checker.check_datatype(expr_type=p.expr.data_type, operator=Operator.A_ELIFMULTIPLE)
         return AstNode(Operator.A_ELIFMULTIPLE, left=p.expr, mid=p.statements, right=p.elif_statement)
 
     @_("ELIF LPAREN expr RPAREN LBRACE scope_open statements RBRACE scope_close")
     def elif_statement(self, p):
+        #print("IF", p.expr.value, p.expr.data_type)
+        # TODO: p.expr.dataype is available here, convert to bool here
+        self.type_checker.check_datatype(expr_type=p.expr.data_type, operator=Operator.A_ELIFSINGLE)
         return AstNode(Operator.A_ELIFSINGLE, left=p.expr, right=p.statements)
 
     @_("ELIF LPAREN expr RPAREN LBRACE scope_open statements RBRACE scope_close ELSE LBRACE scope_open statements RBRACE scope_close")
     def elif_statement(self, p):
+        #print("IF", p.expr.value, p.expr.data_type)
+        # TODO: p.expr.dataype is available here, convert to bool here
+        self.type_checker.check_datatype(expr_type=p.expr.data_type, operator=Operator.A_IFELIFELSE)
         return AstNode(Operator.A_IFELIFELSE, left=p.expr, mid=p.statements0, right=p.statements1)
 
     # switch_statement -> SWITCH ( left_value ) { case_statements }
     @_('SWITCH LPAREN left_value RPAREN LBRACE scope_open case_statements RBRACE scope_close')
     def switch_statement(self, p):
         # TODO: update this
+        # TODO: Check if p.left_value data_type is int or char
         try:
             return AstNode(Operator.A_SWITCH, left=p.left_value[1], right=p.case_statements)
         except:
@@ -322,6 +387,7 @@ class Parser(SlyParser):
     # case_statement -> CASE ( constant ) COLON statements
     @_('CASE LPAREN constant RPAREN COLON scope_open statements scope_close')
     def case_statement(self, p):
+        # TODO: check the type of p.constant here for int or char
         return AstNode(Operator.A_CASESINGLE, left=p.constant, right=p.statements)
 
     # default_statement -> DEFAULT COLON statements
@@ -414,6 +480,8 @@ class Parser(SlyParser):
 
     @_('MINUS expr %prec UMINUS')
     def expr(self, p):
+        print("UNary check")
+        
         data_type = self.type_checker.return_datatype(left_type=p.expr.data_type, operator=Operator.A_NEGATE)
         return AstNode(Operator.A_NEGATE, left=p.expr, data_type=data_type)
 
@@ -433,12 +501,12 @@ class Parser(SlyParser):
 
     @_('expr AND expr')
     def expr(self, p):
-        data_type = self.type_checker.return_datatype(left_type=p.expr.data_type, right_type=p.expr1.data_type, operator=Operator.A_AND)
+        data_type = self.type_checker.return_datatype(left_type=p.expr0.data_type, right_type=p.expr1.data_type, operator=Operator.A_AND)
         return AstNode(Operator.A_AND, left=p.expr0, right=p.expr1, data_type=data_type)
 
     @_('expr OR expr')
     def expr(self, p):
-        data_type = self.type_checker.return_datatype(left_type=p.expr.data_type, right_type=p.expr1.data_type, operator=Operator.A_OR)
+        data_type = self.type_checker.return_datatype(left_type=p.expr0.data_type, right_type=p.expr1.data_type, operator=Operator.A_OR)
         return AstNode(Operator.A_OR, left=p.expr0, right=p.expr1, data_type=data_type)
 
     @_('NOT expr')
@@ -461,7 +529,7 @@ class Parser(SlyParser):
     # expr -> constant
     @_('constant')
     def expr(self, p):
-        print("The const type", p.constant[0])
+        #print("The const type", p.constant[0])
         data_type = self.type_checker.return_datatype(operator=p.constant[0])
         return AstNode(p.constant[0], value=p.constant[1], data_type=data_type)
 
@@ -475,7 +543,7 @@ class Parser(SlyParser):
     @_('left_value ASSIGN expr')
     def assignment_statement(self, p):
 
-        # Add code for implicit/explicit casting in Ast Node
+        # TODO: Add code for implicit/explicit casting in Ast Node
         if type(p.left_value) == list:
             #self.type_checker.check_datatype(left_type=p.left_value[1].data_type,right_type=p.expr.data_type)
             return AstNode(Operator.A_ASSIGN_STMT, left=p.left_value[1], right=p.expr)
@@ -567,7 +635,7 @@ if __name__ == '__main__':
     lex = lexer.Lexer()
     parser = Parser()
 
-    with open(os.path.join(TEST_SUITES_DIR, "SemanticTest1.sq"), 'r') as f:
+    with open(os.path.join(TEST_SUITES_DIR, "SemanticTest2.sq"), 'r') as f:
         text = f.read()
 
     parser.parse(lex.tokenize(text))

@@ -1,0 +1,18 @@
+void @start() {
+    int x;
+    int y;
+    while(true) {
+        int c=4;
+    }
+    while(x+y){
+        x=x+1;
+        y=y+1;
+    }
+    ``while("hello")
+    { 
+        string s;
+    }``
+    for(int i; true; i=i+k){
+        int j;
+    }
+}
