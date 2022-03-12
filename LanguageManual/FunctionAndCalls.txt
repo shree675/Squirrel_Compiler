@@ -8,7 +8,7 @@ $v0-$v1 --> return values (2 - not a hard limit)
 
 
 -------------------- sq -----------------------------
-float sum(int a, float b){
+float @sum(int a, float b){
     float c = a+b;
     return c;
 }
@@ -35,9 +35,9 @@ main:
         c = t2
 
 ------------------- mips ----------------------------
-	.data
-	.text
-	.globl	main
+	    .data
+	    .text
+	    .globl	main
 main:
         li      $t0,1
         li.s    $f0,2.5

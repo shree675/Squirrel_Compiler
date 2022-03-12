@@ -58,41 +58,9 @@ class Parser(SlyParser):
             "type": data_type,
             "dimension": dimension,
             "scope": self.scope_id_stack[-1],
-            "parent_scope": self.scope_id_stack[-2]
+            #"parent_scope": self.scope_id_stack[-2]
         })
 
-    '''
-    def get_data_type(self, varname):
-        """Returns the data type of the variable with the given name"""
-        # check if the variable exists in the current scope
-        current_scope = self.scope_id_stack[-1]
-        parent_scope = self.scope_id_stack[-1]
-        
-        while current_scope >= 1:
-            var2 = list(filter(
-                            lambda var2: var2["scope"] == current_scope,
-                            self.symbol_table
-                        ))
-            #print(var2)
-            # TODO: Check the correctness of this method
-            if len(var2) == 0:
-                parent_scope = self.scope_id_stack[-2] #If there are no entries of variables in the current scope, no way to get parent scope, hence, assuming parent is second last entry
-            if parent_scope == self.scope_id_stack[-1]:
-                Parser.error("Error: There is a problem in this method")
-            else:
-                parent_scope = var2[0]["parent_scope"]
-
-            var = list(filter(
-                lambda var: var["scope"] == current_scope and var["identifier_name"] == varname,
-                self.symbol_table
-            ))
-            if len(var) > 0:
-                return var[0]["type"]
-            current_scope = parent_scope
-            
-
-        Parser.error(f"Error : variable \"{varname}\" not declared in current scope")
-    '''
 
     def get_data_type(self, varname):
 
@@ -195,7 +163,10 @@ class Parser(SlyParser):
     # statements -> statements statement
     @_("statements statement")
     def statements(self, p):
-        return AstNode(Operator.A_NODE, left=p.statements, right=p.statement)
+        head = AstNode(Operator.A_NODE, left=p.statements, right=p.statement)
+        p.statements.parent = head
+        p.statement.parent = head
+        return head
 
     @_('empty')
     def statements(self, p):
@@ -222,6 +193,10 @@ class Parser(SlyParser):
     def statement(self, p):
         return p.iteration_statement
 
+    @_('jump_statement')
+    def statement(self, p):
+        return p.jump_statement
+
     # interation_statement -> while_statement | for_statement
     @_('while_statement')
     def iteration_statement(self, p):
@@ -229,7 +204,9 @@ class Parser(SlyParser):
 
     @_('for_statement')
     def iteration_statement(self, p):
-        return AstNode(Operator.A_FORPARENT, left=p.for_statement)
+        head = AstNode(Operator.A_FORPARENT, left=p.for_statement)
+        p.for_statement.parent = head
+        return head
 
     # while_statement -> WHILE ( expr ) { statements }
     @_('WHILE LPAREN expr RPAREN LBRACE scope_open statements RBRACE scope_close')
@@ -460,7 +437,7 @@ class Parser(SlyParser):
     # jump_statement -> BREAK | return_statement
     @_('BREAK')
     def jump_statement(self, p):
-        return p.BREAK
+        return AstNode(Operator.A_BREAK, value=p.BREAK)
 
     @_('return_statement')
     def jump_statement(self, p):

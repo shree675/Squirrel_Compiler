@@ -10,5 +10,7 @@
 8.  for array reference of multi-dimensional arrays, we have to 
     multiply the index with all the previous dimensions - need to
     change it (shreetesh).
+9.  store functions in symbol table, this means that in our language
+    we have to declare/define the function before use
 
 
