@@ -1,0 +1,14 @@
+
+                    A_FORPARENT
+                        |
+                      A_NODE
+                      /    \
+                    A_DECL  A_FOR (L1)
+                           /    |     \   
+                        expr  assign  A_NODE (L1)
+                                        /       \
+                                    (L2)A_NODE  A_IF (L1)
+                                    /       \
+                                (L3)A_NODE  A_ASSIGN (L2)
+                                  /   \
+                              A_NODE  A_BREAK (L3)
