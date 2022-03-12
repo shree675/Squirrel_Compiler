@@ -6,3 +6,11 @@
 5. Explicit and implicit type casting TAC?
 6. Not able to do semantic analysis for for loop until the get_datatype method of the symbol table is implemented correctly - breaks in case of for loop
 7. 
+
+8.  for array reference of multi-dimensional arrays, we have to 
+    multiply the index with all the previous dimensions - need to
+    change it (shreetesh).
+9.  store functions in symbol table, this means that in our language
+    we have to declare/define the function before use
+
+

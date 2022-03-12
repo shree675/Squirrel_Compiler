@@ -1,4 +1,8 @@
 void @start() {
+    int i=0;
+    int j=0;
+    int k=0;
+
     int arr[3][2][2] = {1,2,3,4,5,6,1,2,3,4,5,6};
     arr[i][j][k]=10;
 

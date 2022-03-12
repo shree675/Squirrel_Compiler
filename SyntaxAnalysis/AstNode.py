@@ -77,7 +77,7 @@ class AstNode:
     If a node contains 1 child, it must be assigned to the left child
     '''
 
-    def __init__(self, operator=None, left=None, mid=None, right=None, value=None, data_type='fuzzy', next_label=None):
+    def __init__(self, operator=None, left=None, mid=None, right=None, value=None, data_type='fuzzy', next_label=None, parent=None):
         self.operator = operator
         self.left = left
         self.mid = mid
@@ -91,6 +91,7 @@ class AstNode:
         self.next = next_label
 
         #print("Value", self.value, "Datatype", self.data_type)
+        self.parent = parent
 
     @staticmethod
     def generateCode(head, get_new_label, get_new_temp, symbol_table):
@@ -761,3 +762,13 @@ class AstNode:
                     head.code = "goto " + head.false
                 else:
                     head.code = "goto " + head.true
+        
+        # ---------------------------------------------------------------------------------
+
+        elif head.operator == Operator.A_BREAK:
+            cur = head
+            while(cur.operator.value != Operator.A_FOR.value):
+                cur = head.parent
+
+            head.code = "goto " + cur.next
+
