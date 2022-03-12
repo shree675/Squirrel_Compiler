@@ -12,7 +12,7 @@ void @start() {
     { 
         string s;
     }``
-    for(int i; true; i=i+k){
+    for(int i; true; i=i+x){
         int j;
     }
 }

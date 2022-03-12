@@ -61,6 +61,7 @@ class Parser(SlyParser):
             "parent_scope": self.scope_id_stack[-2]
         })
 
+    '''
     def get_data_type(self, varname):
         """Returns the data type of the variable with the given name"""
         # check if the variable exists in the current scope
@@ -91,6 +92,32 @@ class Parser(SlyParser):
             
 
         Parser.error(f"Error : variable \"{varname}\" not declared in current scope")
+    '''
+
+    def get_data_type(self, varname):
+
+        i = -1
+        current_scope = self.scope_id_stack[i]
+
+        res = []
+        while current_scope >= 1 and len(res) == 0 :
+
+            res = list(filter(
+                lambda item : item["scope"] == current_scope and item["identifier_name"] == varname,
+                self.symbol_table
+            ))
+
+            i -= 1
+            current_scope = self.scope_id_stack[i]
+        
+        if(len(res) == 1):
+            print(res[0]["type"])
+            return res[0]["type"]
+        else:
+            Parser.error(f"Error : variable \"{varname}\" not declared in the scope")
+
+
+
 
     """The rest of this file conforms to the specifications of SLY, the parsing library used by this project.
     Each function corresponds to a production rule in the grammar. The rule is mentioned as a comment just above 
@@ -635,7 +662,7 @@ if __name__ == '__main__':
     lex = lexer.Lexer()
     parser = Parser()
 
-    with open(os.path.join(TEST_SUITES_DIR, "SemanticTest2.sq"), 'r') as f:
+    with open(os.path.join(TEST_SUITES_DIR, "ArrayUseTest.sq"), 'r') as f:
         text = f.read()
 
     parser.parse(lex.tokenize(text))

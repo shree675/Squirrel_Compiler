@@ -1,7 +1,7 @@
 
 void @start(int e){
     int a;
-
+    int z;
     if (z) {
 
         int b;
@@ -16,6 +16,7 @@ void @start(int e){
     
         if(z) {
             int d;
+            b=c+d;
         }
     
     }
