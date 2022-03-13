@@ -151,7 +151,7 @@ class AstNode:
                                  get_new_temp, symbol_table)
 
             # head.code = statements.code + "\n" + head.next + ":\n" + "return\n"
-            head.code = statements.code + "\n" + "return\n"
+            head.code = statements.code + "\n" 
 
         # ------------------------------------------------------------
 
