@@ -85,6 +85,42 @@ class Parser(SlyParser):
             Parser.error(f"Error : variable \"{varname}\" not declared in the scope")
 
 
+    def print_tree(self, root):
+
+        print('\n--- Tree -------------------------------')
+
+        q = [root]
+        curl = 1
+        nextl = 0
+    
+        while len(q) > 0:
+            s = q.pop(0)
+            curl -= 1
+
+            if isinstance(s, AstNode) and s.operator:
+                print(s.operator.value, end=' ')
+            if isinstance(s, list):
+                print(s, end=' ')
+            if s == None:
+                print('None', end=' ')
+
+            if isinstance(s, AstNode) and s.left:
+                q.append(s.left)
+                nextl =+ 1
+            if isinstance(s, AstNode) and s.mid:
+                q.append(s.mid)
+                nextl =+ 1
+            if isinstance(s, AstNode) and s.right:
+                q.append(s.right)
+                nextl =+ 1
+
+        
+            if curl == 0:
+                curl = nextl
+                nextl = 0
+                print()
+
+        print('\n--- End Tree -------------------------------\n')
 
 
     """The rest of this file conforms to the specifications of SLY, the parsing library used by this project.
@@ -120,6 +156,9 @@ class Parser(SlyParser):
     def program(self, p):
         """Starting production, top of the parsing tree, calls the recursive generateCode() method"""
         val = AstNode(Operator.A_ROOT, left=p.methods)
+
+        self.print_tree(val)
+
         AstNode.generateCode(val, self.get_new_label,
                              self.get_new_temp, self.symbol_table)
         # print(val.code)
@@ -165,6 +204,9 @@ class Parser(SlyParser):
     def statements(self, p):
         head = AstNode(Operator.A_NODE, left=p.statements, right=p.statement)
         p.statements.parent = head
+
+        # print("parent : " + str(p.statements.parent.operator.value))
+
         p.statement.parent = head
         return head
 
@@ -193,7 +235,7 @@ class Parser(SlyParser):
     def statement(self, p):
         return p.iteration_statement
 
-    @_('jump_statement')
+    @_('jump_statement SEMICOL')
     def statement(self, p):
         return p.jump_statement
 
@@ -224,7 +266,14 @@ class Parser(SlyParser):
          # TODO: Do I need to add a semantic check here? Or will the while eventually handle it?
         node_1 = AstNode(Operator.A_FOR, left=p.expr,
                          mid=p.assignment_statement, right=p.statements)
+        p.expr.parent = node_1
+        p.assignment_statement.parent = node_1
+        p.statements.parent = node_1
+        print(f"{p.expr.operator.value} parent is {p.expr.parent.operator.value}")
+        print(f"{p.statements.operator.value} parent is {p.statements.parent.operator.value}")
         node_2 = AstNode(Operator.A_NODE, left=p.for_init, right=node_1)
+        node_1.parent = node_2
+        p.for_init.parent = node_2
         return node_2
 
     # for_init -> declaration_statement | assignment_statement
@@ -639,7 +688,12 @@ if __name__ == '__main__':
     lex = lexer.Lexer()
     parser = Parser()
 
-    with open(os.path.join(TEST_SUITES_DIR, "ArrayUseTest.sq"), 'r') as f:
+    with open(os.path.join(TEST_SUITES_DIR, "JumpTest.sq"), 'r') as f:
         text = f.read()
 
     parser.parse(lex.tokenize(text))
+
+
+
+
+

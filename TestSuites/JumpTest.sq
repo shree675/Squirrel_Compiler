@@ -1,0 +1,7 @@
+void @start(){
+    int x;
+    for(int i; true; i=i+x){
+        int j;
+        break;
+    }
+}

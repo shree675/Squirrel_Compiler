@@ -12,5 +12,6 @@
     change it (shreetesh).
 9.  store functions in symbol table, this means that in our language
     we have to declare/define the function before use
+10. change function labels to be the same as function names
 
 

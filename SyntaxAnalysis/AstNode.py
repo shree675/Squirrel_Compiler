@@ -103,10 +103,11 @@ class AstNode:
 
         if head.operator == Operator.A_ROOT:
 
+            left = head.left
             #typeChecker.check(head, symbol_table)
-            AstNode.generateCode(head.left, get_new_label,
+            AstNode.generateCode(left, get_new_label,
                                  get_new_temp, symbol_table)
-            head.code = head.left.code
+            head.code = left.code + '\n' + left.next + ':\n'
 
             # TODO: place this output file in the Output folder and rename the file
             with open("output.tac", "w") as f:
@@ -117,6 +118,8 @@ class AstNode:
         # --------------------------------------------------
 
         elif head.operator == Operator.A_NODE:
+            print(head.operator.value + " ?")
+
             left, right = head.left, head.right
 
             if left and right:
@@ -125,17 +128,19 @@ class AstNode:
                 left.next = get_new_label()
                 AstNode.generateCode(left, get_new_label,
                                      get_new_temp, symbol_table)
-                head.code = left.code + "\n"
                 AstNode.generateCode(right, get_new_label,
                                      get_new_temp, symbol_table)
-                # head.code += left.next + ":\n" + right.code + "\n" + head.next + ":"
-                head.code += left.next + ":\n" + right.code
+
+                head.code = left.code + '\n' + right.code + "\n" + right.next + ':\n'
+
             elif left:
                 head.next = get_new_label()
                 left.next = get_new_label()
                 AstNode.generateCode(left, get_new_label,
                                      get_new_temp, symbol_table)
-                head.code = left.code
+                head.code = left.code + '\n' + left.next + ':\n'
+            
+            return
 
         # ------------------------------------------------------------
 
@@ -145,7 +150,8 @@ class AstNode:
             AstNode.generateCode(statements, get_new_label,
                                  get_new_temp, symbol_table)
 
-            head.code = statements.code + "\n" + head.next + ":\n" + "return\n"
+            # head.code = statements.code + "\n" + head.next + ":\n" + "return\n"
+            head.code = statements.code + "\n" + "return\n"
 
         # ------------------------------------------------------------
 
@@ -303,6 +309,7 @@ class AstNode:
 
         elif head.operator == Operator.A_SWITCHPARENT or head.operator == Operator.A_IFPARENT or head.operator == Operator.A_FORPARENT:
 
+            print(head.operator.value + " ?")
             left = head.left
 
             head.next = get_new_label()
@@ -643,6 +650,8 @@ class AstNode:
                 head.code = left_value.code + "\n" + expr.code + \
                     "\n" + left_value.value + " = " + expr.value
 
+            return
+
         # --------------------------------------------------------------------
 
         elif head.operator == Operator.A_DECL:
@@ -767,8 +776,8 @@ class AstNode:
 
         elif head.operator == Operator.A_BREAK:
             cur = head
-            while(cur.operator.value != Operator.A_FOR.value):
-                cur = head.parent
+            while(cur.operator != Operator.A_FOR):
+                cur = cur.parent
 
             head.code = "goto " + cur.next
 
