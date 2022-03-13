@@ -1,15 +1,30 @@
 
+int x = 0
+L5:
+
+int i = 0
+L10:
+goto L11
+L11:
+
+int j = 0
+L14:
+
+goto L8
+L12:
+
+
+
+t0 = i + x
+i = t0
+goto L10
 L8:
 
-int a = 3
+L8:
 
 L7:
 
-float b = 0.5
 
-L5:
-
-t0 =  - a
-b = t0
 L2:
-return
+
+L1:
