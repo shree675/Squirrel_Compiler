@@ -491,15 +491,20 @@ class Parser(SlyParser):
     @_('return_statement')
     def jump_statement(self, p):
         return p.return_statement
+    
+    @_('CONTINUE')
+    def jump_statement(self, p):
+        return AstNode(Operator.A_CONTINUE, value=p.CONTINUE)
 
     # return_statement -> RETURN expr | RETURN
     @_('RETURN expr')
     def return_statement(self, p):
-        return str('return ' + p.expr)
+        return AstNode(Operator.A_RETURN, left=p.expr)
+        # return str('return ' + p.expr)
 
     @_('RETURN')
     def return_statement(self, p):
-        return str('return')
+        return AstNode(Operator.A_RETURN)
 
     @_('expr PLUS expr')
     def expr(self, p):

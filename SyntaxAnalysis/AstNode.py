@@ -780,4 +780,21 @@ class AstNode:
                 cur = cur.parent
 
             head.code = "goto " + cur.next
+        
+        elif head.operator == Operator.A_RETURN:
+
+            left = head.left
+
+            if left:
+                AstNode.generateCode(left, get_new_label,
+                                    get_new_temp, symbol_table)
+
+                head.code = left.code + '\n' + 'return ' + left.value
+            else:
+                head.code = 'return'
+
+        
+        elif head.operator == Operator.A_CONTINUE:
+            print()
+
 
