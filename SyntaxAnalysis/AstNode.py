@@ -1,6 +1,7 @@
 #from SemanticAnalysis import TypeChecker
 from enum import Enum
 import math
+from webbrowser import Opera
 
 INT = "int"
 FLOAT = "float"
@@ -91,7 +92,7 @@ class AstNode:
         self.next = next_label
 
         #print("Value", self.value, "Datatype", self.data_type)
-        self.parent = parent
+        # self.parent = parent
 
     @staticmethod
     def generateCode(head, get_new_label, get_new_temp, symbol_table):
@@ -400,18 +401,18 @@ class AstNode:
                     expr.operator == Operator.A_MODULO:
                 expr = AstNode(Operator.A_BOOL, left=expr)
 
-            begin = get_new_label()
+            head.begin = get_new_label()
             expr.true = get_new_label()
             expr.false = head.next
-            statements.next = begin
+            statements.next = head.begin
 
             AstNode.generateCode(expr, get_new_label,
                                  get_new_temp, symbol_table)
             AstNode.generateCode(statements, get_new_label,
                                  get_new_temp, symbol_table)
 
-            head.code = begin + ":\n" + expr.code + "\n" + expr.true + ":\n" + statements.code + "\n" + \
-                "goto " + begin
+            head.code = head.begin + ":\n" + expr.code + "\n" + expr.true + ":\n" + statements.code + "\n" + \
+                "goto " + head.begin
 
         # ------------------------------------------------------------
 
@@ -433,10 +434,12 @@ class AstNode:
                     left.operator == Operator.A_MODULO:
                 left = AstNode(Operator.A_BOOL, left=left)
 
-            begin = get_new_label()
+            # new instance variable created for the "A_FOR" node
+            # setattr(head, 'begin', get_new_label())
+            head.begin = get_new_label()
             left.true = get_new_label()
             left.false = head.next
-            mid.next = begin
+            mid.next = head.begin
 
             AstNode.generateCode(left, get_new_label,
                                  get_new_temp, symbol_table)
@@ -445,8 +448,8 @@ class AstNode:
             AstNode.generateCode(right, get_new_label,
                                  get_new_temp, symbol_table)
 
-            head.code = begin + ":\n" + left.code + "\n" + left.true + ":\n" + right.code + "\n" + \
-                mid.code + "\n" + "goto " + begin
+            head.code = head.begin + ":\n" + left.code + "\n" + left.true + ":\n" + right.code + "\n" + \
+                mid.code + "\n" + "goto " + head.begin
 
         # ------------------------------------------------------------
 
@@ -776,7 +779,11 @@ class AstNode:
 
         elif head.operator == Operator.A_BREAK:
             cur = head
-            while(cur.operator != Operator.A_FOR):
+            # TODO: do this for "while", "switch", if it goes upto ROOT then semantic error
+            while(cur.operator != Operator.A_FOR and 
+                    cur.operator != Operator.A_WHILE and
+                    cur.operator != Operator.A_SWITCH
+                ):
                 cur = cur.parent
 
             head.code = "goto " + cur.next
@@ -795,6 +802,14 @@ class AstNode:
 
         
         elif head.operator == Operator.A_CONTINUE:
-            print()
+            # TODO: do this for "while", "switch", if it goes upto ROOT then semantic error
+            cur = head
+            while(cur.operator != Operator.A_FOR and 
+                    cur.operator != Operator.A_WHILE and
+                    cur.operator != Operator.A_SWITCH
+                ):
+                cur = cur.parent
+
+            head.code = "goto " + cur.begin
 
 

@@ -12,9 +12,12 @@
     change it (shreetesh).
 9.  store functions in symbol table, this means that in our language
     we have to declare/define the function before use
-10. change function labels to be the same as function names
+10. channge function labels to be the same as fuction names
 11. Semantic analysis for function definitions : check the return type
     and check if the value of the same type is being returned in the
     function body. (check inside if, else, etc.)
+
+12. Look into the possibility of creating a control flow graph for 
+    semantic checks and optimizations.
 
 
