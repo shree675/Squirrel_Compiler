@@ -1,8 +1,26 @@
 int @start(){
     int x;
-    for(int i; true; i=i+x){
+    int y;
+    
+    ``for(int i; x<5; i=i+x){
         int j;
-        break;
+        if(j == 0){
+            j = 1;
+            continue;
+        }else{
+            break;
+        }
+    }``
+
+    while(x < 5){
+        int j;
+        if(j == 0){
+            j = 1;
+            continue;
+        }else{
+            break;
+        }
+
     }
-    return 11;
+    return x+x*y+y*(x+y);
 }

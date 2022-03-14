@@ -256,7 +256,10 @@ class Parser(SlyParser):
         #print("While", p.expr.value, p.expr.data_type)
         # TODO: p.expr.dataype is available here, convert to bool here
         self.type_checker.check_datatype(expr_type=p.expr.data_type, operator=Operator.A_WHILE)
-        return AstNode(Operator.A_WHILE, left=p.expr, right=p.statements)
+        head = AstNode(Operator.A_WHILE, left=p.expr, right=p.statements)
+        p.expr.parent = head
+        p.statements.parent = head
+        return head
 
     # for_statement -> FOR ( for_init ; expr ; assignment_statement ) { statements }
    
@@ -269,8 +272,7 @@ class Parser(SlyParser):
         p.expr.parent = node_1
         p.assignment_statement.parent = node_1
         p.statements.parent = node_1
-        print(f"{p.expr.operator.value} parent is {p.expr.parent.operator.value}")
-        print(f"{p.statements.operator.value} parent is {p.statements.parent.operator.value}")
+
         node_2 = AstNode(Operator.A_NODE, left=p.for_init, right=node_1)
         node_1.parent = node_2
         p.for_init.parent = node_2
@@ -287,7 +289,9 @@ class Parser(SlyParser):
 
     @_("if_statement")
     def selection_statement(self, p):
-        return AstNode(Operator.A_IFPARENT, p.if_statement)
+        head = AstNode(Operator.A_IFPARENT, p.if_statement)
+        p.if_statement.parent = head
+        return head
 
     @_('switch_statement')
     def selection_statement(self, p):
@@ -374,7 +378,10 @@ class Parser(SlyParser):
         #print("IF", p.expr.value, p.expr.data_type)
         # TODO: p.expr.dataype is available here, convert to bool here
         self.type_checker.check_datatype(expr_type=p.expr.data_type, operator=Operator.A_IF)
-        return AstNode(Operator.A_IF, left=p.expr, right=p.statements)
+        head = AstNode(Operator.A_IF, left=p.expr, right=p.statements)
+        p.expr.parent = head
+        p.statements.parent = head
+        return head
 
     # if_statement -> IF ( expr ) { statements } else { statements }
     @_("IF LPAREN expr RPAREN LBRACE scope_open statements RBRACE scope_close ELSE LBRACE scope_open statements RBRACE scope_close")
@@ -382,7 +389,11 @@ class Parser(SlyParser):
         #print("IF", p.expr.value, p.expr.data_type)
         # TODO: p.expr.dataype is available here, convert to bool here
         self.type_checker.check_datatype(expr_type=p.expr.data_type, operator=Operator.A_IFELSE)
-        return AstNode(Operator.A_IFELSE, left=p.expr, mid=p.statements0, right=p.statements1)
+        head = AstNode(Operator.A_IFELSE, left=p.expr, mid=p.statements0, right=p.statements1)
+        p.expr.parent = head
+        p.statements0.parent = head
+        p.statements1.parent = head
+        return head
 
     # if_statement -> IF ( expr ) { statements} elif
     @_('IF LPAREN expr RPAREN LBRACE scope_open statements RBRACE scope_close elif_statement')
@@ -390,7 +401,11 @@ class Parser(SlyParser):
         #print("IF", p.expr.value, p.expr.data_type)
         # TODO: p.expr.dataype is available here, convert to bool here
         self.type_checker.check_datatype(expr_type=p.expr.data_type, operator=Operator.A_IFELSE)
-        return AstNode(Operator.A_IFELSE, left=p.expr, mid=p.statements, right=p.elif_statement)
+        head = AstNode(Operator.A_IFELSE, left=p.expr, mid=p.statements, right=p.elif_statement)
+        p.expr.parent = head
+        p.statements.parent = head
+        p.elif_statement.parent = head
+        return head
 
     # elif -> ELIF ( expr ) { statements } elif | ELIF ( expr ) { statements } | ELIF ( expr ) { statements } ELSE { statements }
     @_("ELIF LPAREN expr RPAREN LBRACE scope_open statements RBRACE scope_close elif_statement")
@@ -549,12 +564,12 @@ class Parser(SlyParser):
 
     @_('expr RELOP1 expr')
     def expr(self, p):
-        data_type = self.type_checker.return_datatype(left_type=p.expr.data_type, right_type=p.expr1.data_type, operator=Operator.A_RELOP1)
+        data_type = self.type_checker.return_datatype(left_type=p.expr0.data_type, right_type=p.expr1.data_type, operator=Operator.A_RELOP1)
         return AstNode(Operator.A_RELOP1, left=p.expr0, right=p.expr1, value=p.RELOP1, data_type=data_type)
 
     @_('expr RELOP2 expr')
     def expr(self, p):
-        data_type = self.type_checker.return_datatype(left_type=p.expr.data_type, right_type=p.expr1.data_type, operator=Operator.A_RELOP2)
+        data_type = self.type_checker.return_datatype(left_type=p.expr0.data_type, right_type=p.expr1.data_type, operator=Operator.A_RELOP2)
         return AstNode(Operator.A_RELOP2, left=p.expr0, right=p.expr1, value=p.RELOP2, data_type=data_type)
 
     @_('expr AND expr')

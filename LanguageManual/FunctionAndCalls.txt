@@ -73,3 +73,33 @@ sum:
 
 //  variable descriptor can be used to know which register is 
 //  is currently storing the value of the variable
+
+----------------------------------------------------------------------------
+
+                        A_FUNC
+        A_PARAMS                A_NODE
+                              /        \
+                        A_NODE          A_NODE
+                                          |
+                                        A_FOR
+
+
+                         A_IF            A_ELSE
+                          |                 |
+                        A_RETURN        A_RETURn
+
+
+
+
+if(){
+  return
+}else{
+
+}
+
+if()
+elif
+elif
+elif
+else
+
