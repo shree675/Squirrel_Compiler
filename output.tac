@@ -1,28 +1,31 @@
 
 int x = 0
-L5:
+L7:
 
 int i = 0
-L10:
-goto L11
-L11:
+L12:
+goto L13
+L13:
 
 int j = 0
-L14:
+L16:
 
-goto L8
-L12:
+goto L10
+L14:
 
 
 
 t0 = i + x
 i = t0
-goto L10
-L8:
+goto L12
+L10:
 
-L8:
+L10:
 
-L7:
+L9:
+
+return <AstNode.AstNode object at 0x7fd64882f520>
+L3:
 
 
 L2:
