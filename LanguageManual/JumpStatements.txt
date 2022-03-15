@@ -1,3 +1,19 @@
+✓ 1. break
+    should only occur in :
+    * for loop
+    * while loop
+    * switch
+✓ 2. continue
+    should only occur in :
+    * for loop
+    * while loop
+3. return
+  ✓ * TAC
+    * semantic check :
+        must exist in all the paths of a control 
+        flow graph and check the return type
+
+
 
                     A_FORPARENT
                         |
@@ -12,3 +28,4 @@
                                 (L3)A_NODE  A_ASSIGN (L2)
                                   /   \
                               A_NODE  A_BREAK (L3)
+                        

@@ -155,11 +155,11 @@ class Parser(SlyParser):
     @_('methods')
     def program(self, p):
         """Starting production, top of the parsing tree, calls the recursive generateCode() method"""
-        val = AstNode(Operator.A_ROOT, left=p.methods)
+        root = AstNode(Operator.A_ROOT, left=p.methods)
+        p.methods.parent = root
+        # self.print_tree(root)
 
-        self.print_tree(val)
-
-        AstNode.generateCode(val, self.get_new_label,
+        AstNode.generateCode(root, self.get_new_label,
                              self.get_new_temp, self.symbol_table)
         # print(val.code)
         print(*self.symbol_table, sep="\n")
@@ -167,16 +167,25 @@ class Parser(SlyParser):
     # methods -> methods method
     @_('methods method')
     def methods(self, p):
-        return AstNode(Operator.A_NODE, left=p.methods, right=p.method)
+        head = AstNode(Operator.A_NODE, left=p.methods, right=p.method)
+        p.methods.parent = head
+        p.method.parent = head
+        return head
 
     @_('method')
     def methods(self, p):
-        return AstNode(Operator.A_NODE, left=p.method)
+        head = AstNode(Operator.A_NODE, left=p.method)
+        p.method.parent = head
+        return head
 
     # method -> DATATYPE FUNCNAME ( params ) { statements }
     @_('DATATYPE FUNCNAME LPAREN scope_open params RPAREN LBRACE statements RBRACE scope_close')
     def method(self, p):
-        return AstNode(Operator.A_FUNC, left=p.params, right=p.statements, next_label=self.get_new_label())
+        head = AstNode(Operator.A_FUNC, left=p.params, right=p.statements,
+         next_label=self.get_new_label(), value=p.FUNCNAME[1:])
+        # no AstNode for params here
+        p.statements.parent = head
+        return head
 
     # params -> DATATYPE VARNAME COMMA params | e
     # params -> params_rec | e
@@ -238,6 +247,10 @@ class Parser(SlyParser):
     @_('jump_statement SEMICOL')
     def statement(self, p):
         return p.jump_statement
+    
+    @_('function_call SEMICOL')
+    def statement(self, p):
+        return p.function_call
 
     # interation_statement -> while_statement | for_statement
     @_('while_statement')
@@ -664,29 +677,41 @@ class Parser(SlyParser):
     # expr -> function_call
     @_('function_call')
     def expr(self, p):
-        return str(p.function_call)
+        return p.function_call
+        # return str(p.function_call)
 
     # function_call -> VARNAME ( argument_list )
     @_('VARNAME LPAREN argument_list RPAREN')
     def function_call(self, p):
-        return str(p[0]+p[1]+p[2]+p[3])
+        # here "p.argument_list" could be "None", if there are no arguments
+        head = AstNode(Operator.A_FUNCCALL, left=p.VARNAME, right=p.argument_list)
+        return head
 
-    # argument_list -> argument, argument_list
-    @_('argument COMMA argument_list')
+    # argument_list -> argument_list_rec | e
+    @_('argument_list_rec')
     def argument_list(self, p):
-        return str(p[0]+p[1]+p[2])
+        return p.argument_list_rec
 
-    # argument_list -> argument
-    @_('argument')
+    @_('empty')
     def argument_list(self, p):
-        return str(p.argument)
+        return None
+    
+    @_('expr COMMA argument_list_rec')
+    def argument_list_rec(self, p):
+        head = AstNode(Operator.A_NODE, left=p.expr, right=p.argument_list_rec)
+        return head
+    
+    @_('expr')
+    def argument_list_rec(self, p):
+        return p.expr
+
 
     # argument -> VARNAME | constant | array_variable
-    @_('VARNAME',
-        'constant',
-        'array_variable')
-    def argument(self, p):
-        return str(p[0])
+    # @_('VARNAME',
+        # 'constant',
+        # 'array_variable')
+    # def argument(self, p):
+        # return str(p[0])
 
     @_('')
     def empty(self, p):
@@ -708,7 +733,7 @@ if __name__ == '__main__':
     lex = lexer.Lexer()
     parser = Parser()
 
-    with open(os.path.join(TEST_SUITES_DIR, "JumpTest.sq"), 'r') as f:
+    with open(os.path.join(TEST_SUITES_DIR, "FunctionsAndCallsTest.sq"), 'r') as f:
         text = f.read()
 
     parser.parse(lex.tokenize(text))

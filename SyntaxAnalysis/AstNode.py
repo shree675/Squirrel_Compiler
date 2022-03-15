@@ -43,6 +43,7 @@ class Operator(Enum):
     A_CHARCONST = "char const"
     A_ARR_LITERAL = "arr literal"
     A_FUNC = "func"
+    A_FUNCCALL = "func call"
     A_NODE = "node"
     A_ROOT = "root"
     A_DECL = "decl"
@@ -78,7 +79,8 @@ class AstNode:
     If a node contains 1 child, it must be assigned to the left child
     '''
 
-    def __init__(self, operator=None, left=None, mid=None, right=None, value=None, data_type='fuzzy', next_label=None, parent=None):
+    def __init__(self, operator=None, left=None, mid=None, right=None, 
+    value=None, data_type='fuzzy', next_label=None):
         self.operator = operator
         self.left = left
         self.mid = mid
@@ -147,12 +149,14 @@ class AstNode:
 
         elif head.operator == Operator.A_FUNC:
             params, statements = head.left, head.right
+            # function_name is same as the label
+            function_name = head.value
 
             AstNode.generateCode(statements, get_new_label,
                                  get_new_temp, symbol_table)
 
             # head.code = statements.code + "\n" + head.next + ":\n" + "return\n"
-            head.code = statements.code + "\n" 
+            head.code = function_name + ":\n" + statements.code + "\n" 
 
         # ------------------------------------------------------------
 
@@ -784,7 +788,10 @@ class AstNode:
                     cur.operator != Operator.A_WHILE and
                     cur.operator != Operator.A_SWITCH
                 ):
-                cur = cur.parent
+                if cur.operator != Operator.A_ROOT:
+                    cur = cur.parent
+                else:
+                    raise Exception("Semantic Error : \"break\" can only be used in a for_loop or a while_loop or a switch_case.\n")
 
             head.code = "goto " + cur.next
         
@@ -802,14 +809,43 @@ class AstNode:
 
         
         elif head.operator == Operator.A_CONTINUE:
-            # TODO: do this for "while", "switch", if it goes upto ROOT then semantic error
             cur = head
             while(cur.operator != Operator.A_FOR and 
-                    cur.operator != Operator.A_WHILE and
-                    cur.operator != Operator.A_SWITCH
+                    cur.operator != Operator.A_WHILE
                 ):
-                cur = cur.parent
+                if cur.operator != Operator.A_ROOT:
+                    cur = cur.parent
+                else:
+                    raise Exception("Semantic Error : \"continue\" can only be used in a for_loop or a while_loop.\n")
 
             head.code = "goto " + cur.begin
+        
+        elif head.operator == Operator.A_FUNCCALL:
+
+            function_name = head.left
+            argument_list = head.right
+
+            head.value = get_new_temp()
+
+            if argument_list:
+                AstNode.generateCode(argument_list, get_new_label,
+                                    get_new_temp, symbol_table)
+                
+                args = []
+                cur = argument_list
+                while cur.operator == Operator.A_NODE:
+                    args.append(cur.left.value) 
+                    cur = cur.right
+                args.append(cur.value) 
+
+                head.code = argument_list.code + '\n'
+                for arg in args:
+                    head.code += f"param {arg}\n"
+                head.code += f"{head.value} = call {function_name},{len(args)}\n"
+
+            else:
+                head.code = f"{head.value} = call {function_name},0\n"
+
+
 
 

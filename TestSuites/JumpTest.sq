@@ -1,4 +1,4 @@
-int @start(){
+int @start(int a){
     int x;
     int y;
     
@@ -20,7 +20,8 @@ int @start(){
         }else{
             break;
         }
-
     }
+
+    ``continue;``
     return x+x*y+y*(x+y);
 }
