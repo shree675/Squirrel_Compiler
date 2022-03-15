@@ -684,7 +684,7 @@ class Parser(SlyParser):
     @_('VARNAME LPAREN argument_list RPAREN')
     def function_call(self, p):
         # here "p.argument_list" could be "None", if there are no arguments
-        head = AstNode(Operator.A_FUNCCALL, left=p.argument_list, value=p.VARNAME)
+        head = AstNode(Operator.A_FUNCCALL, left=p.VARNAME, right=p.argument_list)
         return head
 
     # argument_list -> argument_list_rec | e

@@ -822,8 +822,10 @@ class AstNode:
         
         elif head.operator == Operator.A_FUNCCALL:
 
-            argument_list = head.left
-            function_name = head.value
+            function_name = head.left
+            argument_list = head.right
+
+            head.value = get_new_temp()
 
             if argument_list:
                 AstNode.generateCode(argument_list, get_new_label,
@@ -839,10 +841,10 @@ class AstNode:
                 head.code = argument_list.code + '\n'
                 for arg in args:
                     head.code += f"param {arg}\n"
-                head.code = f"{get_new_temp()} = call {function_name},{len(args)}\n"
+                head.code += f"{head.value} = call {function_name},{len(args)}\n"
 
             else:
-                head.code = f"{get_new_temp()} = call {function_name},0\n"
+                head.code = f"{head.value} = call {function_name},0\n"
 
 
 
