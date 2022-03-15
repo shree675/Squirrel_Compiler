@@ -1,4 +1,3 @@
-from turtle import left
 from sly import Parser as SlyParser
 from AstNode import Operator, AstNode
 from SemanticAnalysis import TypeChecker
@@ -248,6 +247,10 @@ class Parser(SlyParser):
     @_('jump_statement SEMICOL')
     def statement(self, p):
         return p.jump_statement
+    
+    @_('function_call SEMICOL')
+    def statement(self, p):
+        return p.function_call
 
     # interation_statement -> while_statement | for_statement
     @_('while_statement')
@@ -680,14 +683,18 @@ class Parser(SlyParser):
     # function_call -> VARNAME ( argument_list )
     @_('VARNAME LPAREN argument_list RPAREN')
     def function_call(self, p):
+        # here "p.argument_list" could be "None", if there are no arguments
         head = AstNode(Operator.A_FUNCCALL, left=p.argument_list, value=p.VARNAME)
         return head
-        # return str(p[0]+p[1]+p[2]+p[3])
 
-    # argument_list -> argument, argument_list
+    # argument_list -> argument_list_rec | e
     @_('argument_list_rec')
     def argument_list(self, p):
-        return str(p[0]+p[1]+p[2])
+        return p.argument_list_rec
+
+    @_('empty')
+    def argument_list(self, p):
+        return None
     
     @_('expr COMMA argument_list_rec')
     def argument_list_rec(self, p):
@@ -696,13 +703,8 @@ class Parser(SlyParser):
     
     @_('expr')
     def argument_list_rec(self, p):
-        head = AstNode(Operator.A_NODE, left=p.expr)
-        return head
+        return p.expr
 
-    # argument_list -> argument
-    @_('empty')
-    def argument_list(self, p):
-        return str(p.argument)
 
     # argument -> VARNAME | constant | array_variable
     # @_('VARNAME',
@@ -731,7 +733,7 @@ if __name__ == '__main__':
     lex = lexer.Lexer()
     parser = Parser()
 
-    with open(os.path.join(TEST_SUITES_DIR, "JumpTest.sq"), 'r') as f:
+    with open(os.path.join(TEST_SUITES_DIR, "FunctionsAndCallsTest.sq"), 'r') as f:
         text = f.read()
 
     parser.parse(lex.tokenize(text))

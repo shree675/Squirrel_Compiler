@@ -8,7 +8,8 @@ params -> DATATYPE VARNAME, params | e
 ✓ params -> params_rec | e
 ✓ params_rec -> DATATYPE VARNAME COMMA params_rec | DATATYPE VARNAME
 
-statement -> declaration_statement SEMICOL | assignment_statement SEMICOL | io_statement SEMICOL | jump_statement SEMICOL | selection_statement | iteration_statement
+statement -> declaration_statement SEMICOL | assignment_statement SEMICOL | io_statement SEMICOL |
+             jump_statement SEMICOL | selection_statement | iteration_statement | function_call
 
 declaration_statement -> simple_init | array_init
 simple_init -> DATATYPE VARNAME | DATATYPE VARNAME = expr

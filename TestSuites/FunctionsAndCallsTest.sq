@@ -1,0 +1,6 @@
+int @start(){
+
+    int a;
+    int b;
+    sum(a, b);
+}

@@ -791,7 +791,7 @@ class AstNode:
                 if cur.operator != Operator.A_ROOT:
                     cur = cur.parent
                 else:
-                    raise Exception("\"break\" can only be used in a for_loop or a while_loop or a switch_case.\n")
+                    raise Exception("Semantic Error : \"break\" can only be used in a for_loop or a while_loop or a switch_case.\n")
 
             head.code = "goto " + cur.next
         
@@ -809,7 +809,6 @@ class AstNode:
 
         
         elif head.operator == Operator.A_CONTINUE:
-            # TODO: do this for "while", "switch", if it goes upto ROOT then semantic error
             cur = head
             while(cur.operator != Operator.A_FOR and 
                     cur.operator != Operator.A_WHILE
@@ -817,8 +816,34 @@ class AstNode:
                 if cur.operator != Operator.A_ROOT:
                     cur = cur.parent
                 else:
-                    raise Exception("\"continue\" can only be used in a for_loop or a while_loop.\n")
+                    raise Exception("Semantic Error : \"continue\" can only be used in a for_loop or a while_loop.\n")
 
             head.code = "goto " + cur.begin
+        
+        elif head.operator == Operator.A_FUNCCALL:
+
+            argument_list = head.left
+            function_name = head.value
+
+            if argument_list:
+                AstNode.generateCode(argument_list, get_new_label,
+                                    get_new_temp, symbol_table)
+                
+                args = []
+                cur = argument_list
+                while cur.operator == Operator.A_NODE:
+                    args.append(cur.left.value) 
+                    cur = cur.right
+                args.append(cur.value) 
+
+                head.code = argument_list.code + '\n'
+                for arg in args:
+                    head.code += f"param {arg}\n"
+                head.code = f"{get_new_temp()} = call {function_name},{len(args)}\n"
+
+            else:
+                head.code = f"{get_new_temp()} = call {function_name},0\n"
+
+
 
 
