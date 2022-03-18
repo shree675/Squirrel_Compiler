@@ -1,4 +1,6 @@
 from typing import Type
+
+from click import pass_obj
 from SemanticAnalysis import TypeChecker
 from enum import Enum
 import math
@@ -157,6 +159,7 @@ class AstNode:
         # ------------------------------------------------------------
 
         elif head.operator == Operator.A_AND:
+            # TODO: Ask Kranthi aboutthis and add TAC for type casting
 
             left, right = head.left, head.right
             true, false = head.true, head.false
@@ -183,6 +186,7 @@ class AstNode:
         # ------------------------------------------------------------
 
         elif head.operator == Operator.A_OR:
+            # TODO: Ask Kranthi aboutthis and add TAC for type casting
 
             left, right = head.left, head.right
             true, false = head.true, head.false
@@ -208,14 +212,45 @@ class AstNode:
         elif head.operator == Operator.A_RELOP1 or head.operator == Operator.A_RELOP2:
 
             left, right = head.left, head.right
+            left_type = left.data_type
+            right_type = right.data_type
             relop = head.value
 
             AstNode.generateCode(left, parser)
             AstNode.generateCode(right, parser)
 
-            head.code = left.code + "\n" + right.code + "\n" + \
-                "if " + left.value + " " + relop + " " + right.value + " goto " + head.true + \
-                "\n" + "goto " + head.false
+            head.code = left.code + "\n" + right.code + "\n"
+
+            """ head.code += f"if {left.value} {relop} {right.value} goto {head.true}\ngoto {head.false}\n"
+            "if " + left.value + " " + relop + " " + right.value + " goto " + head.true + "\n" + "goto " + head.false """
+
+
+
+            if left_type == 'int' and right_type == 'int':
+                pass
+            elif left_type == 'float' and right_type == 'float':
+                pass
+            elif left_type == 'float' or right_type == 'float':
+                if left_type == 'float':
+                    typecast_variable= parser.get_new_temp("float")
+                    head.code += f"{typecast_variable} = (float){right.value}\n"
+                    head.code += f"if {left.value} {relop} {typecast_variable} goto {head.true}\ngoto {head.false}\n"
+                else: 
+                    typecast_variable= parser.get_new_temp("float")
+                    head.code += f"{typecast_variable} = (float){left.value}\n"
+                    head.code += f"if {typecast_variable} {relop} {right.value} goto {head.true}\ngoto {head.false}\n"
+                
+            else:
+                typecast_variable_left = left.value
+                typecast_variable_right = right.value
+                if left_type != 'int':
+                    typecast_variable_left = parser.get_new_temp("int")
+                    head.code += f"{typecast_variable_left} = (int){left.value}\n"   
+                if right_type != 'int':
+                    typecast_variable_right = parser.get_new_temp("int")
+                    head.code += f"{typecast_variable_right} = (int){right.value}\n"
+                head.code += f"if {typecast_variable_left} {relop} {typecast_variable_right} goto {head.true}\ngoto {head.false}\n"
+                
 
         # ------------------------------------------------------------
 
@@ -438,28 +473,24 @@ class AstNode:
             AstNode.generateCode(expr0, parser)
             AstNode.generateCode(expr1, parser)
 
-            # print("head dataype : " ,  head.data_type)
-
             head.value = parser.get_new_temp(head.data_type)
+
+            # head.code = expr0.code + "\n" + expr1.code + "\n" + \
+                # head.value + " = " + expr0.value + " + " + expr1.value
             
             head.code = expr0.code + "\n" + expr1.code + "\n"
 
             if head.data_type != expr0.data_type:
-                nt = parser.get_new_temp(head.data_type)
-                head.code += f"{nt} = ({head.data_type}){expr0.value}\n"
-                head.code += f"{head.value} = {nt} + {expr1.value}\n"
+                typecast_variable= parser.get_new_temp(head.data_type)
+                head.code += f"{typecast_variable} = ({head.data_type}){expr0.value}\n"
+                head.code += f"{head.value} = {typecast_variable} + {expr1.value}\n"
 
             elif head.data_type != expr1.data_type:
-                nt = parser.get_new_temp(head.data_type)
+                typecast_variable= parser.get_new_temp(head.data_type)
                 head.code += f"{parser.get_new_temp(head.data_type)} = ({head.data_type}){expr1.value}\n"
-                head.code += f"{head.value} = {expr0.value} + {nt}\n"
+                head.code += f"{head.value} = {expr0.value} + {typecast_variable}\n"
             else:
                 head.code += f"{head.value} = {expr0.value} + {expr1.value}\n"
-
-            # TypeChecker.TypeChecker.say_hello()
-
-            # head.code = expr0.code + "\n" + expr1.code + "\n" + \
-                # head.value + " = " + expr0.value + " + " + expr1.value
 
         # --------------------------------------------------------------------
 
@@ -481,8 +512,21 @@ class AstNode:
                 AstNode.generateCode(expr0, parser)
                 AstNode.generateCode(expr1, parser)
 
-                head.code = expr0.code + "\n" + expr1.code + "\n" + \
-                    head.value + " = " + expr0.value + " - " + expr1.value
+                # head.code = expr0.code + "\n" + expr1.code + "\n" + \
+                    # head.value + " = " + expr0.value + " - " + expr1.value
+            head.code = expr0.code + "\n" + expr1.code + "\n"
+
+            if head.data_type != expr0.data_type:
+                typecast_variable= parser.get_new_temp(head.data_type)
+                head.code += f"{typecast_variable} = ({head.data_type}){expr0.value}\n"
+                head.code += f"{head.value} = {typecast_variable} - {expr1.value}\n"
+
+            elif head.data_type != expr1.data_type:
+                typecast_variable= parser.get_new_temp(head.data_type)
+                head.code += f"{parser.get_new_temp(head.data_type)} = ({head.data_type}){expr1.value}\n"
+                head.code += f"{head.value} = {expr0.value} - {typecast_variable}\n"
+            else:
+                head.code += f"{head.value} = {expr0.value} - {expr1.value}\n"
 
         # --------------------------------------------------------------------
 
@@ -495,8 +539,21 @@ class AstNode:
             AstNode.generateCode(expr0, parser)
             AstNode.generateCode(expr1, parser)
 
-            head.code = expr0.code + "\n" + expr1.code + "\n" + \
-                head.value + " = " + expr0.value + " * " + expr1.value
+            # head.code = expr0.code + "\n" + expr1.code + "\n" + \
+                # head.value + " = " + expr0.value + " * " + expr1.value
+            head.code = expr0.code + "\n" + expr1.code + "\n"
+
+            if head.data_type != expr0.data_type:
+                typecast_variable= parser.get_new_temp(head.data_type)
+                head.code += f"{typecast_variable} = ({head.data_type}){expr0.value}\n"
+                head.code += f"{head.value} = {typecast_variable} * {expr1.value}\n"
+
+            elif head.data_type != expr1.data_type:
+                typecast_variable= parser.get_new_temp(head.data_type)
+                head.code += f"{parser.get_new_temp(head.data_type)} = ({head.data_type}){expr1.value}\n"
+                head.code += f"{head.value} = {expr0.value} * {typecast_variable}\n"
+            else:
+                head.code += f"{head.value} = {expr0.value} * {expr1.value}\n"
 
         # --------------------------------------------------------------------
 
@@ -509,9 +566,22 @@ class AstNode:
             AstNode.generateCode(expr0, parser)
             AstNode.generateCode(expr1, parser)
 
-            head.code = expr0.code + "\n" + expr1.code + "\n" + \
-                head.value + " = " + expr0.value + " / " + expr1.value
+            # head.code = expr0.code + "\n" + expr1.code + "\n" + \
+                # head.value + " = " + expr0.value + " / " + expr1.value
 
+            head.code = expr0.code + "\n" + expr1.code + "\n"
+
+            if head.data_type != expr0.data_type:
+                typecast_variable= parser.get_new_temp(head.data_type)
+                head.code += f"{typecast_variable} = ({head.data_type}){expr0.value}\n"
+                head.code += f"{head.value} = {typecast_variable} / {expr1.value}\n"
+
+            elif head.data_type != expr1.data_type:
+                typecast_variable= parser.get_new_temp(head.data_type)
+                head.code += f"{parser.get_new_temp(head.data_type)} = ({head.data_type}){expr1.value}\n"
+                head.code += f"{head.value} = {expr0.value} / {typecast_variable}\n"
+            else:
+                head.code += f"{head.value} = {expr0.value} / {expr1.value}\n"
         # --------------------------------------------------------------------
 
         elif head.operator == Operator.A_MODULO:
@@ -731,16 +801,28 @@ class AstNode:
             left = head.left
 
             AstNode.generateCode(left, parser)
-
+            # TODO: I dont think is required
             # left variable type is assumed to be "int" or "float"
             # for other types we need to generate code accordingly after semantic analysis
             # for bool : a == true
             # for char : a != '\0'
             # for string : a != ""
 
+            rhs = "0"
             if left.operator == Operator.A_VARIABLE:
+                """ if left.data_type == "int":
+                    rhs = "0"
+                #elif left.data_type == "float":
+                   # rhs = "0.0"
+                elif left.data_type == "char":
+                    rhs = "\\0"
+                elif left.data_type == "bool":
+                    rhs = "false"
+                else:
+                    rhs = "false" """
+
                 head.code = left.code + "\n" + \
-                    "if " + left.value + " " + "!=" + " " + "0" + " goto " + head.true + \
+                    "if " + left.value + " " + "!=" + " " + rhs + " goto " + head.true + \
                     "\n" + "goto " + head.false
             else:
                 if left.operator == Operator.A_INTCONST and left.value == "0":

@@ -35,3 +35,19 @@ BinaryOperator
 =     if lhs == rhs, where neither are string -> typecast permanently to lhs if required, else do nothing
       if one is string but the other is not -> error 
       if both are string, do nothing
+
+
+----------------------------------------------------------------------------------------------------------------------
+
+int a;
+bool b;
+
+if (a && b) {
+    // do something
+}
+
+Corresponding TAC:
+
+a = (int)0;
+b = (bool)false;
+

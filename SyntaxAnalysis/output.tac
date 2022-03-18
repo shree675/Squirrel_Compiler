@@ -1,41 +1,33 @@
-sum:
-
-
-
-t0 = a + b
-
-int c = t0
-
-L8:
-
-
-return c
-L6:
-
-
-L5:
-
 start:
 
 char a = '0'
-L16:
+L7:
 
-int b = 0
-L14:
-
-
-
-t2 = (int)a
-t1 = t2 + b
-
-a = t1
-L12:
+float b = 0.0
+L5:
 
 
-return 0
+
+tf0 = (float)a
+if tf0 < b goto L10
+goto L9
+
 L10:
 
 
-L2:
+
+tf2 = (float)a
+tf1 = tf2 + b
+
+int c = tf1
+
+L11:
+
+L9:
+
+L9:
+
 
 L2:
+
+L1:

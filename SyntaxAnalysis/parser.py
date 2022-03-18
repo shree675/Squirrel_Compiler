@@ -766,7 +766,7 @@ if __name__ == '__main__':
     lex = lexer.Lexer()
     parser = Parser()
 
-    with open(os.path.join(TEST_SUITES_DIR, "FunctionsAndCallsTest.sq"), 'r') as f:
+    with open(os.path.join(TEST_SUITES_DIR, "TypeCast1.sq"), 'r') as f:
         text = f.read()
 
     parser.parse(lex.tokenize(text))
