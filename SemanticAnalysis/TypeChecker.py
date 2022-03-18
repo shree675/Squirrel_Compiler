@@ -185,3 +185,7 @@ class TypeChecker:
                 TypeChecker.raise_error(data_type1=expr_type,condition_type='int', operator=operator)       
 
         return
+    
+    @staticmethod
+    def say_hello():
+        print("helllooooo")
