@@ -1,7 +1,7 @@
-#from SemanticAnalysis import TypeChecker
+from typing import Type
+from SemanticAnalysis import TypeChecker
 from enum import Enum
 import math
-from webbrowser import Opera
 
 INT = "int"
 FLOAT = "float"
@@ -28,6 +28,7 @@ class Operator(Enum):
     A_MODULO = "%"
     A_NOT = "!"
     A_NEGATE = "uminus"
+    A_TYPECAST = "type cast"
     A_ASSIGN = "="
     A_IF = "if"
     A_ELSE = "else"
@@ -97,7 +98,7 @@ class AstNode:
         # self.parent = parent
 
     @staticmethod
-    def generateCode(head, get_new_label, get_new_temp, symbol_table):
+    def generateCode(head, parser):
 
         if head is None:
             return
@@ -107,9 +108,8 @@ class AstNode:
         if head.operator == Operator.A_ROOT:
 
             left = head.left
-            #typeChecker.check(head, symbol_table)
-            AstNode.generateCode(left, get_new_label,
-                                 get_new_temp, symbol_table)
+            #typeChecker.check(head, parser.symbol_table)
+            AstNode.generateCode(left, parser)
             head.code = left.code + '\n' + left.next + ':\n'
 
             # TODO: place this output file in the Output folder and rename the file
@@ -126,21 +126,18 @@ class AstNode:
             left, right = head.left, head.right
 
             if left and right:
-                head.next = get_new_label()
+                head.next = parser.get_new_label()
                 right.next = head.next
-                left.next = get_new_label()
-                AstNode.generateCode(left, get_new_label,
-                                     get_new_temp, symbol_table)
-                AstNode.generateCode(right, get_new_label,
-                                     get_new_temp, symbol_table)
+                left.next = parser.get_new_label()
+                AstNode.generateCode(left, parser)
+                AstNode.generateCode(right, parser)
 
                 head.code = left.code + '\n' + right.code + "\n" + right.next + ':\n'
 
             elif left:
-                head.next = get_new_label()
-                left.next = get_new_label()
-                AstNode.generateCode(left, get_new_label,
-                                     get_new_temp, symbol_table)
+                head.next = parser.get_new_label()
+                left.next = parser.get_new_label()
+                AstNode.generateCode(left, parser)
                 head.code = left.code + '\n' + left.next + ':\n'
             
             return
@@ -152,8 +149,7 @@ class AstNode:
             # function_name is same as the label
             function_name = head.value
 
-            AstNode.generateCode(statements, get_new_label,
-                                 get_new_temp, symbol_table)
+            AstNode.generateCode(statements, parser)
 
             # head.code = statements.code + "\n" + head.next + ":\n" + "return\n"
             head.code = function_name + ":\n" + statements.code + "\n" 
@@ -171,15 +167,13 @@ class AstNode:
             if right.operator == Operator.A_VARIABLE:
                 right = AstNode(Operator.A_BOOL, left=right)
 
-            left.true = get_new_label()
+            left.true = parser.get_new_label()
             left.false = false
             right.true = true
             right.false = false
 
-            AstNode.generateCode(left, get_new_label,
-                                 get_new_temp, symbol_table)
-            AstNode.generateCode(right, get_new_label,
-                                 get_new_temp, symbol_table)
+            AstNode.generateCode(left, parser)
+            AstNode.generateCode(right, parser)
 
             # if not left.value:
             #     left.code = f"left.value == true"
@@ -200,14 +194,12 @@ class AstNode:
                 right = AstNode(Operator.A_BOOL, left=right)
 
             left.true = true
-            left.false = get_new_label()
+            left.false = parser.get_new_label()
             right.true = true
             right.false = false
 
-            AstNode.generateCode(left, get_new_label,
-                                 get_new_temp, symbol_table)
-            AstNode.generateCode(right, get_new_label,
-                                 get_new_temp, symbol_table)
+            AstNode.generateCode(left, parser)
+            AstNode.generateCode(right, parser)
 
             head.code = left.code + "\n" + left.false + ":" + "\n" + right.code
 
@@ -218,10 +210,8 @@ class AstNode:
             left, right = head.left, head.right
             relop = head.value
 
-            AstNode.generateCode(left, get_new_label,
-                                 get_new_temp, symbol_table)
-            AstNode.generateCode(right, get_new_label,
-                                 get_new_temp, symbol_table)
+            AstNode.generateCode(left, parser)
+            AstNode.generateCode(right, parser)
 
             head.code = left.code + "\n" + right.code + "\n" + \
                 "if " + left.value + " " + relop + " " + right.value + " goto " + head.true + \
@@ -240,8 +230,7 @@ class AstNode:
             left.true = false
             left.false = true
 
-            AstNode.generateCode(left, get_new_label,
-                                 get_new_temp, symbol_table)
+            AstNode.generateCode(left, parser)
 
             head.code = left.code
 
@@ -264,14 +253,12 @@ class AstNode:
                     expr.operator == Operator.A_MODULO:
                 expr = AstNode(Operator.A_BOOL, left=expr)
 
-            expr.true = get_new_label()
+            expr.true = parser.get_new_label()
             expr.false = head.next
             statements.next = head.next
 
-            AstNode.generateCode(expr, get_new_label,
-                                 get_new_temp, symbol_table)
-            AstNode.generateCode(statements, get_new_label,
-                                 get_new_temp, symbol_table)
+            AstNode.generateCode(expr, parser)
+            AstNode.generateCode(statements, parser)
 
             head.code = expr.code + "\n" + expr.true + ":\n" + statements.code
 
@@ -295,17 +282,14 @@ class AstNode:
                     expr.operator == Operator.A_MODULO:
                 expr = AstNode(Operator.A_BOOL, left=expr)
 
-            expr.true = get_new_label()
-            expr.false = get_new_label()
+            expr.true = parser.get_new_label()
+            expr.false = parser.get_new_label()
             statements1.next = head.next
             statements2.next = head.next
 
-            AstNode.generateCode(expr, get_new_label,
-                                 get_new_temp, symbol_table)
-            AstNode.generateCode(statements1, get_new_label,
-                                 get_new_temp, symbol_table)
-            AstNode.generateCode(statements2, get_new_label,
-                                 get_new_temp, symbol_table)
+            AstNode.generateCode(expr, parser)
+            AstNode.generateCode(statements1, parser)
+            AstNode.generateCode(statements2, parser)
 
             head.code = expr.code + "\n" + expr.true + ":\n" + statements1.code + "\n" + \
                 "goto " + head.next + "\n" + expr.false + ":\n" + statements2.code
@@ -317,11 +301,10 @@ class AstNode:
             print(head.operator.value + " ?")
             left = head.left
 
-            head.next = get_new_label()
+            head.next = parser.get_new_label()
             left.next = head.next
 
-            AstNode.generateCode(left, get_new_label,
-                                 get_new_temp, symbol_table)
+            AstNode.generateCode(left, parser)
 
             head.code = left.code + '\n' + left.next + ":\n"
 
@@ -335,8 +318,7 @@ class AstNode:
             right.value = head.value
             right.next = head.next
 
-            AstNode.generateCode(right, get_new_label,
-                                 get_new_temp, symbol_table)
+            AstNode.generateCode(right, parser)
 
             head.code = right.code
 
@@ -351,10 +333,8 @@ class AstNode:
             single.value = head.value
             single.next = head.next
 
-            AstNode.generateCode(single, get_new_label,
-                                 get_new_temp, symbol_table)
-            AstNode.generateCode(multiple, get_new_label,
-                                 get_new_temp, symbol_table)
+            AstNode.generateCode(single, parser)
+            AstNode.generateCode(multiple, parser)
 
             head.code = single.code + "\n" + multiple.code
 
@@ -364,10 +344,9 @@ class AstNode:
 
             constant, statements = head.left, head.right
 
-            statements.next = get_new_label()
+            statements.next = parser.get_new_label()
 
-            AstNode.generateCode(statements, get_new_label,
-                                 get_new_temp, symbol_table)
+            AstNode.generateCode(statements, parser)
 
             head.code = "ifFalse " + head.value + " == " + constant[1] + " goto " + statements.next + "\n" + \
                 statements.code + "\n" + "goto " + head.next + "\n" + statements.next + ":\n"
@@ -380,8 +359,7 @@ class AstNode:
 
             statements.next = head.next
 
-            AstNode.generateCode(statements, get_new_label,
-                                 get_new_temp, symbol_table)
+            AstNode.generateCode(statements, parser)
 
             head.code = statements.code + "\n" + "goto " + head.next
 
@@ -405,15 +383,13 @@ class AstNode:
                     expr.operator == Operator.A_MODULO:
                 expr = AstNode(Operator.A_BOOL, left=expr)
 
-            head.begin = get_new_label()
-            expr.true = get_new_label()
+            head.begin = parser.get_new_label()
+            expr.true = parser.get_new_label()
             expr.false = head.next
             statements.next = head.begin
 
-            AstNode.generateCode(expr, get_new_label,
-                                 get_new_temp, symbol_table)
-            AstNode.generateCode(statements, get_new_label,
-                                 get_new_temp, symbol_table)
+            AstNode.generateCode(expr, parser)
+            AstNode.generateCode(statements, parser)
 
             head.code = head.begin + ":\n" + expr.code + "\n" + expr.true + ":\n" + statements.code + "\n" + \
                 "goto " + head.begin
@@ -439,18 +415,15 @@ class AstNode:
                 left = AstNode(Operator.A_BOOL, left=left)
 
             # new instance variable created for the "A_FOR" node
-            # setattr(head, 'begin', get_new_label())
-            head.begin = get_new_label()
-            left.true = get_new_label()
+            # setattr(head, 'begin', parser.get_new_label())
+            head.begin = parser.get_new_label()
+            left.true = parser.get_new_label()
             left.false = head.next
             mid.next = head.begin
 
-            AstNode.generateCode(left, get_new_label,
-                                 get_new_temp, symbol_table)
-            AstNode.generateCode(mid, get_new_label,
-                                 get_new_temp, symbol_table)
-            AstNode.generateCode(right, get_new_label,
-                                 get_new_temp, symbol_table)
+            AstNode.generateCode(left, parser)
+            AstNode.generateCode(mid, parser)
+            AstNode.generateCode(right, parser)
 
             head.code = head.begin + ":\n" + left.code + "\n" + left.true + ":\n" + right.code + "\n" + \
                 mid.code + "\n" + "goto " + head.begin
@@ -461,15 +434,32 @@ class AstNode:
 
             expr0, expr1 = head.left, head.right
 
-            head.value = get_new_temp()
 
-            AstNode.generateCode(expr0, get_new_label,
-                                 get_new_temp, symbol_table)
-            AstNode.generateCode(expr1, get_new_label,
-                                 get_new_temp, symbol_table)
+            AstNode.generateCode(expr0, parser)
+            AstNode.generateCode(expr1, parser)
 
-            head.code = expr0.code + "\n" + expr1.code + "\n" + \
-                head.value + " = " + expr0.value + " + " + expr1.value
+            # print("head dataype : " ,  head.data_type)
+
+            head.value = parser.get_new_temp(head.data_type)
+            
+            head.code = expr0.code + "\n" + expr1.code + "\n"
+
+            if head.data_type != expr0.data_type:
+                nt = parser.get_new_temp(head.data_type)
+                head.code += f"{nt} = ({head.data_type}){expr0.value}\n"
+                head.code += f"{head.value} = {nt} + {expr1.value}\n"
+
+            elif head.data_type != expr1.data_type:
+                nt = parser.get_new_temp(head.data_type)
+                head.code += f"{parser.get_new_temp(head.data_type)} = ({head.data_type}){expr1.value}\n"
+                head.code += f"{head.value} = {expr0.value} + {nt}\n"
+            else:
+                head.code += f"{head.value} = {expr0.value} + {expr1.value}\n"
+
+            # TypeChecker.TypeChecker.say_hello()
+
+            # head.code = expr0.code + "\n" + expr1.code + "\n" + \
+                # head.value + " = " + expr0.value + " + " + expr1.value
 
         # --------------------------------------------------------------------
 
@@ -478,21 +468,18 @@ class AstNode:
             expr0, expr1 = head.left, head.right
 
             if(expr1 == None):
-                head.value = get_new_temp()
+                head.value = parser.get_new_temp(head.data_type)
 
-                AstNode.generateCode(expr0, get_new_label,
-                                     get_new_temp, symbol_table)
+                AstNode.generateCode(expr0, parser)
 
                 head.code = expr0.code + "\n" +  \
                     head.value + " = " + " - " + expr0.value
 
             else:
-                head.value = get_new_temp()
+                head.value = parser.get_new_temp(head.data_type)
 
-                AstNode.generateCode(expr0, get_new_label,
-                                     get_new_temp, symbol_table)
-                AstNode.generateCode(expr1, get_new_label,
-                                     get_new_temp, symbol_table)
+                AstNode.generateCode(expr0, parser)
+                AstNode.generateCode(expr1, parser)
 
                 head.code = expr0.code + "\n" + expr1.code + "\n" + \
                     head.value + " = " + expr0.value + " - " + expr1.value
@@ -503,12 +490,10 @@ class AstNode:
 
             expr0, expr1 = head.left, head.right
 
-            head.value = get_new_temp()
+            head.value = parser.get_new_temp(head.data_type)
 
-            AstNode.generateCode(expr0, get_new_label,
-                                 get_new_temp, symbol_table)
-            AstNode.generateCode(expr1, get_new_label,
-                                 get_new_temp, symbol_table)
+            AstNode.generateCode(expr0, parser)
+            AstNode.generateCode(expr1, parser)
 
             head.code = expr0.code + "\n" + expr1.code + "\n" + \
                 head.value + " = " + expr0.value + " * " + expr1.value
@@ -519,12 +504,10 @@ class AstNode:
 
             expr0, expr1 = head.left, head.right
 
-            head.value = get_new_temp()
+            head.value = parser.get_new_temp(head.data_type)
 
-            AstNode.generateCode(expr0, get_new_label,
-                                 get_new_temp, symbol_table)
-            AstNode.generateCode(expr1, get_new_label,
-                                 get_new_temp, symbol_table)
+            AstNode.generateCode(expr0, parser)
+            AstNode.generateCode(expr1, parser)
 
             head.code = expr0.code + "\n" + expr1.code + "\n" + \
                 head.value + " = " + expr0.value + " / " + expr1.value
@@ -535,12 +518,10 @@ class AstNode:
 
             expr0, expr1 = head.left, head.right
 
-            head.value = get_new_temp()
+            head.value = parser.get_new_temp(head.data_type)
 
-            AstNode.generateCode(expr0, get_new_label,
-                                 get_new_temp, symbol_table)
-            AstNode.generateCode(expr1, get_new_label,
-                                 get_new_temp, symbol_table)
+            AstNode.generateCode(expr0, parser)
+            AstNode.generateCode(expr1, parser)
 
             head.code = expr0.code + "\n" + expr1.code + "\n" + \
                 head.value + " = " + expr0.value + " % " + expr1.value
@@ -553,14 +534,13 @@ class AstNode:
 
             array_variable = head.left
 
-            AstNode.generateCode(array_variable, get_new_label,
-                                 get_new_temp, symbol_table)
+            AstNode.generateCode(array_variable, parser)
 
-            temp = get_new_temp()
+            temp = parser.get_new_temp()
 
             variable = list(filter(
                 lambda var: var["scope"] == array_variable.value["scope"] and var["identifier_name"] == array_variable.value["varname"],
-                symbol_table
+                parser.symbol_table
             ))
             data_type = variable[0]["type"]
             if data_type == INT:
@@ -585,17 +565,20 @@ class AstNode:
             if head.right is not None:
                 array_var_use, expr = head.left, head.right
 
-                AstNode.generateCode(array_var_use, get_new_label,
-                                     get_new_temp, symbol_table)
-                AstNode.generateCode(expr, get_new_label,
-                                     get_new_temp, symbol_table)
+                AstNode.generateCode(array_var_use, parser)
+                AstNode.generateCode(expr, parser)
 
-                temp = get_new_temp()
-                head.value["val"] = get_new_temp()
+
+                temp = parser.get_new_temp()
+                # TODO : check if this is fine
+                head.value["val"] = parser.get_new_temp()
+
+                # print("eye catchy : " , head.data_type)
+
                 index = head.value["index"]
                 variable = list(filter(
                     lambda var: var["scope"] == head.value["scope"] and var["identifier_name"] == head.value["varname"],
-                    symbol_table
+                    parser.symbol_table
                 ))
                 i = len(variable[0]["dimension"])-index
                 dimension = variable[0]["dimension"][i]
@@ -612,13 +595,12 @@ class AstNode:
             else:
                 expr = head.left
 
-                AstNode.generateCode(expr, get_new_label,
-                                     get_new_temp, symbol_table)
+                AstNode.generateCode(expr, parser)
 
                 index = head.value["index"]
                 variable = list(filter(
                     lambda var: var["scope"] == head.value["scope"] and var["identifier_name"] == head.value["varname"],
-                    symbol_table
+                    parser.symbol_table
                 ))
                 i = len(variable[0]["dimension"])-index
                 dimension = variable[0]["dimension"][len(
@@ -628,7 +610,7 @@ class AstNode:
                     head.value["val"] = expr.value
                     head.code = expr.code
                 else:
-                    head.value["val"] = get_new_temp()
+                    head.value["val"] = parser.get_new_temp(head.data_type)
                     head.code = expr.code + "\n" + \
                         head.value["val"] + " = " + \
                         expr.value + " * " + str(dimension)
@@ -641,17 +623,14 @@ class AstNode:
             if type(head.left) == str:
                 varname, expr = head.left, head.right
 
-                AstNode.generateCode(expr, get_new_label,
-                                     get_new_temp, symbol_table)
+                AstNode.generateCode(expr, parser)
                 head.code = expr.code + "\n" + varname + " = " + expr.value
 
             else:
                 left_value, expr = head.left, head.right
 
-                AstNode.generateCode(
-                    left_value, get_new_label, get_new_temp, symbol_table)
-                AstNode.generateCode(expr, get_new_label,
-                                     get_new_temp, symbol_table)
+                AstNode.generateCode(left_value, parser)
+                AstNode.generateCode(expr, parser)
 
 
                 head.code = left_value.code + "\n" + expr.code + \
@@ -670,8 +649,7 @@ class AstNode:
                 # initialization
                 right = head.right
 
-                AstNode.generateCode(right, get_new_label,
-                                     get_new_temp, symbol_table)
+                AstNode.generateCode(right, parser)
 
                 head.code = right.code + "\n" + \
                     left[0] + " " + left[1] + " = " + right.value + "\n"
@@ -696,8 +674,7 @@ class AstNode:
 
             array_rec, array_list = head.left, head.right
 
-            AstNode.generateCode(array_list, get_new_label,
-                                 get_new_temp, symbol_table)
+            AstNode.generateCode(array_list, parser)
 
             size = 0
             if head.data_type == INT:
@@ -725,8 +702,7 @@ class AstNode:
                 head.code = ""
 
             else:
-                AstNode.generateCode(left, get_new_label,
-                                     get_new_temp, symbol_table)
+                AstNode.generateCode(left, parser)
                 head.value = [*left.value, right[1]]
                 head.code = ""
 
@@ -754,8 +730,7 @@ class AstNode:
 
             left = head.left
 
-            AstNode.generateCode(left, get_new_label,
-                                 get_new_temp, symbol_table)
+            AstNode.generateCode(left, parser)
 
             # left variable type is assumed to be "int" or "float"
             # for other types we need to generate code accordingly after semantic analysis
@@ -800,8 +775,7 @@ class AstNode:
             left = head.left
 
             if left:
-                AstNode.generateCode(left, get_new_label,
-                                    get_new_temp, symbol_table)
+                AstNode.generateCode(left, parser)
 
                 head.code = left.code + '\n' + 'return ' + left.value
             else:
@@ -825,11 +799,10 @@ class AstNode:
             function_name = head.left
             argument_list = head.right
 
-            head.value = get_new_temp()
+            head.value = parser.get_new_temp(head.data_type)
 
             if argument_list:
-                AstNode.generateCode(argument_list, get_new_label,
-                                    get_new_temp, symbol_table)
+                AstNode.generateCode(argument_list, parser)
                 
                 args = []
                 cur = argument_list
@@ -845,6 +818,19 @@ class AstNode:
 
             else:
                 head.code = f"{head.value} = call {function_name},0\n"
+        
+        elif head.operator == Operator.A_TYPECAST:
+
+            data_type = head.left
+            expr = head.right
+
+            AstNode.generateCode(expr, parser)
+            
+            head.value = parser.get_new_temp(data_type)
+
+
+            head.code = f"{expr.code}{head.value} = ({data_type}){expr.value}\n"
+
 
 
 

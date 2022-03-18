@@ -18,7 +18,20 @@ class Parser(SlyParser):
         self.scope_id_stack = [0, 1]
         self.num_labels = 0
         self.num_temp = 0
+        self.num_ftemp = 0
         self.type_checker = TypeChecker.TypeChecker(self.symbol_table)
+        self.function_symbol_table = []
+
+        '''
+            function_symbol_table = [
+               {
+                   "return_type" : "int",
+                   "name" : "start",
+                   "parameters" : ["int", "float", "char"]
+
+               } 
+            ]
+        '''
 
     @staticmethod
     def error(message = "Syntax Error"):
@@ -34,10 +47,14 @@ class Parser(SlyParser):
         self.num_labels += 1
         return "L" + str(self.num_labels - 1)
 
-    def get_new_temp(self):
+    def get_new_temp(self, data_type):
         """Generates and returns a new temporary variable, globally unique"""
-        self.num_temp += 1
-        return "t" + str(self.num_temp - 1)
+        if data_type == "float":
+            self.num_ftemp += 1
+            return "tf" + str(self.num_ftemp - 1)
+        else:
+            self.num_temp += 1
+            return "t" + str(self.num_temp - 1)
 
     # dimension = [2, 3] =>  2 rows, 3 cols
     def push_to_ST(self, data_type, varname, dimension):
@@ -59,6 +76,13 @@ class Parser(SlyParser):
             "dimension": dimension,
             "scope": self.scope_id_stack[-1],
             #"parent_scope": self.scope_id_stack[-2]
+        })
+    
+    def push_to_FST(self, return_type,  name, parameters):
+        self.function_symbol_table.append({
+            "return_type" : return_type,
+            "name" : name,
+            "parameters" : parameters
         })
 
 
@@ -159,10 +183,13 @@ class Parser(SlyParser):
         p.methods.parent = root
         # self.print_tree(root)
 
-        AstNode.generateCode(root, self.get_new_label,
-                             self.get_new_temp, self.symbol_table)
+        # AstNode.generateCode(root, self.get_new_label,
+                             # self.get_new_temp, self.symbol_table)
+        
+        AstNode.generateCode(root, self)
         # print(val.code)
         print(*self.symbol_table, sep="\n")
+        print(*self.function_symbol_table, sep="\n")
 
     # methods -> methods method
     @_('methods method')
@@ -185,6 +212,9 @@ class Parser(SlyParser):
          next_label=self.get_new_label(), value=p.FUNCNAME[1:])
         # no AstNode for params here
         p.statements.parent = head
+
+        # Push the function to the symbol table
+        self.push_to_FST(p.DATATYPE, p.FUNCNAME, p.params)
         return head
 
     # params -> DATATYPE VARNAME COMMA params | e
@@ -194,19 +224,21 @@ class Parser(SlyParser):
 
     @_('params_rec')
     def params(self, p):
-        return None
+        return p.params_rec
 
     @_('empty')
     def params(self, p):
-        return None
+        return []
 
     @_('DATATYPE VARNAME COMMA params_rec')
     def params_rec(self, p):
         self.push_to_ST(p.DATATYPE, p.VARNAME, [])
+        return [p.DATATYPE, *p.params_rec]
 
     @_('DATATYPE VARNAME')
     def params_rec(self, p):
         self.push_to_ST(p.DATATYPE, p.VARNAME, [])
+        return [p.DATATYPE]
 
     # statements -> statements statement
     @_("statements statement")
@@ -623,6 +655,7 @@ class Parser(SlyParser):
     # expr -> (DATATYPE) expr
     @_('LPAREN DATATYPE RPAREN expr %prec TYPECASTING')
     def expr(self, p):
+        return AstNode(Operator.A_TYPECAST, left=p.DATATYPE, right=p.expr)
         return str('('+p[0]+p[1]+p[2]+p[3]+')')
 
     # assignment_statement -> left_value = expr

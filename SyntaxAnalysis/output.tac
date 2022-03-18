@@ -1,61 +1,41 @@
-
-int x = 0
-L9:
-
-int y = 0
-L7:
-
-L11:
-
-
-if x < 5 goto L12
-goto L5
-L12:
-
-int j = 0
-L15:
+sum:
 
 
 
-if j == 0 goto L18
-goto L19
-L18:
+t0 = a + b
+
+int c = t0
+
+L8:
 
 
-j = 1
-L22:
+return c
+L6:
 
-goto L11
-L20:
 
-goto L17
-L19:
-
-goto L5
-L24:
-
-L17:
-
-L17:
-
-goto L11
 L5:
 
+start:
+
+char a = '0'
+L16:
+
+int b = 0
+L14:
 
 
 
-t2 = x * y
-t1 = x + t2
+t2 = (int)a
+t1 = t2 + b
+
+a = t1
+L12:
 
 
-
-t4 = x + y
-t3 = y * t4
-t0 = t1 + t3
-return t0
-L3:
+return 0
+L10:
 
 
 L2:
 
-L1:
+L2:
