@@ -2,11 +2,10 @@
 2. error in testcase: string f3 = -"hello";
     Probably unary operator in declaration is not working
 3. What do we do about all the warnings?
-4. jump statements
+4. jump statements - (semantic check for return remaining)
 5. Explicit and implicit type casting TAC?
 6. Not able to do semantic analysis for for loop until the get_datatype method of the symbol table is implemented correctly - breaks in case of for loop
 7. 
-
 8.  for array reference of multi-dimensional arrays, we have to 
     multiply the index with all the previous dimensions - need to
     change it (shreetesh).
@@ -16,7 +15,6 @@
 11. Semantic analysis for function definitions : check the return type
     and check if the value of the same type is being returned in the
     function body. (check inside if, else, etc.)
-
 12. Look into the possibility of creating a control flow graph for 
     semantic checks and optimizations.
 
