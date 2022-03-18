@@ -1,21 +1,73 @@
-1. Semantic checks for function call parameters once functions grammar rules are implemented
+1. Semantic analysis for FUNCTION CALLS - no.of args, type of args,
+    type of return value.
+
 2. error in testcase: string f3 = -"hello";
-    Probably unary operator in declaration is not working
-3. What do we do about all the warnings?
-4. jump statements - (semantic check for return remaining)
+    Probably unary operator in declaration is not working - Kranthi
+
+3. What do we do about all the warnings? - Kranthi (later)
+
+✓ 4. jump statements
+
 5. Explicit and implicit type casting TAC?
-6. Not able to do semantic analysis for for loop until the get_datatype method of the symbol table is implemented correctly - breaks in case of for loop
-7. 
-8.  for array reference of multi-dimensional arrays, we have to 
+
+✓ 6. Not able to do semantic analysis for for loop until the get_datatype method of the symbol table is implemented correctly - breaks in case of for loop
+
+7.  for array reference of multi-dimensional arrays, we have to 
     multiply the index with all the previous dimensions - need to
     change it (shreetesh).
-9.  store functions in symbol table, this means that in our language
+
+8.  Aashrith - store functions in symbol table, this means that in our language
     we have to declare/define the function before use
-10. channge function labels to be the same as fuction names
-11. Semantic analysis for function definitions : check the return type
+
+9. Semantic analysis for function definitions : check the return type
     and check if the value of the same type is being returned in the
     function body. (check inside if, else, etc.)
-12. Look into the possibility of creating a control flow graph for 
-    semantic checks and optimizations.
+
+10. Look into the possibility of creating a control flow graph for 
+    semantic checks and optimizations - this is a very important - how to make this - 
+    detect dead subtree, prune the AST, then call generate code - not for the presentation - keep thinking abotu it
+
+11. Labels issue - some repeated labels and some are missing - Shreetesh, Kranthi - tomorrow
+
+12. just add an implicit return in case user missed it, no need for the semantic check - 
+
+Aashrith - refactor generatecode method - passing parser instead of individual methods
+
+comparing enum - Operator.value instead of Operator
+
+Kranthi
+13. Stitching together parser with preprocessor - run from main method
+14. test recursion - and all test cases
+15. output.tac file, move it to output folder
+16. formatting the TAC file - write a post processing method to clean up the TAC 
 
 
+Wednesday, March 23rd, 2022
+
+Friday Presentation:
+1. slide
+2. live demo - a few test cases
+
+
+Phase 2:
+1 meeting next week - chalk out concrete plan for phase 2
+
+1. Register allocation - register descriptors and variable descriptors
+    0 to 31 registers, status attached to each one, if its free, or taken 
+    availability, mark a register an unavilable, free the register
+    if a register is taken, we have to spill the register (save it in memory), then go ahead and use the register 
+    decide on a method that is optimized, but not too hard to do
+    
+2. Code Optimization
+    if its x^2, change it to x*x,
+    if it is x/2 we can change it to right shift
+
+    load and stores without modifications (maybe a dirty check)
+
+    detecting dead code and eliminating it
+
+    if a condition always evaluates to false - some corresponding section mught be unreachable - we should get rid of it
+
+3. Code generation
+4. Type conversions
+5. 
