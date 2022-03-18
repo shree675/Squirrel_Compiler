@@ -3,4 +3,6 @@ int @start(){
     int a;
     int b;
     a = b + a * sum(a+b*(a+b), b+a*(b+a), a*b*b);
+
+    return a + sum(a,b);
 }
