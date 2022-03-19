@@ -122,23 +122,21 @@ class AstNode:
         # --------------------------------------------------
 
         elif head.operator == Operator.A_NODE:
-            print(head.operator.value + " ?")
+            # print(head.operator.value + " ?")
 
             left, right = head.left, head.right
 
             if left and right:
-                head.next = parser.get_new_label()
-                right.next = head.next
+                right.next = parser.get_new_label()
                 left.next = parser.get_new_label()
                 AstNode.generateCode(left, parser)
                 AstNode.generateCode(right, parser)
-                if head.value == "for":
-                    head.code = left.code + '\n' + right.code
-                else:
-                    head.code = left.code + '\n' + right.code + "\n" + right.next + ':\n'
+                # if head.value == "for":
+                #     head.code = left.code + '\n' + right.code
+                # else:
+                head.code = left.code + '\n' + right.code + "\n" + right.next + ':'
 
             elif left:
-                head.next = parser.get_new_label()
                 left.next = parser.get_new_label()
                 AstNode.generateCode(left, parser)
                 head.code = left.code + '\n' + left.next + ':\n'
@@ -351,10 +349,12 @@ class AstNode:
             head.value = left
             right.value = head.value
             right.next = head.next
+            print('a_switch', right.next)
 
             AstNode.generateCode(right, parser)
 
             head.code = right.code
+            # print('abc', right.code)
 
         # ------------------------------------------------------------
 
@@ -382,8 +382,9 @@ class AstNode:
 
             AstNode.generateCode(statements, parser)
 
-            head.code = "ifFalse " + head.value + " == " + constant[1] + " goto " + statements.next + "\n" + \
+            head.code = "ifFalse " + head.value + " == " + constant[1] + " goto " + statements.next + \
                 statements.code + "\n" + "goto " + head.next + "\n" + statements.next + ":\n"
+            print('abc', statements.code)
 
         # ------------------------------------------------------------
 
@@ -491,7 +492,7 @@ class AstNode:
 
         # --------------------------------------------------------------------
 
-        elif head.operator == Operator.A_MINUS:
+        elif head.operator == Operator.A_MINUS or head.operator == Operator.A_NEGATE:
 
             expr0, expr1 = head.left, head.right
 
@@ -500,8 +501,15 @@ class AstNode:
 
                 AstNode.generateCode(expr0, parser)
 
-                head.code = expr0.code + "\n" +  \
-                    head.value + " = " + " - " + expr0.value
+                # head.code = expr0.code + "\n" +  \
+                #     head.value + " = " + " - " + expr0.value
+                head.code = expr0.code + "\n"
+
+                if head.data_type != expr0.data_type:
+                    typecast_variable = parser.get_new_temp(head.data_type)
+                    head.code += f"{typecast_variable} = ({head.data_type}) - {expr0.value}\n"
+                else:
+                    head.code += f"{head.value} = - {expr0.value}\n"
 
             else:
                 head.value = parser.get_new_temp(head.data_type)
@@ -511,19 +519,19 @@ class AstNode:
 
                 # head.code = expr0.code + "\n" + expr1.code + "\n" + \
                 # head.value + " = " + expr0.value + " - " + expr1.value
-            head.code = expr0.code + "\n" + expr1.code + "\n"
+                head.code = expr0.code + "\n" + expr1.code + "\n"
 
-            if head.data_type != expr0.data_type:
-                typecast_variable = parser.get_new_temp(head.data_type)
-                head.code += f"{typecast_variable} = ({head.data_type}){expr0.value}\n"
-                head.code += f"{head.value} = {typecast_variable} - {expr1.value}\n"
+                if head.data_type != expr0.data_type:
+                    typecast_variable = parser.get_new_temp(head.data_type)
+                    head.code += f"{typecast_variable} = ({head.data_type}){expr0.value}\n"
+                    head.code += f"{head.value} = {typecast_variable} - {expr1.value}\n"
 
-            elif head.data_type != expr1.data_type:
-                typecast_variable = parser.get_new_temp(head.data_type)
-                head.code += f"{parser.get_new_temp(head.data_type)} = ({head.data_type}){expr1.value}\n"
-                head.code += f"{head.value} = {expr0.value} - {typecast_variable}\n"
-            else:
-                head.code += f"{head.value} = {expr0.value} - {expr1.value}\n"
+                elif head.data_type != expr1.data_type:
+                    typecast_variable = parser.get_new_temp(head.data_type)
+                    head.code += f"{parser.get_new_temp(head.data_type)} = ({head.data_type}){expr1.value}\n"
+                    head.code += f"{head.value} = {expr0.value} - {typecast_variable}\n"
+                else:
+                    head.code += f"{head.value} = {expr0.value} - {expr1.value}\n"
 
         # --------------------------------------------------------------------
 
@@ -566,6 +574,7 @@ class AstNode:
             # head.code = expr0.code + "\n" + expr1.code + "\n" + \
             # head.value + " = " + expr0.value + " / " + expr1.value
 
+            print('1', expr0.code, '2', expr1.code)
             head.code = expr0.code + "\n" + expr1.code + "\n"
 
             if head.data_type != expr0.data_type:
