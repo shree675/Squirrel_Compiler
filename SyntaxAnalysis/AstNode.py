@@ -132,8 +132,10 @@ class AstNode:
                 left.next = parser.get_new_label()
                 AstNode.generateCode(left, parser)
                 AstNode.generateCode(right, parser)
-
-                head.code = left.code + '\n' + right.code + "\n" + right.next + ':\n'
+                if head.value == "for":
+                    head.code = left.code + '\n' + right.code
+                else:
+                    head.code = left.code + '\n' + right.code + "\n" + right.next + ':\n'
 
             elif left:
                 head.next = parser.get_new_label()
@@ -337,7 +339,8 @@ class AstNode:
 
             AstNode.generateCode(left, parser)
 
-            head.code = left.code + '\n' + left.next + ":\n"
+            head.code = left.code + '\n'
+            # print('aaaaa', head.code)
 
         # ------------------------------------------------------------
 
@@ -422,8 +425,6 @@ class AstNode:
             AstNode.generateCode(expr, parser)
             AstNode.generateCode(statements, parser)
 
-            print('abc', expr.code)
-
             head.code = head.begin + ":\n" + expr.code + "\n" + expr.true + ":\n" + statements.code + "\n" + \
                 "goto " + head.begin
 
@@ -457,7 +458,6 @@ class AstNode:
             AstNode.generateCode(left, parser)
             AstNode.generateCode(mid, parser)
             AstNode.generateCode(right, parser)
-
             head.code = head.begin + ":\n" + left.code + "\n" + left.true + ":\n" + right.code + "\n" + \
                 mid.code + "\n" + "goto " + head.begin
 
@@ -488,7 +488,6 @@ class AstNode:
                 head.code += f"{head.value} = {expr0.value} + {typecast_variable}\n"
             else:
                 head.code += f"{head.value} = {expr0.value} + {expr1.value}\n"
-                print('def', head.code)
 
         # --------------------------------------------------------------------
 
