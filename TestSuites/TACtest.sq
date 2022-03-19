@@ -1,4 +1,5 @@
 int @start(){
+    ``string a=-"hello";``
     int a;
     int b;
     int c;

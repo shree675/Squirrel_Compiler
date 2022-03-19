@@ -317,7 +317,7 @@ class Parser(SlyParser):
         p.statements.parent = node_1
 
         node_2 = AstNode(Operator.A_NODE, left=p.for_init,
-                         right=node_1, value="for")
+                         right=node_1)
         node_1.parent = node_2
         p.for_init.parent = node_2
         return node_2
@@ -782,7 +782,7 @@ if __name__ == '__main__':
     lex = lexer.Lexer()
     parser = Parser()
 
-    with open(os.path.join(TEST_SUITES_DIR, "TypeCast1.sq"), 'r') as f:
+    with open(os.path.join(TEST_SUITES_DIR, "ArrayUseTest.sq"), 'r') as f:
         text = f.read()
 
     parser.parse(lex.tokenize(text))

@@ -27,7 +27,7 @@ we have to declare/define the function before use
     semantic checks and optimizations - this is a very important - how to make this -
     detect dead subtree, prune the AST, then call generate code - not for the presentation - keep thinking abotu it
 
-11. Labels issue - some repeated labels and some are missing - Shreetesh, Kranthi - tomorrow
+✓ 11. Labels issue - some repeated labels and some are missing - Shreetesh, Kranthi - tomorrow
 
 12. just add an implicit return in case user missed it, no need for the semantic check -
 
@@ -69,7 +69,3 @@ Phase 2:
 3. Code generation
 4. Type conversions
 5.
-
-Errors:
-JumpTest.sq
-TACtest.sq
