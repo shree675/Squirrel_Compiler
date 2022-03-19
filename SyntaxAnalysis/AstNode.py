@@ -6,6 +6,8 @@ import re
 import os
 from enum import Enum
 import math
+import logging as logger
+logger.exception = logger.error
 
 INT = "int"
 FLOAT = "float"
@@ -100,6 +102,14 @@ class AstNode:
 
         #print("Value", self.value, "Datatype", self.data_type)
         # self.parent = parent
+    @staticmethod
+    def raise_error(message=None):
+        try:
+            if condition_type != None:
+                raise Exception("Semantic Error", message)
+        except Exception as ex:
+            logger.exception(ex)
+            quit()
 
     @staticmethod
     def generateCode(head, parser):
@@ -119,11 +129,11 @@ class AstNode:
 
             # TODO: place this output file in the Output folder and rename the file
             output_path = "Output/output.tac" if os.getcwd().endswith(
-                "Squirrel_Compiler") else "../Outtput/output.tac"
+                "Squirrel_Compiler") else "../Output/output.tac"
             with open(output_path, "w") as f:
                 # format code
                 output = re.sub(r"\n{3,}", "\n\n", head.code, flags=re.DOTALL)
-                print(output)
+                # print(output)
                 f.write(output)
 
         # --------------------------------------------------
@@ -165,13 +175,14 @@ class AstNode:
         # ------------------------------------------------------------
 
         elif head.operator == Operator.A_AND:
-            # TODO: Ask Kranthi aboutthis and add TAC for type casting
+            # TODO: Ask Kranthi about this and add TAC for type casting
 
             left, right = head.left, head.right
             true, false = head.true, head.false
 
             if left.operator == Operator.A_VARIABLE:
                 left = AstNode(Operator.A_BOOL, left=left)
+
 
             if right.operator == Operator.A_VARIABLE:
                 right = AstNode(Operator.A_BOOL, left=right)
@@ -233,7 +244,7 @@ class AstNode:
             if left_type == 'int' and right_type == 'int':
                 head.code += f"if {left.value} {relop} {right.value} goto {head.true}\ngoto {head.false}\n"
             elif left_type == 'float' and right_type == 'float':
-                pass
+                head.code += f"if {left.value} {relop} {right.value} goto {head.true}\ngoto {head.false}\n"
             elif left_type == 'float' or right_type == 'float':
                 if left_type == 'float':
                     typecast_variable = parser.get_new_temp("float")
@@ -486,11 +497,13 @@ class AstNode:
             head.code = expr0.code + "\n" + expr1.code + "\n"
 
             if head.data_type != expr0.data_type:
+                # if the left operand datatype does not match the combined head datatype, it needs to undergo a widening implicit typecast
                 typecast_variable = parser.get_new_temp(head.data_type)
                 head.code += f"{typecast_variable} = ({head.data_type}){expr0.value}\n"
                 head.code += f"{head.value} = {typecast_variable} + {expr1.value}\n"
 
             elif head.data_type != expr1.data_type:
+                # similarly, if the right operand datatype does not match the combined head datatype, it needs to undergo a widening implicit typecast
                 typecast_variable = parser.get_new_temp(head.data_type)
                 head.code += f"{parser.get_new_temp(head.data_type)} = ({head.data_type}){expr1.value}\n"
                 head.code += f"{head.value} = {expr0.value} + {typecast_variable}\n"
@@ -581,7 +594,7 @@ class AstNode:
             # head.code = expr0.code + "\n" + expr1.code + "\n" + \
             # head.value + " = " + expr0.value + " / " + expr1.value
 
-            print('1', expr0.code, '2', expr1.code)
+            #print('1', expr0.code, '2', expr1.code)
             head.code = expr0.code + "\n" + expr1.code + "\n"
 
             if head.data_type != expr0.data_type:
@@ -606,8 +619,22 @@ class AstNode:
             AstNode.generateCode(expr0, parser)
             AstNode.generateCode(expr1, parser)
 
-            head.code = expr0.code + "\n" + expr1.code + "\n" + \
-                head.value + " = " + expr0.value + " % " + expr1.value
+            # head.code = expr0.code + "\n" + expr1.code + "\n" + \
+            # head.value + " = " + expr0.value + " % " + expr1.value
+
+            head.code = expr0.code + "\n" + expr1.code + "\n"
+
+            if head.data_type != expr0.data_type:
+                typecast_variable = parser.get_new_temp(head.data_type)
+                head.code += f"{typecast_variable} = ({head.data_type}){expr0.value}\n"
+                head.code += f"{head.value} = {typecast_variable} % {expr1.value}\n"
+
+            elif head.data_type != expr1.data_type:
+                typecast_variable = parser.get_new_temp(head.data_type)
+                head.code += f"{parser.get_new_temp(head.data_type)} = ({head.data_type}){expr1.value}\n"
+                head.code += f"{head.value} = {expr0.value} % {typecast_variable}\n"
+            else:
+                head.code += f"{head.value} = {expr0.value} % {expr1.value}\n"
 
         # --------------------------------------------------------------------
 
@@ -696,23 +723,32 @@ class AstNode:
 
         elif head.operator == Operator.A_ASSIGN_STMT:
             # TODO: Code to check types and TAC for implicit/explicit casting
+            # Fix type in parser first, then use head.data_type for implicit type casting here
 
-            if type(head.left) == str:
-                varname, expr = head.left, head.right
+            print("assign stmt datatype", head.data_type)
+            left_value, expr = head.left, head.right
 
-                AstNode.generateCode(expr, parser)
-                head.code = expr.code + "\n" + varname + " = " + expr.value
+            AstNode.generateCode(left_value, parser)
+            AstNode.generateCode(expr, parser)
 
+            head.code = left_value.code + "\n" + expr.code + "\n"
+
+            # left_value.value + " = " + expr.value
+
+            # head.value = parser.get_new_temp(head.data_type)
+
+            # AstNode.generateCode(expr0, parser)
+
+            # head.code = expr0.code + "\n" +  \
+            #     head.value + " = " + " - " + expr0.value
+            # head.code = expr0.code + "\n"
+
+            if head.data_type != expr.data_type:
+                typecast_variable = parser.get_new_temp(head.data_type)
+                head.code += f"{typecast_variable} = ({head.data_type}) {expr.value}\n"
+                head.code += f"{head.value} = {typecast_variable}\n"
             else:
-                left_value, expr = head.left, head.right
-
-                AstNode.generateCode(left_value, parser)
-                AstNode.generateCode(expr, parser)
-
-                head.code = left_value.code + "\n" + expr.code + \
-                    "\n" + left_value.value + " = " + expr.value
-
-            return
+                head.code += f"{head.value} = {expr.value}\n"
 
         # --------------------------------------------------------------------
 
@@ -723,6 +759,7 @@ class AstNode:
             # to distinguish between init and declaration
             if head.right is not None:
                 # initialization
+                # TODO: check if the type of right side matches left and perform appropriate implicit cast
                 right = head.right
 
                 AstNode.generateCode(right, parser)
@@ -771,6 +808,7 @@ class AstNode:
 
         elif head.operator == Operator.A_ARR_LITERAL:
 
+            # TODO: Check for need of type casting here
             left, right = head.left, head.right
 
             if right == None:
@@ -799,57 +837,49 @@ class AstNode:
         elif head.operator == Operator.A_VARIABLE or head.operator == Operator.A_INTCONST or head.operator == Operator.A_STRINGCONST or head.operator == Operator.A_CHARCONST or head.operator == Operator.A_FLOATCONST:
 
             head.code = ""
-
         # --------------------------------------------------------------------
 
         elif head.operator == Operator.A_BOOL:
 
-            print('unique here')
             left = head.left
+            print('unique here', left.value)
 
             AstNode.generateCode(left, parser)
-            # TODO: I dont think is required
+            # TODO: I dont think is required - follow the type checking rules of NOT AND OR
             # left variable type is assumed to be "int" or "float"
             # for other types we need to generate code accordingly after semantic analysis
             # for bool : a == true
             # for char : a != '\0'
             # for string : a != ""
 
-            rhs = "0"
+            temp_false = "" if head.false is None else "\ngoto " + head.false
+            temp_true = "" if head.true is None else "\ngoto " + head.true
+
             if left.operator == Operator.A_VARIABLE or left.operator == Operator.A_PLUS or left.operator == Operator.A_MINUS or \
                     left.operator == Operator.A_MULTIPLY or left.operator == Operator.A_DIVIDE or \
                     left.operator == Operator.A_MODULO:
-                """ if left.data_type == "int":
-                    rhs = "0"
-                #elif left.data_type == "float":
-                   # rhs = "0.0"
-                elif left.data_type == "char":
-                    rhs = "\\0"
-                elif left.data_type == "bool":
-                    rhs = "false"
-                else:
-                    rhs = "false" """
 
-                head.code = left.code + "\n" + \
-                    "if " + left.value + " " + "!=" + " " + rhs + " goto " + head.true + \
-                    "\n" + "goto " + head.false
+                
+
+                # TODO: Why is left.code empty here?
+                print("left.code", left.value is None)
+                head.code = left.code + "\n" + "if " + left.value + " " + "!=" + " 0 goto " + head.true + temp_false
+
             else:
                 if left.operator == Operator.A_INTCONST and left.value == "0":
-                    head.code = "goto " + head.false
+                    head.code = temp_false
                 elif left.operator == Operator.A_STRINGCONST and left.value == "":
-                    head.code = "goto " + head.false
+                    head.code = temp_false
                 elif left.operator == Operator.A_CHARCONST and left.value == "'\\0'":
-                    head.code = "goto " + head.false
+                    head.code = temp_false
                 elif left.operator == Operator.A_FLOATCONST and left.value == "0.0":
-                    head.code = "goto " + head.false
+                    head.code = temp_false
                 else:
-                    head.code = "goto " + head.true
-
+                    head.code = head.true
         # ---------------------------------------------------------------------------------
 
         elif head.operator == Operator.A_BREAK:
             cur = head
-            # TODO: do this for "while", "switch", if it goes upto ROOT then semantic error
             while(cur.operator != Operator.A_FOR and
                     cur.operator != Operator.A_WHILE and
                     cur.operator != Operator.A_SWITCH
@@ -857,7 +887,7 @@ class AstNode:
                 if cur.operator != Operator.A_ROOT:
                     cur = cur.parent
                 else:
-                    raise Exception(
+                    raise_error(
                         "Semantic Error : \"break\" can only be used in a for_loop or a while_loop or a switch_case.\n")
 
             head.code = "goto " + cur.next
@@ -881,7 +911,7 @@ class AstNode:
                 if cur.operator != Operator.A_ROOT:
                     cur = cur.parent
                 else:
-                    raise Exception(
+                    raise_error(
                         "Semantic Error : \"continue\" can only be used in a for_loop or a while_loop.\n")
 
             head.code = "goto " + cur.begin

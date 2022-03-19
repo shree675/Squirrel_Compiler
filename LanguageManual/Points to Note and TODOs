@@ -29,7 +29,7 @@ we have to declare/define the function before use
 
 ✓ 11. Labels issue - some repeated labels and some are missing - Shreetesh, Kranthi - tomorrow
 
-12. just add an implicit return in case user missed it, no need for the semantic check -
+12. just add an implicit return in case user missed it, no need for the semantic check - Aashrith
 
 13. Dynamically create the instance variables in the AstNodes
 
@@ -39,11 +39,17 @@ Aashrith - refactor generatecode method - passing parser instead of individual m
 
 comparing enum - Operator.value instead of Operator
 
+16. Semantic check for trying to use array variables inappropriately - eg. a[2] = {5,2}; 
+                                                                           a = 2; // should give an error
+
 Kranthi 
 13. Stitching together parser with preprocessor - run from main method 
 14. test recursion - and all test cases 
 ✓ 15. output.tac file, move it to output folder 
-✓ 16.  formatting the TAC file - write a post processing method to clean up the TAC
+✓ 16.  formatting the TAC file - write a post processing method to clean up the TAC 
+17. @captnTardigrade: Can we remove empty labels without messing up anything in the TAC - while post processing the TAC?
+
+18. TAC for input() and output()
 
 Wednesday, March 23rd, 2022
 

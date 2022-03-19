@@ -86,21 +86,17 @@ class TypeChecker:
                 return 'int'
 
         elif operator.value == Operator.A_NOT.value:
-            if left_type == 'int':
-                print("Implicitly casting from int to bool")
+            if left_type == 'int' or left_type == 'char' or left_type == 'float':
+                print("Implicitly casting from to bool")
                 # TODO: Modify the symbol table here maybe?
                 return 'bool'
-            elif left_type == 'float':
-                print("Implicitly casting from float to bool")
-                # TODO: Modify the symbol table here maybe?
-                return 'bool'
+           
             elif left_type == 'str':
+                TypeChecker.raise_error(left_type, operator)
                 
-                return 'bool'
             elif left_type == 'bool':
                 return 'bool'
-            elif left_type == 'char':
-                return 'bool'
+            
         #------------------------------Binary Operators----------------------------------
         elif operator.value == Operator.A_PLUS.value or operator.value == Operator.A_MINUS.value or operator.value == Operator.A_MULTIPLY.value or operator.value == Operator.A_DIVIDE.value:
             if left_type == 'str' or right_type == 'str':
@@ -145,7 +141,7 @@ class TypeChecker:
         elif operator.value == Operator.A_AND.value or operator.value == Operator.A_OR.value:
             if left_type == 'bool' and right_type == 'bool':
                 return 'bool'
-            elif left_type == 'float' or right_type == 'float' or left_type == 'str' or right_type == 'str':
+            elif left_type == 'str' or right_type == 'str':
                 raise_error(left_type, operator) #change error
             else:
                 print("Implicitly casting to bool")
@@ -186,6 +182,3 @@ class TypeChecker:
 
         return
     
-    @staticmethod
-    def say_hello():
-        print("helllooooo")

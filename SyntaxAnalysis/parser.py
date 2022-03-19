@@ -355,7 +355,9 @@ class Parser(SlyParser):
     def simple_init(self, p):
         self.push_to_ST(p.DATATYPE, p.VARNAME, [])
         data_type = self.get_data_type(p.VARNAME)
-        return AstNode(Operator.A_DECL, left=[p.DATATYPE, p.VARNAME], data_type=data_type)
+        node =  AstNode(Operator.A_DECL, left=[p.DATATYPE, p.VARNAME], data_type=data_type,)
+        node.code = ""
+        return node
 
     @_("DATATYPE VARNAME ASSIGN expr")
     def simple_init(self, p):
@@ -405,7 +407,8 @@ class Parser(SlyParser):
         print("Array expr type", p.expr.value, p.expr.data_type)
         self.type_checker.check_datatype(
             expr_type=p.expr.data_type, operator=Operator.A_ARR_EXPR_REC)
-        return AstNode(Operator.A_ARR_EXPR_REC, left=p.expr, value={"varname": p.VARNAME, "val": "", "index": 1, "scope": self.id-1})
+        data_type = self.get_data_type(p.VARNAME)
+        return AstNode(Operator.A_ARR_EXPR_REC, left=p.expr, value={"varname": p.VARNAME, "val": "", "index": 1, "scope": self.id-1}, data_type=data_type)
 
     # array_variable [expr]
     @_("array_var_use LSQB expr RSQB")
@@ -414,7 +417,16 @@ class Parser(SlyParser):
         print("Array expr type", p.expr.value, p.expr.data_type)
         self.type_checker.check_datatype(
             expr_type=p.expr.data_type, operator=Operator.A_ARR_EXPR_REC)
-        return AstNode(Operator.A_ARR_EXPR_REC, left=p.array_var_use, right=p.expr, value={"varname": p.array_var_use.value["varname"], "val": "", "index": p.array_var_use.value["index"]+1, "scope": self.id-1})
+        return AstNode(
+            Operator.A_ARR_EXPR_REC,
+            left=p.array_var_use,
+            right=p.expr,
+            value={
+                "varname": p.array_var_use.value["varname"],
+                "val": "",
+                "index": p.array_var_use.value["index"]+1,
+                "scope": self.id-1
+            })
 
 # ---------------------------------------------------------------------------
 
@@ -672,19 +684,21 @@ class Parser(SlyParser):
     @_('LPAREN DATATYPE RPAREN expr %prec TYPECASTING')
     def expr(self, p):
         return AstNode(Operator.A_TYPECAST, left=p.DATATYPE, right=p.expr)
-        return str('('+p[0]+p[1]+p[2]+p[3]+')')
+        # return str('('+p[0]+p[1]+p[2]+p[3]+')')
 
     # assignment_statement -> left_value = expr
     @_('left_value ASSIGN expr')
     def assignment_statement(self, p):
 
         # TODO: Add code for implicit/explicit casting in Ast Node
-        if type(p.left_value) == list:
-            # self.type_checker.check_datatype(left_type=p.left_value[1].data_type,right_type=p.expr.data_type)
-            return AstNode(Operator.A_ASSIGN_STMT, left=p.left_value[1], right=p.expr)
-        else:
-            # self.type_checker.check_datatype(left_type=p.left_value.data_type,right_type=p.expr.data_type)
-            return AstNode(Operator.A_ASSIGN_STMT, left=p.left_value, right=p.expr)
+        # What is this and why is it a list?
+        # if type(p.left_value) == list:
+        #     # self.type_checker.check_datatype(left_type=p.left_value[1].data_type,right_type=p.expr.data_type)
+        #     print("left_value datatype", p.left_value[1].data_type)
+        #     return AstNode(Operator.A_ASSIGN_STMT, left=p.left_value[1], right=p.expr)
+        # else:
+        #     # self.type_checker.check_datatype(left_type=p.left_value.data_type,right_type=p.expr.data_type)
+        return AstNode(Operator.A_ASSIGN_STMT, left=p.left_value, right=p.expr, data_type=p.left_value.data_type)
 
     # left_value -> VARNAME | array_variable
     @_('VARNAME')
@@ -695,7 +709,10 @@ class Parser(SlyParser):
         return AstNode(Operator.A_VARIABLE, value=p.VARNAME, data_type=data_type)
 
         """
-        return ["varname", str(p[0])]
+        # return ["varname", str(p[0])]
+
+        data_type = self.get_data_type(p.VARNAME)
+        return AstNode(Operator.A_VARIABLE, value=p.VARNAME, data_type=data_type)
 
     @_('array_var_use')
     def left_value(self, p):
@@ -782,7 +799,7 @@ if __name__ == '__main__':
     lex = lexer.Lexer()
     parser = Parser()
 
-    with open(os.path.join(TEST_SUITES_DIR, "ArrayUseTest.sq"), 'r') as f:
+    with open(os.path.join(TEST_SUITES_DIR, "TypeCast2.sq"), 'r') as f:
         text = f.read()
 
     parser.parse(lex.tokenize(text))

@@ -29,8 +29,8 @@ BinaryOperator
     output always int
  
 && || : bool and bool (works as is)
-      : str or float on either side (Error)
-      : int or bool or char (temporarily cast to bool)
+      : str on either side (Error)
+      : int or char or float (temporarily cast to bool)
         output always bool
 =     if lhs == rhs, where neither are string -> typecast permanently to lhs if required, else do nothing
       if one is string but the other is not -> error 

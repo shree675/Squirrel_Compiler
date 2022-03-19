@@ -1,0 +1,7 @@
+
+void @start() {
+    int a = 3;
+    bool b;
+    a = a && a;
+}
+
