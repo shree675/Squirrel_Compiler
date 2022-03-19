@@ -3,6 +3,10 @@ int @sum(int a, int b){
     return c; 
 }
 
+int @abc(){
+    return 1;
+}
+
 int @start(){
 
     char a;

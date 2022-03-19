@@ -112,13 +112,12 @@ class AstNode:
             left = head.left
             #typeChecker.check(head, parser.symbol_table)
             AstNode.generateCode(left, parser)
-            head.code = left.code + '\n' + left.next + ':\n'
+            # head.code = left.code + '\n' + left.next + ':\n'
+            head.code = left.code
 
             # TODO: place this output file in the Output folder and rename the file
             with open("output.tac", "w") as f:
                 f.write(head.code)
-
-            # print(head.code)
 
         # --------------------------------------------------
 
@@ -225,7 +224,7 @@ class AstNode:
             "if " + left.value + " " + relop + " " + right.value + " goto " + head.true + "\n" + "goto " + head.false """
 
             if left_type == 'int' and right_type == 'int':
-                pass
+                head.code += f"if {left.value} {relop} {right.value} goto {head.true}\ngoto {head.false}\n"
             elif left_type == 'float' and right_type == 'float':
                 pass
             elif left_type == 'float' or right_type == 'float':
@@ -423,6 +422,8 @@ class AstNode:
             AstNode.generateCode(expr, parser)
             AstNode.generateCode(statements, parser)
 
+            print('abc', expr.code)
+
             head.code = head.begin + ":\n" + expr.code + "\n" + expr.true + ":\n" + statements.code + "\n" + \
                 "goto " + head.begin
 
@@ -487,6 +488,7 @@ class AstNode:
                 head.code += f"{head.value} = {expr0.value} + {typecast_variable}\n"
             else:
                 head.code += f"{head.value} = {expr0.value} + {expr1.value}\n"
+                print('def', head.code)
 
         # --------------------------------------------------------------------
 
@@ -787,6 +789,7 @@ class AstNode:
 
         elif head.operator == Operator.A_BOOL:
 
+            print('unique here')
             left = head.left
 
             AstNode.generateCode(left, parser)
@@ -798,7 +801,9 @@ class AstNode:
             # for string : a != ""
 
             rhs = "0"
-            if left.operator == Operator.A_VARIABLE:
+            if left.operator == Operator.A_VARIABLE or left.operator == Operator.A_PLUS or left.operator == Operator.A_MINUS or \
+                    left.operator == Operator.A_MULTIPLY or left.operator == Operator.A_DIVIDE or \
+                    left.operator == Operator.A_MODULO:
                 """ if left.data_type == "int":
                     rhs = "0"
                 #elif left.data_type == "float":

@@ -185,7 +185,6 @@ class Parser(SlyParser):
         # self.get_new_temp, self.symbol_table)
 
         AstNode.generateCode(root, self)
-        # print(val.code)
         print(*self.symbol_table, sep="\n")
         print(*self.function_symbol_table, sep="\n")
 
@@ -782,7 +781,7 @@ if __name__ == '__main__':
     lex = lexer.Lexer()
     parser = Parser()
 
-    with open(os.path.join(TEST_SUITES_DIR, "ArrayUseTest.sq"), 'r') as f:
+    with open(os.path.join(TEST_SUITES_DIR, "SemanticTest2.sq"), 'r') as f:
         text = f.read()
 
     parser.parse(lex.tokenize(text))
