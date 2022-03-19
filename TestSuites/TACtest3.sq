@@ -1,4 +1,7 @@
 void @start() {
+    int k;
+    int a;
+    int b;
     for(int i; i; i=i+k){
         int j;
         j=a+b;

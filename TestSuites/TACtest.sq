@@ -1,4 +1,9 @@
 int @start(){
+    int a;
+    int b;
+    int c;
+    int d;
+
     if(false || true && false){
         int i;
     }

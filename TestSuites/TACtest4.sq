@@ -1,4 +1,7 @@
 int @start(){
+    int a;
+    int b;
+    int c;
     if(a + b == c){
         int i;
         c = 2;
