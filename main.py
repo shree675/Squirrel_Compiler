@@ -16,25 +16,14 @@ Commend to run the compiler
 python3 main.py [-flags] <filename1>.sq <filename2>.sq ... <filenameN>.sq """
 
 # think about what names to save output file with - lets go with <original filename>.asm or filename.s
-
 import sys
-#import re
-from LexicalAnalysis import lexer
 from Preprocessing import preprocessor
 def compile(filename, optimization_level, save_preprocessed_file, save_intermediate_code):
     print("Compiling", filename, optimization_level)
-    try:
-        # open .sq code file in read mode
-        file_handle = open("./TestSuites/"+filename, "r")
-        # read whole file to a string
-        file = file_handle.read()
-        # close file
-        file_handle.close()
-        # print(data)
-        pre = preprocessor.Preprocessor()
-        file = pre.preprocess(filename, file, save=save_preprocessed_file)
-    except:
-        print("Error reading .sq file")
+    with open("./TestSuites/" + filename, "r") as f:
+        inputFile = f.read()
+    pre = preprocessor.Preprocessor()
+    pre.preprocess(filename, inputFile, save=save_preprocessed_file)
 
 
 def main(*argv):

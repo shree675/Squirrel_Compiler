@@ -39,7 +39,11 @@ Aashrith - refactor generatecode method - passing parser instead of individual m
 
 comparing enum - Operator.value instead of Operator
 
-Kranthi 13. Stitching together parser with preprocessor - run from main method 14. test recursion - and all test cases 15. output.tac file, move it to output folder 16. formatting the TAC file - write a post processing method to clean up the TAC
+Kranthi 
+13. Stitching together parser with preprocessor - run from main method 
+14. test recursion - and all test cases 
+✓ 15. output.tac file, move it to output folder 
+✓ 16.  formatting the TAC file - write a post processing method to clean up the TAC
 
 Wednesday, March 23rd, 2022
 

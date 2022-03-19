@@ -1,7 +1,9 @@
-from typing import Type
+# from typing import Type
 
-from click import pass_obj
-from SemanticAnalysis import TypeChecker
+# from click import pass_obj
+# from SemanticAnalysis import TypeChecker
+import re
+import os
 from enum import Enum
 import math
 
@@ -116,8 +118,13 @@ class AstNode:
             head.code = left.code
 
             # TODO: place this output file in the Output folder and rename the file
-            with open("output.tac", "w") as f:
-                f.write(head.code)
+            output_path = "Output/output.tac" if os.getcwd().endswith(
+                "Squirrel_Compiler") else "../Outtput/output.tac"
+            with open(output_path, "w") as f:
+                # format code
+                output = re.sub(r"\n{3,}", "\n\n", head.code, flags=re.DOTALL)
+                print(output)
+                f.write(output)
 
         # --------------------------------------------------
 
