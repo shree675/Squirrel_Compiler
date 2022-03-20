@@ -1,19 +1,25 @@
-int @sum(int a, int b){
+int @sum(int a, int b, float d){
     int c = a+b;
     return c; 
 }
 
-int @abc(){
+int @abc(int a, float b){
     return 1;
 }
 
+``float @abc(int a, float b){
+    return 1.1;
+}``
+
 int @start(){
 
-    char a;
+    int a;
     int b;
+    float c;
     ``a = (int)((float)b + a * sum(a+b*(a+b), b+a*(b+a), a*b*b));``
     a = a+b;
+    a = sum(a, b, c+a);
 
-    ``return a + sum(a,b);``
+    ``return a + sum(a,b,c);``
     return 0;
 }

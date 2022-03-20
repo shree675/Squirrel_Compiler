@@ -1,20 +1,53 @@
-start:
+sum:
 
-int a[12]
-a[0]=2
-a[4]=3
-a[8]=5
+t0 = a + b
 
-L6:
+c = (int) t0
 
-g = (int) 2
+L10:
 
-L4:
-
-if g != 0 goto L9
-goto L8
-L9:
-
+return c
 L8:
 
-L1:
+L7:
+
+abc:
+
+return 1
+L12:
+
+L5:
+start:
+
+a = (int) 0
+L24:
+b = (int) 0
+L22:
+c = (float) 0.0
+L20:
+
+t1 = a + b
+
+a = t1
+
+L18:
+
+tf1 = (float) a
+tf0 = c + tf1
+
+L28:
+L26:
+param a
+param b
+param tf0
+t2 = call sum,3
+
+t3 = (int) t2
+a = t3
+
+L16:
+
+return 0
+L14:
+
+L3:

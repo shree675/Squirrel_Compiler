@@ -27,7 +27,7 @@ class Parser(SlyParser):
                {
                    "return_type" : "int",
                    "name" : "start",
-                   "parameters" : ["int", "float", "char"]
+                   "parameters_types" : ["int", "float", "char"]
 
                } 
             ]
@@ -76,11 +76,18 @@ class Parser(SlyParser):
             # "parent_scope": self.scope_id_stack[-2]
         })
 
-    def push_to_FST(self, return_type,  name, parameters):
+    def push_to_FST(self, return_type,  function_name, parameters_types):
+        repeated = list(filter(lambda e : e["function_name"] == function_name and
+            e["parameters_types"] == parameters_types, 
+            self.function_symbol_table))
+
+        if len(repeated) > 0:
+            Parser.error(f"The function {function_name}({','.join(parameters_types)}) is already defined.\n") 
+
         self.function_symbol_table.append({
             "return_type": return_type,
-            "name": name,
-            "parameters": parameters
+            "function_name": function_name,
+            "parameters_types": parameters_types
         })
 
     def get_data_type(self, varname):
@@ -105,6 +112,17 @@ class Parser(SlyParser):
         else:
             Parser.error(
                 f"Error : variable \"{varname}\" not declared in the scope")
+    
+    def check_function_signature(self, function_name, args_types):
+
+
+        matched = list(filter(lambda e : e["function_name"] == "@"+function_name and
+            e["parameters_types"] == args_types, 
+            self.function_symbol_table)) 
+        
+        if len(matched) == 0:
+            Parser.error(f"Semantic error : function call {function_name}({','.join(args_types)})"
+            + " doesn't match any of the defined function signatures.\n")
 
     def print_tree(self, root):
 
@@ -207,7 +225,8 @@ class Parser(SlyParser):
         # no AstNode for params here
         p.statements.parent = head
 
-        # Push the function to the symbol table
+        # Push the function to the symbol table 
+        # p.params is a list of data types of parameters
         self.push_to_FST(p.DATATYPE, p.FUNCNAME, p.params)
         return head
 
@@ -668,6 +687,7 @@ class Parser(SlyParser):
     def expr(self, p):
         #print("The const type", p.constant[0])
         data_type = self.type_checker.return_datatype(operator=p.constant[0])
+        # p.constant = [Operator.A_CHARCONST, 't'] for a character
         return AstNode(p.constant[0], value=p.constant[1], data_type=data_type)
 
     # expr -> (DATATYPE) expr
@@ -739,7 +759,20 @@ class Parser(SlyParser):
     @_('VARNAME LPAREN argument_list RPAREN')
     def function_call(self, p):
         # here "p.argument_list" could be "None", if there are no arguments
-        # semantic check
+        # ----- semantic check --------
+        args_types = []
+        cur = p.argument_list
+        while cur.operator == Operator.A_NODE:
+            data_type = cur.left.data_type
+            args_types.append(data_type)
+            cur = cur.right
+        args_types.append(cur.data_type)
+        
+        # print("LOOK HERE : ", parameters)
+
+        self.check_function_signature(p.VARNAME, args_types)
+
+        # -----------------------
         head = AstNode(Operator.A_FUNCCALL, left=p.VARNAME,
                        right=p.argument_list)
         return head
@@ -789,7 +822,7 @@ if __name__ == '__main__':
     lex = lexer.Lexer()
     parser = Parser()
 
-    with open(os.path.join(TEST_SUITES_DIR, "SemanticTest3.sq"), 'r') as f:
+    with open(os.path.join(TEST_SUITES_DIR, "FunctionsAndCallsTest.sq"), 'r') as f:
         text = f.read()
 
     parser.parse(lex.tokenize(text))
