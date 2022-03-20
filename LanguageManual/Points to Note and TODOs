@@ -1,5 +1,6 @@
 1. Semantic analysis for FUNCTION CALLS - no.of args, type of args,
    type of return value.
+
    - When a function is defined, check for unique name and signature combination
 
 2. error in testcase: string f3 = -"hello";
@@ -40,19 +41,20 @@ Aashrith - refactor generatecode method - passing parser instead of individual m
 
 comparing enum - Operator.value instead of Operator
 
-16. Semantic check for trying to use array variables inappropriately - eg. a[2] = {5,2}; 
-                                                                           a = 2; // should give an error
+16. Semantic check for trying to use array variables inappropriately - eg. a[2] = {5,2};
+    a = 2; // should give an error
 
 17. Can we return AstNodes everywhere? - it will make life peaceful
 
-Kranthi 
-13. Stitching together parser with preprocessor - run from main method 
-14. test recursion - and all test cases 
-✓ 15. output.tac file, move it to output folder 
-✓ 16.  formatting the TAC file - write a post processing method to clean up the TAC 
-17. @captnTardigrade: Can we remove empty labels without messing up anything in the TAC - while post processing the TAC?
+18. Same function name and variable name - semantic check? ( Eg. int area; void @area())
+
+Kranthi 13. Stitching together parser with preprocessor - run from main method 14. test recursion - and all test cases
+✓ 15. output.tac file, move it to output folder
+✓ 16. formatting the TAC file - write a post processing method to clean up the TAC 17. @captnTardigrade: Can we remove empty labels without messing up anything in the TAC - while post processing the TAC?
 
 18. TAC for input() and output()
+
+19. for "@sum", what is the function name?
 
 Wednesday, March 23rd, 2022
 
