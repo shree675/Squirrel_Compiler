@@ -1,25 +1,16 @@
-int @sum(int a, int b, float d){
+``int @sum(int a, int b, float d){
     int c = a+b;
     return c; 
-}
-
-int @abc(int a, float b){
-    return 1;
-}
-
-``float @abc(int a, float b){
-    return 1.1;
 }``
 
 int @start(){
 
-    int a;
+    int a[3] = {1,2,3};
     int b;
-    float c;
-    ``a = (int)((float)b + a * sum(a+b*(a+b), b+a*(b+a), a*b*b));``
-    a = a+b;
-    a = sum(a, b, c+a);
 
-    ``return a + sum(a,b,c);``
-    return 0;
+    input(a[1+2+3]);
+    input(b);
+
+    output(a[1-2+3]);
+    output(b);
 }

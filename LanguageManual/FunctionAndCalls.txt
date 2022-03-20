@@ -117,3 +117,24 @@ c = a+b;
 t0 = ()
 
 
+----------------------------------------------------------
+TAC for Input and Output
+
+input(a); ---> input int,a
+
+input(a[i+2][j]);
+
+t0 = i+2
+t1 = t0 * cols
+t2 = t1 + j
+t3 = t2 * 4
+
+input int, a[t3]
+
+
+
+-----
+
+output(a);
+
+output int,a

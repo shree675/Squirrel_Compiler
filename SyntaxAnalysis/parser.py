@@ -565,12 +565,13 @@ class Parser(SlyParser):
     # input_statement -> INPUT ( left_value )
     @_('INPUT LPAREN left_value RPAREN')
     def input_statement(self, p):
-        return str(p[0]+p[1]+p[2]+p[3])
+        return AstNode(Operator.A_INPUT, left=p.left_value)
+        # return str(p[0]+p[1]+p[2]+p[3])
 
     # output_statement -> OUTPUT ( left_value )  | OUTPUT ( constant )
     @_('OUTPUT LPAREN left_value RPAREN')
     def output_statement(self, p):
-        return str(p[0]+p[1]+p[2]+p[3])
+        return AstNode(Operator.A_OUTPUT, left=p.left_value)
 
     @_('OUTPUT LPAREN constant RPAREN')
     def output_statement(self, p):
