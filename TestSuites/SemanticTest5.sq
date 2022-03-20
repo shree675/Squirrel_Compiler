@@ -1,0 +1,16 @@
+void @start() {
+    int a = 3;
+   
+    switch(a)
+    { 
+        case (1): 
+
+        case (3): 
+        a = 4;
+        a=3;
+        break;
+
+        default: 
+    
+    }
+}

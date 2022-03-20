@@ -1,5 +1,6 @@
 1. Semantic analysis for FUNCTION CALLS - no.of args, type of args,
    type of return value.
+   - When a function is defined, check for unique name and signature combination
 
 2. error in testcase: string f3 = -"hello";
    Probably unary operator in declaration is not working - Kranthi
@@ -41,6 +42,8 @@ comparing enum - Operator.value instead of Operator
 
 16. Semantic check for trying to use array variables inappropriately - eg. a[2] = {5,2}; 
                                                                            a = 2; // should give an error
+
+17. Can we return AstNodes everywhere? - it will make life peaceful
 
 Kranthi 
 13. Stitching together parser with preprocessor - run from main method 

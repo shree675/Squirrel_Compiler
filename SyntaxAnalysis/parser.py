@@ -295,8 +295,6 @@ class Parser(SlyParser):
     # while_statement -> WHILE ( expr ) { statements }
     @_('WHILE LPAREN expr RPAREN LBRACE scope_open statements RBRACE scope_close')
     def while_statement(self, p):
-        #print("While", p.expr.value, p.expr.data_type)
-        # TODO: p.expr.dataype is available here, convert to bool here
         self.type_checker.check_datatype(
             expr_type=p.expr.data_type, operator=Operator.A_WHILE)
         head = AstNode(Operator.A_WHILE, left=p.expr, right=p.statements)
@@ -308,8 +306,6 @@ class Parser(SlyParser):
 
     @_('FOR LPAREN scope_open for_init SEMICOL expr SEMICOL assignment_statement RPAREN LBRACE statements RBRACE scope_close')
     def for_statement(self, p):
-        print("While", p.expr.value, p.expr.data_type)
-        # TODO: Do I need to add a semantic check here? Or will the while eventually handle it?
         node_1 = AstNode(Operator.A_FOR, left=p.expr,
                          mid=p.assignment_statement, right=p.statements)
         p.expr.parent = node_1
@@ -403,18 +399,16 @@ class Parser(SlyParser):
     # array_variable -> VARNAME [expr]
     @_("VARNAME LSQB expr RSQB")
     def array_var_use(self, p):
-        # TODO: expr data type check
         print("Array expr type", p.expr.value, p.expr.data_type)
         self.type_checker.check_datatype(
             expr_type=p.expr.data_type, operator=Operator.A_ARR_EXPR_REC)
         data_type = self.get_data_type(p.VARNAME)
+        
         return AstNode(Operator.A_ARR_EXPR_REC, left=p.expr, value={"varname": p.VARNAME, "val": "", "index": 1, "scope": self.id-1}, data_type=data_type)
 
     # array_variable [expr]
     @_("array_var_use LSQB expr RSQB")
     def array_var_use(self, p):
-        # TODO: expr data type check
-        print("Array expr type", p.expr.value, p.expr.data_type)
         self.type_checker.check_datatype(
             expr_type=p.expr.data_type, operator=Operator.A_ARR_EXPR_REC)
         return AstNode(
@@ -433,8 +427,6 @@ class Parser(SlyParser):
     # if_statement -> IF ( expr ) { statements }
     @_("IF LPAREN expr RPAREN LBRACE scope_open statements RBRACE scope_close ")
     def if_statement(self, p):
-        #print("IF", p.expr.value, p.expr.data_type)
-        # TODO: p.expr.dataype is available here, convert to bool here
         self.type_checker.check_datatype(
             expr_type=p.expr.data_type, operator=Operator.A_IF)
         head = AstNode(Operator.A_IF, left=p.expr, right=p.statements)
@@ -445,8 +437,6 @@ class Parser(SlyParser):
     # if_statement -> IF ( expr ) { statements } else { statements }
     @_("IF LPAREN expr RPAREN LBRACE scope_open statements RBRACE scope_close ELSE LBRACE scope_open statements RBRACE scope_close")
     def if_statement(self, p):
-        #print("IF", p.expr.value, p.expr.data_type)
-        # TODO: p.expr.dataype is available here, convert to bool here
         self.type_checker.check_datatype(
             expr_type=p.expr.data_type, operator=Operator.A_IFELSE)
         head = AstNode(Operator.A_IFELSE, left=p.expr,
@@ -459,8 +449,6 @@ class Parser(SlyParser):
     # if_statement -> IF ( expr ) { statements} elif
     @_('IF LPAREN expr RPAREN LBRACE scope_open statements RBRACE scope_close elif_statement')
     def if_statement(self, p):
-        #print("IF", p.expr.value, p.expr.data_type)
-        # TODO: p.expr.dataype is available here, convert to bool here
         self.type_checker.check_datatype(
             expr_type=p.expr.data_type, operator=Operator.A_IFELSE)
         head = AstNode(Operator.A_IFELSE, left=p.expr,
@@ -473,24 +461,18 @@ class Parser(SlyParser):
     # elif -> ELIF ( expr ) { statements } elif | ELIF ( expr ) { statements } | ELIF ( expr ) { statements } ELSE { statements }
     @_("ELIF LPAREN expr RPAREN LBRACE scope_open statements RBRACE scope_close elif_statement")
     def elif_statement(self, p):
-        #print("IF", p.expr.value, p.expr.data_type)
-        # TODO: p.expr.dataype is available here, convert to bool here
         self.type_checker.check_datatype(
             expr_type=p.expr.data_type, operator=Operator.A_ELIFMULTIPLE)
         return AstNode(Operator.A_ELIFMULTIPLE, left=p.expr, mid=p.statements, right=p.elif_statement)
 
     @_("ELIF LPAREN expr RPAREN LBRACE scope_open statements RBRACE scope_close")
     def elif_statement(self, p):
-        #print("IF", p.expr.value, p.expr.data_type)
-        # TODO: p.expr.dataype is available here, convert to bool here
         self.type_checker.check_datatype(
             expr_type=p.expr.data_type, operator=Operator.A_ELIFSINGLE)
         return AstNode(Operator.A_ELIFSINGLE, left=p.expr, right=p.statements)
 
     @_("ELIF LPAREN expr RPAREN LBRACE scope_open statements RBRACE scope_close ELSE LBRACE scope_open statements RBRACE scope_close")
     def elif_statement(self, p):
-        #print("IF", p.expr.value, p.expr.data_type)
-        # TODO: p.expr.dataype is available here, convert to bool here
         self.type_checker.check_datatype(
             expr_type=p.expr.data_type, operator=Operator.A_IFELIFELSE)
         return AstNode(Operator.A_IFELIFELSE, left=p.expr, mid=p.statements0, right=p.statements1)
@@ -498,17 +480,25 @@ class Parser(SlyParser):
     # switch_statement -> SWITCH ( left_value ) { case_statements }
     @_('SWITCH LPAREN left_value RPAREN LBRACE scope_open case_statements RBRACE scope_close')
     def switch_statement(self, p):
-        # TODO: update this
-        # TODO: Check if p.left_value data_type is int or char
-        try:
+        
+        if p.left_value.data_type != 'int' and p.left_value.data_type != 'char':
+            Parser.error("Switch statement variable must be of type int or char")
+
+        """ try:
             return AstNode(Operator.A_SWITCH, left=p.left_value[1], right=p.case_statements)
-        except:
-            return AstNode(Operator.A_SWITCH, left=p.left_value, right=p.case_statements)
+        except: """
+        head = AstNode(Operator.A_SWITCH, left=p.left_value, right=p.case_statements)
+        p.left_value.parent = head
+        p.case_statements.parent = head
+        return head
 
     # case_statements -> case_statement case_statements | case_statement | default_statement
     @_('case_statement case_statements')
     def case_statements(self, p):
-        return AstNode(Operator.A_CASEMULTIPLE, left=p.case_statement, right=p.case_statements)
+        head =  AstNode(Operator.A_CASEMULTIPLE, left=p.case_statement, right=p.case_statements)
+        p.case_statement.parent = head
+        p.case_statements.parent = head
+        return head
 
     @_('case_statement')
     def case_statements(self, p):
@@ -521,13 +511,19 @@ class Parser(SlyParser):
     # case_statement -> CASE ( constant ) COLON statements
     @_('CASE LPAREN constant RPAREN COLON scope_open statements scope_close')
     def case_statement(self, p):
-        # TODO: check the type of p.constant here for int or char
-        return AstNode(Operator.A_CASESINGLE, left=p.constant, right=p.statements)
+        print("P constant", p.constant[0])
+        if p.constant[0] != Operator.A_INTCONST and p.constant[0] != Operator.A_CHARCONST:
+            Parser.error("Case statement variable must be of type int or char")
+        head = AstNode(Operator.A_CASESINGLE, left=p.constant, right=p.statements)
+        p.statements.parent = head
+        return head
 
     # default_statement -> DEFAULT COLON statements
     @_('DEFAULT COLON scope_open statements scope_close')
     def default_statement(self, p):
-        return AstNode(Operator.A_DEFAULT, left=p.statements)
+        head = AstNode(Operator.A_DEFAULT, left=p.statements)
+        p.statements.parent = head
+        return head
 
 # ------------------- SCOPING RULES -------------------------
     @_("")
@@ -661,8 +657,6 @@ class Parser(SlyParser):
 
     @_('VARNAME')
     def expr(self, p):
-        # TODO: Test this - I think its sorted
-        # TODO: First check if this variable is already declared in symbol table or not, then find datatype from symbol table and pass it
         data_type = self.get_data_type(p.VARNAME)
         return AstNode(Operator.A_VARIABLE, value=p.VARNAME, data_type=data_type)
 
@@ -679,12 +673,10 @@ class Parser(SlyParser):
         data_type = self.type_checker.return_datatype(operator=p.constant[0])
         return AstNode(p.constant[0], value=p.constant[1], data_type=data_type)
 
-    # TODO: Do we need to do something here? - implement explicit casting rules?
     # expr -> (DATATYPE) expr
     @_('LPAREN DATATYPE RPAREN expr %prec TYPECASTING')
     def expr(self, p):
         return AstNode(Operator.A_TYPECAST, left=p.DATATYPE, right=p.expr)
-        # return str('('+p[0]+p[1]+p[2]+p[3]+')')
 
     # assignment_statement -> left_value = expr
     @_('left_value ASSIGN expr')
@@ -799,7 +791,7 @@ if __name__ == '__main__':
     lex = lexer.Lexer()
     parser = Parser()
 
-    with open(os.path.join(TEST_SUITES_DIR, "TypeCast2.sq"), 'r') as f:
+    with open(os.path.join(TEST_SUITES_DIR, "SemanticTest3.sq"), 'r') as f:
         text = f.read()
 
     parser.parse(lex.tokenize(text))
