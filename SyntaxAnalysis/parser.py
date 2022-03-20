@@ -67,9 +67,6 @@ class Parser(SlyParser):
         if len(repeated_vars) > 0:
             Parser.error(
                 f"Error : variable \"{varname}\" already declared in current scope")
-            """ print("Error: Variable already declared in current scope")
-            raise Exception(
-                f"Error : variable \"{varname}\" already declared in current scope") """
         # else append the variable to the symbol table
         self.symbol_table.append({
             "identifier_name": varname,
@@ -750,6 +747,7 @@ class Parser(SlyParser):
     @_('VARNAME LPAREN argument_list RPAREN')
     def function_call(self, p):
         # here "p.argument_list" could be "None", if there are no arguments
+        # semantic check
         head = AstNode(Operator.A_FUNCCALL, left=p.VARNAME,
                        right=p.argument_list)
         return head
