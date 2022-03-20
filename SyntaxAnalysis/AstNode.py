@@ -51,6 +51,8 @@ class Operator(Enum):
     A_ARR_LITERAL = "arr literal"
     A_FUNC = "func"
     A_FUNCCALL = "func call"
+    A_INPUT = "input"
+    A_OUTPUT = "output"
     A_NODE = "node"
     A_ROOT = "root"
     A_DECL = "decl"
@@ -664,7 +666,7 @@ class AstNode:
 
             head.value = array_variable.value["varname"] + "[" + temp + "]"
             head.code = array_variable.code + "\n" + \
-                temp + " = " + array_variable.value["val"] + " * " + str(size)
+                temp + " = " + array_variable.value["val"] + " * " + str(size) + '\n'
 
         # --------------------------------------------------------------------
 
@@ -694,9 +696,8 @@ class AstNode:
                 for j in range(i, len(variable[0]["dimension"])):
                     dimension *= variable[0]["dimension"][j]
 
-                head.code = array_var_use.code + "\n" + expr.code + "\n" + temp + " = " + expr.value + " * " + str(dimension) + "\n" + \
-                    head.value["val"] + " = " + \
-                    array_var_use.value["val"] + " + " + temp
+                head.code = array_var_use.code + expr.code + temp + " = " + expr.value + " * " + str(dimension) + "\n" + \
+                    head.value["val"] + " = " + array_var_use.value["val"] + " + " + temp + "\n"
 
             else:
                 expr = head.left
@@ -716,7 +717,7 @@ class AstNode:
                 head.value["val"] = parser.get_new_temp(head.data_type)
                 head.code = expr.code + "\n" + \
                     head.value["val"] + " = " + \
-                    expr.value + " * " + str(dimension)
+                    expr.value + " * " + str(dimension) + "\n"
 
         # --------------------------------------------------------------------
 
@@ -947,3 +948,42 @@ class AstNode:
             head.value = parser.get_new_temp(data_type)
 
             head.code = f"{expr.code}{head.value} = ({data_type}){expr.value}\n"
+        
+        elif head.operator == Operator.A_INPUT:
+
+            left_value = head.left
+
+            if left_value.operator == Operator.A_VARIABLE:
+                # print(left_value.value)
+                # data_type = parser.get_data_type(left_value.value)
+                head.code = f"input {left_value.data_type}, {left_value.value}\n"
+            else:
+                # data_type = parser.get_data_type(left_value.value.split('[')[0])
+                # head = left_value.code
+                AstNode.generateCode(left_value, parser)
+                cur = left_value
+                while cur.left:
+                    cur = cur.left
+
+                head.code = left_value.code 
+                head.code += f"input {cur.data_type}, {left_value.value}\n"
+
+        elif head.operator == Operator.A_OUTPUT:
+
+            left_value = head.left
+
+            if left_value.operator == Operator.A_VARIABLE:
+                # print(left_value.value)
+                # data_type = parser.get_data_type(left_value.value)
+                head.code = f"output {left_value.data_type}, {left_value.value}\n"
+            else:
+                # data_type = parser.get_data_type(left_value.value.split('[')[0])
+                # head = left_value.code
+                AstNode.generateCode(left_value, parser)
+                cur = left_value
+                while cur.left:
+                    cur = cur.left
+
+                head.code = left_value.code 
+                head.code += f"output {cur.data_type}, {left_value.value}\n"
+
