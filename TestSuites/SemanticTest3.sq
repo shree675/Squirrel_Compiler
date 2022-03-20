@@ -1,6 +1,11 @@
 void @start() {
     int a[3] = {2,3,5};
     ``a[0.4] = 1;``
-    float t = 1;
-    a[t] = 9;
+    ``float t = 1;
+    a[t] = 9;``
+    int g = 2;
+    if("hello")
+    { 
+        ``nothing``
+    }
 }

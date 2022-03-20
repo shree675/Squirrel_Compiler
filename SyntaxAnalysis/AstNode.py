@@ -105,8 +105,7 @@ class AstNode:
     @staticmethod
     def raise_error(message=None):
         try:
-            if condition_type != None:
-                raise Exception("Semantic Error", message)
+            raise Exception(message)
         except Exception as ex:
             logger.exception(ex)
             quit()
@@ -400,7 +399,7 @@ class AstNode:
 
             AstNode.generateCode(statements, parser)
 
-            head.code = "ifFalse " + head.value + " == " + constant[1] + " goto " + statements.next + \
+            head.code = "ifFalse " + head.value.value + " == " + constant[1] + " goto " + statements.next + \
                 statements.code + "\n" + "goto " + head.next + "\n" + statements.next + ":\n"
             print('abc', statements.code)
 
@@ -499,13 +498,13 @@ class AstNode:
             if head.data_type != expr0.data_type:
                 # if the left operand datatype does not match the combined head datatype, it needs to undergo a widening implicit typecast
                 typecast_variable = parser.get_new_temp(head.data_type)
-                head.code += f"{typecast_variable} = ({head.data_type}){expr0.value}\n"
+                head.code += f"{typecast_variable} = ({head.data_type}) {expr0.value}\n"
                 head.code += f"{head.value} = {typecast_variable} + {expr1.value}\n"
 
             elif head.data_type != expr1.data_type:
                 # similarly, if the right operand datatype does not match the combined head datatype, it needs to undergo a widening implicit typecast
                 typecast_variable = parser.get_new_temp(head.data_type)
-                head.code += f"{parser.get_new_temp(head.data_type)} = ({head.data_type}){expr1.value}\n"
+                head.code += f"{typecast_variable} = ({head.data_type}) {expr1.value}\n"
                 head.code += f"{head.value} = {expr0.value} + {typecast_variable}\n"
             else:
                 head.code += f"{head.value} = {expr0.value} + {expr1.value}\n"
@@ -548,7 +547,7 @@ class AstNode:
 
                 elif head.data_type != expr1.data_type:
                     typecast_variable = parser.get_new_temp(head.data_type)
-                    head.code += f"{parser.get_new_temp(head.data_type)} = ({head.data_type}){expr1.value}\n"
+                    head.code += f"{typecast_variable} = ({head.data_type}){expr1.value}\n"
                     head.code += f"{head.value} = {expr0.value} - {typecast_variable}\n"
                 else:
                     head.code += f"{head.value} = {expr0.value} - {expr1.value}\n"
@@ -570,12 +569,12 @@ class AstNode:
 
             if head.data_type != expr0.data_type:
                 typecast_variable = parser.get_new_temp(head.data_type)
-                head.code += f"{typecast_variable} = ({head.data_type}){expr0.value}\n"
+                head.code += f"{typecast_variable} = ({head.data_type}) {expr0.value}\n"
                 head.code += f"{head.value} = {typecast_variable} * {expr1.value}\n"
 
             elif head.data_type != expr1.data_type:
                 typecast_variable = parser.get_new_temp(head.data_type)
-                head.code += f"{parser.get_new_temp(head.data_type)} = ({head.data_type}){expr1.value}\n"
+                head.code += f"{typecast_variable} = ({head.data_type}) {expr1.value}\n"
                 head.code += f"{head.value} = {expr0.value} * {typecast_variable}\n"
             else:
                 head.code += f"{head.value} = {expr0.value} * {expr1.value}\n"
@@ -599,12 +598,12 @@ class AstNode:
 
             if head.data_type != expr0.data_type:
                 typecast_variable = parser.get_new_temp(head.data_type)
-                head.code += f"{typecast_variable} = ({head.data_type}){expr0.value}\n"
+                head.code += f"{typecast_variable} = ({head.data_type}) {expr0.value}\n"
                 head.code += f"{head.value} = {typecast_variable} / {expr1.value}\n"
 
             elif head.data_type != expr1.data_type:
                 typecast_variable = parser.get_new_temp(head.data_type)
-                head.code += f"{parser.get_new_temp(head.data_type)} = ({head.data_type}){expr1.value}\n"
+                head.code += f"{typecast_variable} = ({head.data_type}) {expr1.value}\n"
                 head.code += f"{head.value} = {expr0.value} / {typecast_variable}\n"
             else:
                 head.code += f"{head.value} = {expr0.value} / {expr1.value}\n"
@@ -626,12 +625,12 @@ class AstNode:
 
             if head.data_type != expr0.data_type:
                 typecast_variable = parser.get_new_temp(head.data_type)
-                head.code += f"{typecast_variable} = ({head.data_type}){expr0.value}\n"
+                head.code += f"{typecast_variable} = ({head.data_type}) {expr0.value}\n"
                 head.code += f"{head.value} = {typecast_variable} % {expr1.value}\n"
 
             elif head.data_type != expr1.data_type:
                 typecast_variable = parser.get_new_temp(head.data_type)
-                head.code += f"{parser.get_new_temp(head.data_type)} = ({head.data_type}){expr1.value}\n"
+                head.code += f"{typecast_variable} = ({head.data_type}) {expr1.value}\n"
                 head.code += f"{head.value} = {expr0.value} % {typecast_variable}\n"
             else:
                 head.code += f"{head.value} = {expr0.value} % {expr1.value}\n"
@@ -722,8 +721,7 @@ class AstNode:
         # --------------------------------------------------------------------
 
         elif head.operator == Operator.A_ASSIGN_STMT:
-            # TODO: Code to check types and TAC for implicit/explicit casting
-            # Fix type in parser first, then use head.data_type for implicit type casting here
+            # TODO: Test this
 
             print("assign stmt datatype", head.data_type)
             left_value, expr = head.left, head.right
@@ -746,9 +744,9 @@ class AstNode:
             if head.data_type != expr.data_type:
                 typecast_variable = parser.get_new_temp(head.data_type)
                 head.code += f"{typecast_variable} = ({head.data_type}) {expr.value}\n"
-                head.code += f"{head.value} = {typecast_variable}\n"
+                head.code += f"{left_value.value} = {typecast_variable}\n"
             else:
-                head.code += f"{head.value} = {expr.value}\n"
+                head.code += f"{left_value.value} = {expr.value}\n"
 
         # --------------------------------------------------------------------
 
@@ -765,11 +763,11 @@ class AstNode:
                 AstNode.generateCode(right, parser)
 
                 head.code = right.code + "\n" + \
-                    left[0] + " " + left[1] + " = " + right.value + "\n"
+                    left[1] + " = (" + left[0] + ") " + right.value + "\n"
 
             else:
                 # declaration
-                head.code = left[0] + " " + left[1] + " = "
+                head.code = left[1] + " = (" + left[0] + ") " 
                 if left[0] == INT:
                     head.code += "0"
                 elif left[0] == FLOAT:
@@ -859,8 +857,6 @@ class AstNode:
                     left.operator == Operator.A_MULTIPLY or left.operator == Operator.A_DIVIDE or \
                     left.operator == Operator.A_MODULO:
 
-                
-
                 # TODO: Why is left.code empty here?
                 print("left.code", left.value is None)
                 head.code = left.code + "\n" + "if " + left.value + " " + "!=" + " 0 goto " + head.true + temp_false
@@ -887,8 +883,8 @@ class AstNode:
                 if cur.operator != Operator.A_ROOT:
                     cur = cur.parent
                 else:
-                    raise_error(
-                        "Semantic Error : \"break\" can only be used in a for_loop or a while_loop or a switch_case.\n")
+                    AstNode.raise_error(
+                        'Semantic Error : \"break\" can only be used in a for_loop or a while_loop or a switch_case.\n')
 
             head.code = "goto " + cur.next
 
@@ -911,7 +907,7 @@ class AstNode:
                 if cur.operator != Operator.A_ROOT:
                     cur = cur.parent
                 else:
-                    raise_error(
+                    AstNode.raise_error(
                         "Semantic Error : \"continue\" can only be used in a for_loop or a while_loop.\n")
 
             head.code = "goto " + cur.begin

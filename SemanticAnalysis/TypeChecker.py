@@ -164,7 +164,7 @@ class TypeChecker:
             if expr_type == 'bool':
                 return
             if expr_type == 'str':
-                TypeChecker.raise_error(data_type1='str',condition_type='bool', operator=operator)
+                TypeChecker.raise_error(data_type1='str',condition_type='bool or char or int', operator=operator)
             if expr_type == 'int' or expr_type == 'char' or expr_type == 'float':
                 print("Implicitly casting to bool")
                 # TODO: Modify the symbol table here maybe?  
@@ -172,11 +172,6 @@ class TypeChecker:
             print("Array[expr] int type check")
             if expr_type == 'int':
                 return
-            if expr_type == 'str':
-                TypeChecker.raise_error(data_type1='str',condition_type='int', operator=operator)
-            if expr_type == 'bool' or expr_type == 'char' or expr_type == 'float':
-                print("Implicitly casting to int")
-                # TODO: Modify the symbol table here maybe?    
             else:
                 TypeChecker.raise_error(data_type1=expr_type,condition_type='int', operator=operator)       
 
