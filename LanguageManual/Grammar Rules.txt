@@ -21,7 +21,7 @@ array_init -> DATATYPE array_variable = { array_list }
 array_variable -> VARNAME [ INTVAL ] | array_variable [ INTVAL ]
 array_var_use -> VARNAME [ expr ] | array_var_use [ expr ]
 
-array_list -> array_list, expr | expr
+array_list -> array_list, constant | constant
 
 constant -> INTVAL | FLOATVAL | CHARVAL | STRINGVAL | BOOLVAL
 

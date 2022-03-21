@@ -3,14 +3,14 @@
 
    - When a function is defined, check for unique name and signature combination
 
-2. error in testcase: string f3 = -"hello";
-   Probably unary operator in declaration is not working - Kranthi
+✓ 2. error in testcase: string f3 = -"hello";
+   Probably unary operator in declaration is not working 
 
 3. What do we do about all the warnings? - Kranthi (later)
 
-✓ 4. jump statements
+✓ 4. jump statements - shreetesh (check)
 
-5. Explicit and implicit type casting TAC?
+5. Explicit and implicit type casting TAC? - most probabply done
 
 ✓ 6. Not able to do semantic analysis for for loop until the get_datatype method of the symbol table is implemented correctly - breaks in case of for loop
 
@@ -37,7 +37,7 @@ we have to declare/define the function before use
 
 14. Semantic checks for explicit casts that are not allowed
 
-Aashrith - refactor generatecode method - passing parser instead of individual methods
+✓ Aashrith - refactor generatecode method - passing parser instead of individual methods
 
 comparing enum - Operator.value instead of Operator
 

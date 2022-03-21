@@ -403,7 +403,6 @@ class AstNode:
 
             head.code = "ifFalse " + head.value.value + " == " + constant[1] + " goto " + statements.next + \
                 statements.code + "\n" + "goto " + head.next + "\n" + statements.next + ":\n"
-            print('abc', statements.code)
 
         # ------------------------------------------------------------
 
@@ -724,7 +723,6 @@ class AstNode:
         elif head.operator == Operator.A_ASSIGN_STMT:
             # TODO: Test this
 
-            print("assign stmt datatype", head.data_type)
             left_value, expr = head.left, head.right
 
             AstNode.generateCode(left_value, parser)
@@ -786,6 +784,7 @@ class AstNode:
 
             array_rec, array_list = head.left, head.right
 
+            array_list.data_type=head.data_type
             AstNode.generateCode(array_list, parser)
 
             size = 0
@@ -798,7 +797,11 @@ class AstNode:
             elif head.data_type == BOOL:
                 size = 1
 
-            head.code = f"{head.data_type} {head.value}[{int(math.prod(array_rec.value['list']))*size}]\n"
+            dimension_prod=int(math.prod(array_rec.value['list']))
+            if dimension_prod!=len(array_list.value):
+                AstNode.raise_error("Semantic Error: Array dimension and initialization mismatch")
+
+            head.code = f"{head.data_type} {head.value}[{dimension_prod*size}]\n"
 
             for i in range(len(array_list.value)):
                 head.code += f"{head.value}[{i*size}]={array_list.value[i]}\n"
@@ -811,11 +814,16 @@ class AstNode:
             left, right = head.left, head.right
 
             if right == None:
+                if left[0].value.split(' ')[0]!=head.data_type:
+                    AstNode.raise_error("Semantic Error: Array initialization datatype mismatch")
                 head.value = [left[1]]
                 head.code = ""
 
             else:
+                left.data_type=head.data_type
                 AstNode.generateCode(left, parser)
+                if right[0].value.split(' ')[0]!=head.data_type:
+                    AstNode.raise_error("Semantic Error: Array initialization datatype mismatch")
                 head.value = [*left.value, right[1]]
                 head.code = ""
 

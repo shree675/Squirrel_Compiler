@@ -1,39 +1,35 @@
 start:
 
-int a[12]
-a[0]=1
-a[4]=2
-a[8]=3
-
-L12:
-b = (int) 0
-L10:
-
-t0 = 1 + 2
-
-t1 = t0 + 3
-
-t2 = t1 * 1
-
-t3 = t2 * 4
-input int, a[t3]
+int a[16]
+a[0]=2
+a[4]=3
+a[8]=5
+a[12]=34
 
 L8:
-input int, b
+
+t0 = 1 * 2
+t1 = 1 * 1
+t2 = t0 + t1
+
+t3 = t2 * 4
+
+t4 = (fuzzy) 2
+a[t3] = t4
 
 L6:
 
-t4 = 1 - 2
+t5 = 1 * 2
+t6 = 1 * 1
+t7 = t5 + t6
 
-t5 = t4 + 3
+t8 = t7 * 4
 
-t6 = t5 * 1
-
-t7 = t6 * 4
-output int, a[t7]
+g = (int) a[t8]
 
 L4:
-output int, b
+
+a = 3
 
 L2:
 

@@ -3,6 +3,7 @@ from AstNode import Operator, AstNode
 from SemanticAnalysis import TypeChecker
 from LexicalAnalysis import lexer
 import os
+import math
 import logging as logger
 logger.exception = logger.error
 
@@ -385,6 +386,9 @@ class Parser(SlyParser):
         self.push_to_ST(
             p.DATATYPE, p.array_variable.value["varname"], p.array_variable.value["list"])
         #data_type = self.get_data_type(p.VARNAME)
+        # dimension_prod=int(math.prod(p.array_variable.value['list']))
+        # if dimension_prod!=len(p.array_list.value):
+        #     Parser.raise_error("Semantic Error: Array dimension and declaration mismatch")
         return AstNode(Operator.A_ARR_DECL, left=p.array_variable, right=p.array_list, data_type=p.DATATYPE, value=p.array_variable.value["varname"])
 
     # array_variable -> VARNAME [INTVAL]
@@ -397,13 +401,12 @@ class Parser(SlyParser):
     def array_variable(self, p):
         return AstNode(Operator.A_ARRAY_REC, left=p.array_variable, value={"list": [*p.array_variable.value["list"], int(p.INTVAL)], "varname": p.array_variable.value["varname"]})
 
-    # TODO: Are we doing expr or constant here?
-    # array_list -> array_list, expr
+    # array_list -> array_list, constant
     @_("array_list COMMA constant")
     def array_list(self, p):
         return AstNode(Operator.A_ARR_LITERAL, left=p.array_list, right=p.constant)
 
-    # array_list -> expr
+    # array_list -> constant
     @_("constant")
     def array_list(self, p):
         #print("The const type", p.constant[0])
@@ -419,7 +422,6 @@ class Parser(SlyParser):
         self.type_checker.check_datatype(
             expr_type=p.expr.data_type, operator=Operator.A_ARR_EXPR_REC)
         data_type = self.get_data_type(p.VARNAME)
-        
         return AstNode(Operator.A_ARR_EXPR_REC, left=p.expr, value={"varname": p.VARNAME, "val": "", "index": 1, "scope": self.id-1}, data_type=data_type)
 
     # array_variable [expr]
@@ -436,7 +438,7 @@ class Parser(SlyParser):
                 "val": "",
                 "index": p.array_var_use.value["index"]+1,
                 "scope": self.id-1
-            })
+            },data_type=p.array_var_use.data_type)
 
 # ---------------------------------------------------------------------------
 
@@ -679,9 +681,7 @@ class Parser(SlyParser):
 
     @_('array_var_use')
     def expr(self, p):
-        # TODO: find data type and pass it
-        # ,data_type=data_type
-        return AstNode(Operator.A_ARREXPR_VARIABLE, left=p.array_var_use)
+        return AstNode(Operator.A_ARREXPR_VARIABLE, left=p.array_var_use, data_type = p.array_var_use.data_type)
 
     # expr -> constant
     @_('constant')
@@ -691,9 +691,10 @@ class Parser(SlyParser):
         # p.constant = [Operator.A_CHARCONST, 't'] for a character
         return AstNode(p.constant[0], value=p.constant[1], data_type=data_type)
 
-    # expr -> (DATATYPE) expr
+    # expr -> (DATATYPE) expr# 
     @_('LPAREN DATATYPE RPAREN expr %prec TYPECASTING')
     def expr(self, p):
+        # TODO: check if DATATYPE and expr is compatible
         return AstNode(Operator.A_TYPECAST, left=p.DATATYPE, right=p.expr)
 
     # assignment_statement -> left_value = expr
@@ -823,7 +824,7 @@ if __name__ == '__main__':
     lex = lexer.Lexer()
     parser = Parser()
 
-    with open(os.path.join(TEST_SUITES_DIR, "FunctionsAndCallsTest.sq"), 'r') as f:
+    with open(os.path.join(TEST_SUITES_DIR, "SemanticTest3.sq"), 'r') as f:
         text = f.read()
 
     parser.parse(lex.tokenize(text))
