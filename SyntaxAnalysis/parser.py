@@ -78,12 +78,13 @@ class Parser(SlyParser):
         })
 
     def push_to_FST(self, return_type,  function_name, parameters_types):
-        repeated = list(filter(lambda e : e["function_name"] == function_name and
-            e["parameters_types"] == parameters_types, 
-            self.function_symbol_table))
+        repeated = list(filter(lambda e: e["function_name"] == function_name and
+                               e["parameters_types"] == parameters_types,
+                               self.function_symbol_table))
 
         if len(repeated) > 0:
-            Parser.error(f"The function {function_name}({','.join(parameters_types)}) is already defined.\n") 
+            Parser.error(
+                f"The function {function_name}({','.join(parameters_types)}) is already defined.\n")
 
         self.function_symbol_table.append({
             "return_type": return_type,
@@ -113,17 +114,16 @@ class Parser(SlyParser):
         else:
             Parser.error(
                 f"Error : variable \"{varname}\" not declared in the scope")
-    
+
     def check_function_signature(self, function_name, args_types):
 
+        matched = list(filter(lambda e: e["function_name"] == "@"+function_name and
+                              e["parameters_types"] == args_types,
+                              self.function_symbol_table))
 
-        matched = list(filter(lambda e : e["function_name"] == "@"+function_name and
-            e["parameters_types"] == args_types, 
-            self.function_symbol_table)) 
-        
         if len(matched) == 0:
             Parser.error(f"Semantic error : function call {function_name}({','.join(args_types)})"
-            + " doesn't match any of the defined function signatures.\n")
+                         + " doesn't match any of the defined function signatures.\n")
 
     def print_tree(self, root):
 
@@ -226,7 +226,7 @@ class Parser(SlyParser):
         # no AstNode for params here
         p.statements.parent = head
 
-        # Push the function to the symbol table 
+        # Push the function to the symbol table
         # p.params is a list of data types of parameters
         self.push_to_FST(p.DATATYPE, p.FUNCNAME, p.params)
         return head
@@ -368,7 +368,8 @@ class Parser(SlyParser):
     def simple_init(self, p):
         self.push_to_ST(p.DATATYPE, p.VARNAME, [])
         data_type = self.get_data_type(p.VARNAME)
-        node =  AstNode(Operator.A_DECL, left=[p.DATATYPE, p.VARNAME], data_type=data_type,)
+        node = AstNode(Operator.A_DECL, left=[
+                       p.DATATYPE, p.VARNAME], data_type=data_type,)
         node.code = ""
         return node
 
@@ -438,7 +439,7 @@ class Parser(SlyParser):
                 "val": "",
                 "index": p.array_var_use.value["index"]+1,
                 "scope": self.id-1
-            },data_type=p.array_var_use.data_type)
+            }, data_type=p.array_var_use.data_type)
 
 # ---------------------------------------------------------------------------
 
@@ -498,14 +499,16 @@ class Parser(SlyParser):
     # switch_statement -> SWITCH ( left_value ) { case_statements }
     @_('SWITCH LPAREN left_value RPAREN LBRACE scope_open case_statements RBRACE scope_close')
     def switch_statement(self, p):
-        
+
         if p.left_value.data_type != 'int' and p.left_value.data_type != 'char':
-            Parser.error("Switch statement variable must be of type int or char")
+            Parser.error(
+                "Switch statement variable must be of type int or char")
 
         """ try:
             return AstNode(Operator.A_SWITCH, left=p.left_value[1], right=p.case_statements)
         except: """
-        head = AstNode(Operator.A_SWITCH, left=p.left_value, right=p.case_statements)
+        head = AstNode(Operator.A_SWITCH, left=p.left_value,
+                       right=p.case_statements)
         p.left_value.parent = head
         p.case_statements.parent = head
         return head
@@ -513,7 +516,8 @@ class Parser(SlyParser):
     # case_statements -> case_statement case_statements | case_statement | default_statement
     @_('case_statement case_statements')
     def case_statements(self, p):
-        head =  AstNode(Operator.A_CASEMULTIPLE, left=p.case_statement, right=p.case_statements)
+        head = AstNode(Operator.A_CASEMULTIPLE,
+                       left=p.case_statement, right=p.case_statements)
         p.case_statement.parent = head
         p.case_statements.parent = head
         return head
@@ -532,7 +536,8 @@ class Parser(SlyParser):
         print("P constant", p.constant[0])
         if p.constant[0] != Operator.A_INTCONST and p.constant[0] != Operator.A_CHARCONST:
             Parser.error("Case statement variable must be of type int or char")
-        head = AstNode(Operator.A_CASESINGLE, left=p.constant, right=p.statements)
+        head = AstNode(Operator.A_CASESINGLE,
+                       left=p.constant, right=p.statements)
         p.statements.parent = head
         return head
 
@@ -681,7 +686,7 @@ class Parser(SlyParser):
 
     @_('array_var_use')
     def expr(self, p):
-        return AstNode(Operator.A_ARREXPR_VARIABLE, left=p.array_var_use, data_type = p.array_var_use.data_type)
+        return AstNode(Operator.A_ARREXPR_VARIABLE, left=p.array_var_use, data_type=p.array_var_use.data_type)
 
     # expr -> constant
     @_('constant')
@@ -691,7 +696,7 @@ class Parser(SlyParser):
         # p.constant = [Operator.A_CHARCONST, 't'] for a character
         return AstNode(p.constant[0], value=p.constant[1], data_type=data_type)
 
-    # expr -> (DATATYPE) expr# 
+    # expr -> (DATATYPE) expr#
     @_('LPAREN DATATYPE RPAREN expr %prec TYPECASTING')
     def expr(self, p):
         # TODO: check if DATATYPE and expr is compatible
@@ -769,7 +774,7 @@ class Parser(SlyParser):
             args_types.append(data_type)
             cur = cur.right
         args_types.append(cur.data_type)
-        
+
         # print("LOOK HERE : ", parameters)
 
         self.check_function_signature(p.VARNAME, args_types)
@@ -824,7 +829,7 @@ if __name__ == '__main__':
     lex = lexer.Lexer()
     parser = Parser()
 
-    with open(os.path.join(TEST_SUITES_DIR, "SemanticTest3.sq"), 'r') as f:
+    with open(os.path.join(TEST_SUITES_DIR, "SemanticTest6.sq"), 'r') as f:
         text = f.read()
 
     parser.parse(lex.tokenize(text))
