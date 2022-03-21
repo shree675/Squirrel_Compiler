@@ -181,9 +181,27 @@ class AstNode:
             left, right = head.left, head.right
             true, false = head.true, head.false
 
+            if true == None or false == None:
+                left.true = parser.get_new_label()
+                left.false = false
+                right.true = true
+                right.false = false
+                AstNode.generateCode(left, parser)
+                AstNode.generateCode(right, parser)
+                head.code = left.code + '\n' + right.code
+                label1 = parser.get_new_label()
+                label2 = parser.get_new_label()
+                head.code += f"if {left.value} == 0 goto {label2}\n"
+                head.code += f"if {right.value} == 0 goto {label2}\n"
+                head.code += f"{head.value} = 1\n"
+                head.code += f"goto {label1}\n"
+                head.code += f"{label2}:\n"
+                head.code += f"{head.value} = 0\n"
+                head.code += f"{label1}:\n"
+                return
+
             if left.operator == Operator.A_VARIABLE:
                 left = AstNode(Operator.A_BOOL, left=left)
-
 
             if right.operator == Operator.A_VARIABLE:
                 right = AstNode(Operator.A_BOOL, left=right)
@@ -241,6 +259,12 @@ class AstNode:
 
             """ head.code += f"if {left.value} {relop} {right.value} goto {head.true}\ngoto {head.false}\n"
             "if " + left.value + " " + relop + " " + right.value + " goto " + head.true + "\n" + "goto " + head.false """
+
+            if head.true == None or head.false == None:
+                temp0 = parser.get_new_temp("int")
+                head.code += f"{temp0}={left.value} {relop} {right.value}"
+                head.value = temp0
+                return
 
             if left_type == 'int' and right_type == 'int':
                 head.code += f"if {left.value} {relop} {right.value} goto {head.true}\ngoto {head.false}\n"
@@ -665,7 +689,8 @@ class AstNode:
 
             head.value = array_variable.value["varname"] + "[" + temp + "]"
             head.code = array_variable.code + "\n" + \
-                temp + " = " + array_variable.value["val"] + " * " + str(size) + '\n'
+                temp + " = " + \
+                array_variable.value["val"] + " * " + str(size) + '\n'
 
         # --------------------------------------------------------------------
 
@@ -696,7 +721,8 @@ class AstNode:
                     dimension *= variable[0]["dimension"][j]
 
                 head.code = array_var_use.code + expr.code + temp + " = " + expr.value + " * " + str(dimension) + "\n" + \
-                    head.value["val"] + " = " + array_var_use.value["val"] + " + " + temp + "\n"
+                    head.value["val"] + " = " + \
+                    array_var_use.value["val"] + " + " + temp + "\n"
 
             else:
                 expr = head.left
@@ -766,7 +792,7 @@ class AstNode:
 
             else:
                 # declaration
-                head.code = left[1] + " = (" + left[0] + ") " 
+                head.code = left[1] + " = (" + left[0] + ") "
                 if left[0] == INT:
                     head.code += "0"
                 elif left[0] == FLOAT:
@@ -784,7 +810,7 @@ class AstNode:
 
             array_rec, array_list = head.left, head.right
 
-            array_list.data_type=head.data_type
+            array_list.data_type = head.data_type
             AstNode.generateCode(array_list, parser)
 
             size = 0
@@ -797,9 +823,10 @@ class AstNode:
             elif head.data_type == BOOL:
                 size = 1
 
-            dimension_prod=int(math.prod(array_rec.value['list']))
-            if dimension_prod!=len(array_list.value):
-                AstNode.raise_error("Semantic Error: Array dimension and initialization mismatch")
+            dimension_prod = int(math.prod(array_rec.value['list']))
+            if dimension_prod != len(array_list.value):
+                AstNode.raise_error(
+                    "Semantic Error: Array dimension and initialization mismatch")
 
             head.code = f"{head.data_type} {head.value}[{dimension_prod*size}]\n"
 
@@ -814,16 +841,18 @@ class AstNode:
             left, right = head.left, head.right
 
             if right == None:
-                if left[0].value.split(' ')[0]!=head.data_type:
-                    AstNode.raise_error("Semantic Error: Array initialization datatype mismatch")
+                if left[0].value.split(' ')[0] != head.data_type:
+                    AstNode.raise_error(
+                        "Semantic Error: Array initialization datatype mismatch")
                 head.value = [left[1]]
                 head.code = ""
 
             else:
-                left.data_type=head.data_type
+                left.data_type = head.data_type
                 AstNode.generateCode(left, parser)
-                if right[0].value.split(' ')[0]!=head.data_type:
-                    AstNode.raise_error("Semantic Error: Array initialization datatype mismatch")
+                if right[0].value.split(' ')[0] != head.data_type:
+                    AstNode.raise_error(
+                        "Semantic Error: Array initialization datatype mismatch")
                 head.value = [*left.value, right[1]]
                 head.code = ""
 
@@ -868,7 +897,8 @@ class AstNode:
 
                 # TODO: Why is left.code empty here?
                 print("left.code", left.value is None)
-                head.code = left.code + "\n" + "if " + left.value + " " + "!=" + " 0 goto " + head.true + temp_false
+                head.code = left.code + "\n" + "if " + left.value + \
+                    " " + "!=" + " 0 goto " + head.true + temp_false
 
             else:
                 if left.operator == Operator.A_INTCONST and left.value == "0":
@@ -956,7 +986,7 @@ class AstNode:
             head.value = parser.get_new_temp(data_type)
 
             head.code = f"{expr.code}{head.value} = ({data_type}){expr.value}\n"
-        
+
         elif head.operator == Operator.A_INPUT:
 
             left_value = head.left
@@ -973,7 +1003,7 @@ class AstNode:
                 while cur.left:
                     cur = cur.left
 
-                head.code = left_value.code 
+                head.code = left_value.code
                 head.code += f"input {cur.data_type}, {left_value.value}\n"
 
         elif head.operator == Operator.A_OUTPUT:
@@ -992,6 +1022,5 @@ class AstNode:
                 while cur.left:
                     cur = cur.left
 
-                head.code = left_value.code 
+                head.code = left_value.code
                 head.code += f"output {cur.data_type}, {left_value.value}\n"
-
