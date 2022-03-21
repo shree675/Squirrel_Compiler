@@ -163,6 +163,25 @@ class AstNode:
             left, right = head.left, head.right
             true, false = head.true, head.false
 
+            if true == None or false == None:
+                left.true = parser.get_new_label()
+                left.false = false
+                right.true = true
+                right.false = false
+                AstNode.generateCode(left, parser)
+                AstNode.generateCode(right, parser)
+                head.code = left.code + '\n' + right.code
+                label1 = parser.get_new_label()
+                label2 = parser.get_new_label()
+                head.code += f"if {left.value} == 0 goto {label2}\n"
+                head.code += f"if {right.value} == 0 goto {label2}\n"
+                head.code += f"{head.value} = 1\n"
+                head.code += f"goto {label1}\n"
+                head.code += f"{label2}:\n"
+                head.code += f"{head.value} = 0\n"
+                head.code += f"{label1}:\n"
+                return
+
             if left.operator == Operator.A_VARIABLE:
                 left = AstNode(Operator.A_BOOL, left=left)
 
@@ -222,6 +241,12 @@ class AstNode:
 
             """ head.code += f"if {left.value} {relop} {right.value} goto {head.true}\ngoto {head.false}\n"
             "if " + left.value + " " + relop + " " + right.value + " goto " + head.true + "\n" + "goto " + head.false """
+
+            if head.true == None or head.false == None:
+                temp0 = parser.get_new_temp("int")
+                head.code += f"{temp0}={left.value} {relop} {right.value}"
+                head.value = temp0
+                return
 
             if left_type == 'int' and right_type == 'int':
                 head.code += f"if {left.value} {relop} {right.value} goto {head.true}\ngoto {head.false}\n"

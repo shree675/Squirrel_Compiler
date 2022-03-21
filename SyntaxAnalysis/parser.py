@@ -355,12 +355,14 @@ class Parser(SlyParser):
     def simple_init(self, p):
         self.push_to_ST(p.DATATYPE, p.VARNAME, [])
         data_type = self.get_data_type(p.VARNAME)
+        # TODO: get rid of list here
         return AstNode(Operator.A_DECL, left=[p.DATATYPE, p.VARNAME], data_type=data_type)
 
     @_("DATATYPE VARNAME ASSIGN expr")
     def simple_init(self, p):
         self.push_to_ST(p.DATATYPE, p.VARNAME, [])
         data_type = self.get_data_type(p.VARNAME)
+        # TODO: get rid of list here
         return AstNode(Operator.A_DECL, left=[p.DATATYPE, p.VARNAME], right=p.expr, data_type=data_type)
 
 # ----------------------- ARRAY INIT ---------------------------------
@@ -782,7 +784,7 @@ if __name__ == '__main__':
     lex = lexer.Lexer()
     parser = Parser()
 
-    with open(os.path.join(TEST_SUITES_DIR, "ArrayUseTest.sq"), 'r') as f:
+    with open(os.path.join(TEST_SUITES_DIR, "SemanticTest5.sq"), 'r') as f:
         text = f.read()
 
     parser.parse(lex.tokenize(text))
