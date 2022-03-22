@@ -56,6 +56,8 @@ Kranthi 13. Stitching together parser with preprocessor - run from main method 1
 
 19. for "@sum", what is the function name?
 
+20. Should we change the way we represent string variables in TAC?
+
 Wednesday, March 23rd, 2022
 
 Friday Presentation:
@@ -87,8 +89,7 @@ Phase 2:
 
 Test cases not working:
 
-1. ArrayUseTest.sq
-2. Fibonacci.sq
+(none)
 
 TODO test case:
 

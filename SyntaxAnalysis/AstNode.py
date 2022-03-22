@@ -712,7 +712,8 @@ class AstNode:
             ))
             data_type = variable[0]["type"]
 
-            temp = parser.get_new_temp(data_type)
+            # temp = parser.get_new_temp(data_type)
+            temp = parser.get_new_temp("int")
 
             if data_type == INT:
                 size = 4
@@ -723,10 +724,13 @@ class AstNode:
             elif data_type == BOOL:
                 size = 1
 
+            # int_temp = parser.get_new_temp("int")
+
             head.value = array_variable.value["varname"] + "[" + temp + "]"
             head.code = array_variable.code + "\n" + \
                 temp + " = " + \
-                array_variable.value["val"] + " * " + str(size) + '\n'
+                array_variable.value["val"] + " * " + \
+                str(size) + '\n'
 
         # --------------------------------------------------------------------
 
@@ -740,9 +744,11 @@ class AstNode:
                 AstNode.generateCode(array_var_use, parser)
                 AstNode.generateCode(expr, parser)
 
-                temp = parser.get_new_temp(head.data_type)
+                # temp = parser.get_new_temp(head.data_type)
+                temp = parser.get_new_temp("int")
                 # TODO : check if this is fine
-                head.value["val"] = parser.get_new_temp(head.data_type)
+                # head.value["val"] = parser.get_new_temp(head.data_type)
+                head.value["val"] = parser.get_new_temp("int")
 
                 # print("eye catchy : " , head.data_type)
 
@@ -777,7 +783,8 @@ class AstNode:
                 for j in range(i, len(variable[0]["dimension"])):
                     dimension *= variable[0]["dimension"][j]
 
-                head.value["val"] = parser.get_new_temp(head.data_type)
+                # head.value["val"] = parser.get_new_temp(head.data_type)
+                head.value["val"] = parser.get_new_temp("int")
                 head.code = expr.code + "\n" + \
                     head.value["val"] + " = " + \
                     expr.value + " * " + str(dimension) + "\n"
@@ -829,7 +836,6 @@ class AstNode:
 
                 AstNode.generateCode(right, parser)
 
-                print('aaaa', right.value, right.code)
                 head.code = right.code + "\n" + \
                     left[1] + " = (" + left[0] + ") " + right.value + "\n"
 

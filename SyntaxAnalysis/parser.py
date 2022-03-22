@@ -92,6 +92,7 @@ class Parser(SlyParser):
             "parameters_types": parameters_types
         })
 
+    # this method should be used in parser.py ONLY
     def get_data_type(self, varname):
 
         i = -1
@@ -420,16 +421,38 @@ class Parser(SlyParser):
     @_("VARNAME LSQB expr RSQB")
     def array_var_use(self, p):
         print("Array expr type", p.expr.value, p.expr.data_type)
+
+        i = -1
+        current_scope = self.scope_id_stack[i]
+
+        res = []
+        while current_scope >= 1 and len(res) == 0:
+
+            res = list(filter(
+                lambda item: item["scope"] == current_scope and item["identifier_name"] == p.VARNAME,
+                self.symbol_table
+            ))
+
+            if(len(res) > 0):
+                break
+
+            i -= 1
+            current_scope = self.scope_id_stack[i]
+
         self.type_checker.check_datatype(
             expr_type=p.expr.data_type, operator=Operator.A_ARR_EXPR_REC)
         data_type = self.get_data_type(p.VARNAME)
-        return AstNode(Operator.A_ARR_EXPR_REC, left=p.expr, value={"varname": p.VARNAME, "val": "", "index": 1, "scope": self.id-1}, data_type=data_type)
+        return AstNode(Operator.A_ARR_EXPR_REC, left=p.expr,
+                       value={"varname": p.VARNAME, "val": "",
+                              "index": 1, "scope": current_scope},
+                       data_type=data_type)
 
     # array_variable [expr]
     @_("array_var_use LSQB expr RSQB")
     def array_var_use(self, p):
         self.type_checker.check_datatype(
             expr_type=p.expr.data_type, operator=Operator.A_ARR_EXPR_REC)
+
         return AstNode(
             Operator.A_ARR_EXPR_REC,
             left=p.array_var_use,
@@ -438,7 +461,7 @@ class Parser(SlyParser):
                 "varname": p.array_var_use.value["varname"],
                 "val": "",
                 "index": p.array_var_use.value["index"]+1,
-                "scope": self.id-1
+                "scope": p.array_var_use.value["scope"]
             }, data_type=p.array_var_use.data_type)
 
 # ---------------------------------------------------------------------------
@@ -829,7 +852,7 @@ if __name__ == '__main__':
     lex = lexer.Lexer()
     parser = Parser()
 
-    with open(os.path.join(TEST_SUITES_DIR, "SemanticTest5.sq"), 'r') as f:
+    with open(os.path.join(TEST_SUITES_DIR, "SemanticTest1.sq"), 'r') as f:
         text = f.read()
 
     parser.parse(lex.tokenize(text))
