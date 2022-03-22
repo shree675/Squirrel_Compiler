@@ -1,4 +1,3 @@
-
 void @start() {
     char a;
     float b;

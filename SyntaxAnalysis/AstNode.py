@@ -773,6 +773,8 @@ class AstNode:
                 ))
                 i = index
                 dimension = 1
+                print("i", index)
+                print(variable[0]["dimension"])
                 for j in range(i, len(variable[0]["dimension"])):
                     dimension *= variable[0]["dimension"][j]
 
@@ -803,7 +805,11 @@ class AstNode:
             #     head.value + " = " + " - " + expr0.value
             # head.code = expr0.code + "\n"
 
-            if head.data_type != expr.data_type:
+            if head.data_type != expr.data_type and head.data_type == "fuzzy":
+                typecast_variable = parser.get_new_temp(expr.data_type)
+                head.code += f"{typecast_variable} = ({expr.data_type}) {expr.value}\n"
+                head.code += f"{left_value.value} = {typecast_variable}\n"
+            elif head.data_type != expr.data_type:
                 typecast_variable = parser.get_new_temp(head.data_type)
                 head.code += f"{typecast_variable} = ({head.data_type}) {expr.value}\n"
                 head.code += f"{left_value.value} = {typecast_variable}\n"

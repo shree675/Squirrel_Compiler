@@ -2,7 +2,7 @@ void @start() {
 	int fibonacci[6] = {0,0,0,0,0,0};	``array of 6 integers``
 	fibonacci[1] = 1;
 	for(int i=2;i<6;i=i+1){
-		fibonacci[i] = fibonacci[i-1] + fibonacci[i-2];
-		output(fibonacci[i]);
+		fibonacci[i] = 4; ``fibonacci[i-1] + fibonacci[i-2];``
+		``output(fibonacci[i]);``
 	}
 }
