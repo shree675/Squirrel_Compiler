@@ -182,6 +182,7 @@ class AstNode:
             true, false = head.true, head.false
 
             if true == None or false == None:
+                head.value = parser.get_new_temp("int")
                 left.true = parser.get_new_label()
                 left.false = false
                 right.true = true
@@ -226,6 +227,26 @@ class AstNode:
 
             left, right = head.left, head.right
             true, false = head.true, head.false
+
+            if true == None or false == None:
+                head.value = parser.get_new_temp("int")
+                left.true = parser.get_new_label()
+                left.false = false
+                right.true = true
+                right.false = false
+                AstNode.generateCode(left, parser)
+                AstNode.generateCode(right, parser)
+                head.code = left.code + '\n' + right.code + "\n"
+                label1 = parser.get_new_label()
+                label2 = parser.get_new_label()
+                head.code += f"if {left.value} != 0 goto {label2}\n"
+                head.code += f"if {right.value} != 0 goto {label2}\n"
+                head.code += f"{head.value} = 0\n"
+                head.code += f"goto {label1}\n"
+                head.code += f"{label2}:\n"
+                head.code += f"{head.value} = 1\n"
+                head.code += f"{label1}:\n"
+                return
 
             if left.operator == Operator.A_VARIABLE:
                 left = AstNode(Operator.A_BOOL, left=left)
@@ -297,6 +318,22 @@ class AstNode:
 
             left = head.left
             true, false = head.true, head.false
+
+            if true == None or false == None:
+                head.value = parser.get_new_temp("int")
+                left.true = false
+                left.false = true
+                AstNode.generateCode(left, parser)
+                head.code = left.code + '\n'
+                label1 = parser.get_new_label()
+                label2 = parser.get_new_label()
+                head.code += f"if {left.value} == 0 goto {label2}\n"
+                head.code += f"{head.value} = 0\n"
+                head.code += f"goto {label1}\n"
+                head.code += f"{label2}:\n"
+                head.code += f"{head.value} = 1\n"
+                head.code += f"{label1}:\n"
+                return
 
             if left.operator == Operator.A_VARIABLE:
                 left = AstNode(Operator.A_BOOL, left=left)
@@ -787,6 +824,7 @@ class AstNode:
 
                 AstNode.generateCode(right, parser)
 
+                print('aaaa', right.value, right.code)
                 head.code = right.code + "\n" + \
                     left[1] + " = (" + left[0] + ") " + right.value + "\n"
 
