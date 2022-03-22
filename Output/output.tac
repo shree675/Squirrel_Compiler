@@ -2,27 +2,39 @@ start:
 
 a = (int) 3
 
-L4:
-ifFalse a == 1 goto L7
-L7:
+L16:
 
-ifFalse a == 3 goto L8
+b = (float) 0.5
 
-a = 4
+L14:
 
-L13:
+tf1 = (float) a
+tf0 = tf1 + b
 
-a = 3
+x = (int) tf0
 
-L11:
-goto L6
-L9:
+L12:
+
+c = (bool) true
+
+L10:
+
+d = (char) 'a'
+
 L8:
 
-b = (int) 0
-L15:
-goto L6
+e = (string) "hello"
 
 L6:
+f = (int) 0
+L4:
+
+tf3 = (float) a
+tf2 = tf3 + b
+
+t0 = (int) tf2
+f = t0
+
+L2:
 
 L1:
