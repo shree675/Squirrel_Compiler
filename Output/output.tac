@@ -1,34 +1,28 @@
 start:
 
-a = (int) 3.6
-
-L10:
-b = (bool) false
-L8:
-
-c = (float) 4.5
-
-L6:
-
-t1 = (int) b
-t0 = a + t1
-
-tf0 = (float) t0
-c = tf0
+a = (int) 3
 
 L4:
+ifFalse a == 1 goto L7
+L7:
 
-if a == 0 goto L14
-if a == 0 goto L14
-t2 = 1
-goto L13
-L14:
-t2 = 0
+ifFalse a == 3 goto L8
+
+a = 4
+
 L13:
 
-t3 = (int) t2
-a = t3
+a = 3
 
-L2:
+L11:
+goto L6
+L9:
+L8:
+
+b = (int) 0
+L15:
+goto L6
+
+L6:
 
 L1:

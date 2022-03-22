@@ -89,10 +89,10 @@ Test cases not working:
 
 1. ArrayUseTest.sq
 2. Fibonacci.sq
-3. SemanticTest3.sq
-4. SemanticTest5.sq - ambiguous
-5. TACtest2.sq - working correctly without writing break
-6. TACtest4.sq - line 25
+
+TODO test case:
+
+1. SemanticTest3.sq
 
 Test cases not eligible:
 

@@ -418,7 +418,6 @@ class AstNode:
             AstNode.generateCode(left, parser)
 
             head.code = left.code + '\n'
-            # print('aaaaa', head.code)
 
         # ------------------------------------------------------------
 
@@ -463,7 +462,7 @@ class AstNode:
             AstNode.generateCode(statements, parser)
 
             head.code = "ifFalse " + head.value.value + " == " + constant[1] + " goto " + statements.next + \
-                statements.code + "\n" + "goto " + head.next + "\n" + statements.next + ":\n"
+                statements.code + "\n" + statements.next + ":\n"
 
         # ------------------------------------------------------------
 
@@ -954,7 +953,7 @@ class AstNode:
                 elif left.operator == Operator.A_FLOATCONST and left.value == "0.0":
                     head.code = temp_false
                 else:
-                    head.code = head.true
+                    head.code = 'goto ' + head.true
         # ---------------------------------------------------------------------------------
 
         elif head.operator == Operator.A_BREAK:
