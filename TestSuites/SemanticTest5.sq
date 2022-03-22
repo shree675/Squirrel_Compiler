@@ -10,7 +10,7 @@ void @start() {
         a=3;
         break;
 
-        default: 
+        default: int b;
     
     }
 }

@@ -829,7 +829,7 @@ if __name__ == '__main__':
     lex = lexer.Lexer()
     parser = Parser()
 
-    with open(os.path.join(TEST_SUITES_DIR, "SemanticTest6.sq"), 'r') as f:
+    with open(os.path.join(TEST_SUITES_DIR, "TypeCast2.sq"), 'r') as f:
         text = f.read()
 
     parser.parse(lex.tokenize(text))

@@ -1,36 +1,33 @@
 start:
 
-b = (int) 0
+a = (int) 3.6
+
+L10:
+b = (bool) false
 L8:
-c = (int) 0
+
+c = (float) 4.5
+
 L6:
-d = (int) 0
+
+t1 = (int) b
+t0 = a + t1
+
+tf0 = (float) t0
+c = tf0
+
 L4:
 
-if c == 0 goto L13
-t2 = 0
-goto L12
-L13:
+if a == 0 goto L14
+if a == 0 goto L14
 t2 = 1
-L12:
-if b == 0 goto L15
-if t2 == 0 goto L15
-t1 = 1
-goto L14
-L15:
-t1 = 0
+goto L13
 L14:
+t2 = 0
+L13:
 
-t3=d >= b
-if t1 != 0 goto L17
-if t3 != 0 goto L17
-t0 = 0
-goto L16
-L17:
-t0 = 1
-L16:
-
-a = (int) t0
+t3 = (int) t2
+a = t3
 
 L2:
 
