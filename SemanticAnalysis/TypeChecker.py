@@ -1,4 +1,4 @@
-from SyntaxAnalysis import AstNode
+from AstNode import AstNode
 import logging as logger
 logger.exception = logger.error
 

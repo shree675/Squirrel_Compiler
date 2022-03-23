@@ -1,9 +1,9 @@
 from sly import Parser as SlyParser
-from AstNode import Operator, AstNode
+from AstNode.AstNode import Operator, AstNode
 from SemanticAnalysis import TypeChecker
 from LexicalAnalysis import lexer
 import os
-import math
+import re
 import logging as logger
 logger.exception = logger.error
 
@@ -215,13 +215,21 @@ class Parser(SlyParser):
     def program(self, p):
         """Starting production, top of the parsing tree, calls the recursive generateCode() method"""
         root = AstNode(Operator.A_ROOT, left=p.methods)
+        root.output_file = self.output_file
         p.methods.parent = root
         # self.print_tree(root)
 
         # AstNode.generateCode(root, self.get_new_label,
         # self.get_new_temp, self.symbol_table)
 
-        AstNode.generateCode(root, self)
+        code = AstNode.generateCode(root, self)
+        output_path = self.output_file if os.getcwd().endswith(
+                "Squirrel_Compiler") else "../" + self.output_file
+        with open(output_path, "w") as f:
+            # format code
+            output = re.sub(r"\n{3,}", "\n\n", code, flags=re.DOTALL)
+            # print(output)
+            f.write(output)
         print(*self.symbol_table, sep="\n")
         print(*self.function_symbol_table, sep="\n")
 

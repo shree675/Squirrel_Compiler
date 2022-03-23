@@ -16,14 +16,27 @@ Commend to run the compiler
 python3 main.py [-flags] <filename1>.sq <filename2>.sq ... <filenameN>.sq """
 
 # think about what names to save output file with - lets go with <original filename>.asm or filename.s
+
+
+
+
 import sys
 from Preprocessing import preprocessor
+from LexicalAnalysis import lexer
+from SyntaxAnalysis import parser as Parser
 def compile(filename, optimization_level, save_preprocessed_file, save_intermediate_code):
     print("Compiling", filename, optimization_level)
-    with open("./TestSuites/" + filename, "r") as f:
+    with open(filename, "r") as f:
         inputFile = f.read()
     pre = preprocessor.Preprocessor()
-    pre.preprocess(filename, inputFile, save=save_preprocessed_file)
+    preprcessed_output = pre.preprocess(
+        filename, inputFile, save=save_preprocessed_file)
+
+    lex = lexer.Lexer()
+    tokens = lex.tokenize(preprcessed_output)
+    parser = Parser.Parser()
+    parser.output_file = "./Output/" + filename.split('.')[0].split("/")[-1] + '.sq'
+    parser.parse(tokens)
 
 
 def main(*argv):
