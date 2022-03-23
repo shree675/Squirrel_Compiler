@@ -125,6 +125,26 @@ class Parser(SlyParser):
         if len(matched) == 0:
             Parser.error(f"Semantic error : function call {function_name}({','.join(args_types)})"
                          + " doesn't match any of the defined function signatures.\n")
+    
+    def check_if_variable(self, varname):
+        i = -1
+        current_scope = self.scope_id_stack[i]
+
+        res = []
+        while current_scope >= 1 and len(res) == 0:
+
+            res = list(filter(
+                lambda item: item["scope"] == current_scope and item["identifier_name"] == varname,
+                self.symbol_table
+            ))
+
+            i -= 1
+            current_scope = self.scope_id_stack[i]
+
+        num_dimensions = len(res[0]["dimension"])
+        if num_dimensions != 0:
+            Parser.error(f"Semantic Error: \"{varname}\" is not an array variable.")
+
 
     def print_tree(self, root):
 
@@ -705,6 +725,7 @@ class Parser(SlyParser):
     @_('VARNAME')
     def expr(self, p):
         data_type = self.get_data_type(p.VARNAME)
+        self.check_if_variable(p.VARNAME)
         return AstNode(Operator.A_VARIABLE, value=p.VARNAME, data_type=data_type)
 
     @_('array_var_use')
@@ -751,6 +772,8 @@ class Parser(SlyParser):
         # return ["varname", str(p[0])]
 
         data_type = self.get_data_type(p.VARNAME)
+        self.check_if_variable(p.VARNAME)
+
         return AstNode(Operator.A_VARIABLE, value=p.VARNAME, data_type=data_type)
 
     @_('array_var_use')
@@ -852,7 +875,7 @@ if __name__ == '__main__':
     lex = lexer.Lexer()
     parser = Parser()
 
-    with open(os.path.join(TEST_SUITES_DIR, "SemanticTest1.sq"), 'r') as f:
+    with open(os.path.join(TEST_SUITES_DIR, "ArrayUseTest.sq"), 'r') as f:
         text = f.read()
 
     parser.parse(lex.tokenize(text))
