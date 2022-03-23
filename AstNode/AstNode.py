@@ -1030,13 +1030,13 @@ class AstNode:
 
             if (left != None and left.data_type != cur.value["return_type"]):
                 AstNode.raise_error(
-                    f'Semantic Error: return type of the function \"{cur.value["return_type"]}\" ' + \
-                     f'doesn\'t match with the datatype \"{left.data_type}\" of the returned value.\n')
+                    f'Semantic Error: return type of the function \"{cur.value["return_type"]}\" ' +
+                    f'doesn\'t match with the datatype \"{left.data_type}\" of the returned value.\n')
 
             elif(left == None and cur.value["return_type"] != "void"):
                 AstNode.raise_error(
-                    f'Semantic Error: return type of the function \"void\" ' + \
-                      f'doesn\'t match with the datatype \"{left.data_type}\" of the returned value.\n')
+                    f'Semantic Error: return type of the function \"void\" ' +
+                    f'doesn\'t match with the datatype \"{left.data_type}\" of the returned value.\n')
 
             if left:
                 AstNode.generateCode(left, parser)
@@ -1117,7 +1117,10 @@ class AstNode:
 
             left_value = head.left
 
-            if left_value.operator == Operator.A_VARIABLE:
+            # TODO: convert all lists to node
+            if type(left_value) == list:
+                head.code = f"output {left_value[0].value.split(' ')[0]}, {left_value[1]}\n"
+            elif left_value.operator == Operator.A_VARIABLE:
                 # print(left_value.value)
                 # data_type = parser.get_data_type(left_value.value)
                 head.code = f"output {left_value.data_type}, {left_value.value}\n"

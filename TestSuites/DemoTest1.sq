@@ -1,0 +1,16 @@
+
+
+void @start() {
+    int b = 5;
+    int c = 15;
+
+    int a = b+c;
+    float d = a*5;
+    char e = (char) 10;
+    
+    a = -a/(b+c)%6;
+}
+
+
+
+

@@ -1,0 +1,33 @@
+
+
+`` a macro definition ``
+replace size 4
+
+int @printResult(bool value){
+    if(!value){
+		output("It's not a palindrome");
+	}
+	else{
+		output("It's a palindrome");
+	}
+    return 0;
+}
+
+void @start(){
+	char array[size] = {'a', 'b', 'x', 'b'};
+	bool is_palindrome = true;
+    int i = is_palindrome || 0;
+    
+    input(i);
+	
+    int j = 3;
+	while(i<=j){
+		if(array[i] != array[j]){
+			is_palindrome = false;
+			continue;
+		}
+		i = i + 1;
+		j = j - 1;
+	}
+	printResult(is_palindrome);
+}

@@ -1,3 +1,4 @@
+import warnings
 from sly import Parser as SlyParser
 from AstNode.AstNode import Operator, AstNode
 from SemanticAnalysis import TypeChecker
@@ -6,7 +7,6 @@ import os
 import re
 import logging as logger
 logger.exception = logger.error
-import warnings
 warnings.filterwarnings("ignore")
 
 TEST_SUITES_DIR = os.path.join("..", "TestSuites") if os.getcwd().endswith(
@@ -112,7 +112,7 @@ class Parser(SlyParser):
             current_scope = self.scope_id_stack[i]
 
         if(len(res) == 1):
-            #print(res[0]["type"])
+            # print(res[0]["type"])
             return res[0]["type"]
         else:
             Parser.error(
@@ -180,7 +180,7 @@ class Parser(SlyParser):
             if curl == 0:
                 curl = nextl
                 nextl = 0
-                #print()
+                # print()
 
         print('\n--- End Tree -------------------------------\n')
 
@@ -226,7 +226,7 @@ class Parser(SlyParser):
 
         code = AstNode.generateCode(root, self)
         output_path = self.output_file if os.getcwd().endswith(
-                "Squirrel_Compiler") else "../" + self.output_file
+            "Squirrel_Compiler") else "../" + self.output_file
 
         with open(output_path, "w") as f:
             # format code
@@ -254,8 +254,8 @@ class Parser(SlyParser):
     @_('DATATYPE FUNCNAME LPAREN scope_open params RPAREN LBRACE statements RBRACE scope_close')
     def method(self, p):
         head = AstNode(Operator.A_FUNC, left=p.params, right=p.statements,
-                       next_label=self.get_new_label(), 
-                       value={"function_name" : p.FUNCNAME[1:], "return_type" : p.DATATYPE})
+                       next_label=self.get_new_label(),
+                       value={"function_name": p.FUNCNAME[1:], "return_type": p.DATATYPE})
 
         # no AstNode for params here
         p.statements.parent = head
@@ -637,7 +637,7 @@ class Parser(SlyParser):
 
     @_('OUTPUT LPAREN constant RPAREN')
     def output_statement(self, p):
-        return str(p[0]+p[1]+p[2]+p[3])
+        return AstNode(Operator.A_OUTPUT, left=p.constant)
 
     # jump_statement -> BREAK | return_statement
     @_('BREAK')
@@ -718,7 +718,7 @@ class Parser(SlyParser):
 
     @_('expr AND expr')
     def expr(self, p):
-        #print('first',p.expr0.data_type,'second',p.expr1.data_type)
+        # print('first',p.expr0.data_type,'second',p.expr1.data_type)
         data_type = self.type_checker.return_datatype(
             left_type=p.expr0.data_type, right_type=p.expr1.data_type, operator=Operator.A_AND)
         return AstNode(Operator.A_AND, left=p.expr0, right=p.expr1, data_type=data_type)
@@ -756,8 +756,9 @@ class Parser(SlyParser):
     # expr -> (DATATYPE) expr#
     @_('LPAREN DATATYPE RPAREN expr %prec TYPECASTING')
     def expr(self, p):
-        data_type = self.type_checker.return_datatype(left_type = p.DATATYPE, right_type = p.expr.data_type, operator=Operator.A_TYPECAST)
-        return AstNode(Operator.A_TYPECAST, left=p.DATATYPE, right=p.expr, data_type = data_type)
+        data_type = self.type_checker.return_datatype(
+            left_type=p.DATATYPE, right_type=p.expr.data_type, operator=Operator.A_TYPECAST)
+        return AstNode(Operator.A_TYPECAST, left=p.DATATYPE, right=p.expr, data_type=data_type)
 
     # assignment_statement -> left_value = expr
     @_('left_value ASSIGN expr')

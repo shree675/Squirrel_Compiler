@@ -1,0 +1,21 @@
+
+
+void @start(){
+    int var1;
+    int var2;
+
+    switch(var1){
+        case (20): switch(var2){
+                        case (50): int n;
+
+                        default: int a;
+                    }
+                    break;
+
+        case (4): char myChar;
+                  myChar = 'v';
+                  break;
+
+        default: output(var1);
+    }
+}
