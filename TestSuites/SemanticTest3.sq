@@ -4,7 +4,8 @@ void @start() {
     a[1][1] = 2;
     int g = a[1][1];
     int i;
-    i=a;
+    i=a[i][i];
+    ``a[i][i]=3;``
 
     ``a[0.4] = 1;``
     ``float t = 1;
