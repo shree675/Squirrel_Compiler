@@ -1,5 +1,6 @@
 int @abc(){
     int a[2]={0,1};
+    return 5.6;
 }
 
 int @start(){

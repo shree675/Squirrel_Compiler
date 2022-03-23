@@ -112,7 +112,7 @@ class Parser(SlyParser):
             current_scope = self.scope_id_stack[i]
 
         if(len(res) == 1):
-            print(res[0]["type"])
+            #print(res[0]["type"])
             return res[0]["type"]
         else:
             Parser.error(
@@ -150,7 +150,7 @@ class Parser(SlyParser):
 
     def print_tree(self, root):
 
-        print('\n--- Tree -------------------------------')
+        #print('\n--- Tree -------------------------------')
 
         q = [root]
         curl = 1
@@ -180,7 +180,7 @@ class Parser(SlyParser):
             if curl == 0:
                 curl = nextl
                 nextl = 0
-                print()
+                #print()
 
         print('\n--- End Tree -------------------------------\n')
 
@@ -228,14 +228,13 @@ class Parser(SlyParser):
         output_path = self.output_file if os.getcwd().endswith(
                 "Squirrel_Compiler") else "../" + self.output_file
 
-        print('out_put file', output_path)
         with open(output_path, "w") as f:
             # format code
             output = re.sub(r"\n{3,}", "\n\n", code, flags=re.DOTALL)
             # print(output)
             f.write(output)
-        print(*self.symbol_table, sep="\n")
-        print(*self.function_symbol_table, sep="\n")
+        #print(*self.symbol_table, sep="\n")
+        #print(*self.function_symbol_table, sep="\n")
 
     # methods -> methods method
     @_('methods method')
@@ -269,7 +268,6 @@ class Parser(SlyParser):
     # params -> DATATYPE VARNAME COMMA params | e
     # params -> params_rec | e
     # params_rec -> DATATYPE VARNAME COMMA params_rec | DATATYPE VARNAME
-    # TODO: Semantic checks for functions
 
     @_('params_rec')
     def params(self, p):
@@ -454,7 +452,7 @@ class Parser(SlyParser):
     # array_variable -> VARNAME [expr]
     @_("VARNAME LSQB expr RSQB")
     def array_var_use(self, p):
-        print("Array expr type", p.expr.value, p.expr.data_type)
+        #print("Array expr type", p.expr.value, p.expr.data_type)
 
         i = -1
         current_scope = self.scope_id_stack[i]
@@ -590,7 +588,7 @@ class Parser(SlyParser):
     # case_statement -> CASE ( constant ) COLON statements
     @_('CASE LPAREN constant RPAREN COLON scope_open statements scope_close')
     def case_statement(self, p):
-        print("P constant", p.constant[0])
+        #print("P constant", p.constant[0])
         if p.constant[0] != Operator.A_INTCONST and p.constant[0] != Operator.A_CHARCONST:
             Parser.error("Case statement variable must be of type int or char")
         head = AstNode(Operator.A_CASESINGLE,
@@ -696,7 +694,7 @@ class Parser(SlyParser):
 
     @_('MINUS expr %prec UMINUS')
     def expr(self, p):
-        print("UNary check")
+        #print("UNary check")
 
         data_type = self.type_checker.return_datatype(
             left_type=p.expr.data_type, operator=Operator.A_NEGATE)
@@ -720,7 +718,7 @@ class Parser(SlyParser):
 
     @_('expr AND expr')
     def expr(self, p):
-        print('first',p.expr0.data_type,'second',p.expr1.data_type)
+        #print('first',p.expr0.data_type,'second',p.expr1.data_type)
         data_type = self.type_checker.return_datatype(
             left_type=p.expr0.data_type, right_type=p.expr1.data_type, operator=Operator.A_AND)
         return AstNode(Operator.A_AND, left=p.expr0, right=p.expr1, data_type=data_type)
@@ -758,37 +756,17 @@ class Parser(SlyParser):
     # expr -> (DATATYPE) expr#
     @_('LPAREN DATATYPE RPAREN expr %prec TYPECASTING')
     def expr(self, p):
-        # TODO: check if DATATYPE and expr is compatible
-        print("***", p.expr.data_type)
-        print(p.DATATYPE)
         data_type = self.type_checker.return_datatype(left_type = p.DATATYPE, right_type = p.expr.data_type, operator=Operator.A_TYPECAST)
         return AstNode(Operator.A_TYPECAST, left=p.DATATYPE, right=p.expr, data_type = data_type)
 
     # assignment_statement -> left_value = expr
     @_('left_value ASSIGN expr')
     def assignment_statement(self, p):
-
-        # TODO: Add code for implicit/explicit casting in Ast Node
-        # What is this and why is it a list?
-        # if type(p.left_value) == list:
-        #     # self.type_checker.check_datatype(left_type=p.left_value[1].data_type,right_type=p.expr.data_type)
-        #     print("left_value datatype", p.left_value[1].data_type)
-        #     return AstNode(Operator.A_ASSIGN_STMT, left=p.left_value[1], right=p.expr)
-        # else:
-        #     # self.type_checker.check_datatype(left_type=p.left_value.data_type,right_type=p.expr.data_type)
         return AstNode(Operator.A_ASSIGN_STMT, left=p.left_value, right=p.expr, data_type=p.left_value.data_type)
 
     # left_value -> VARNAME | array_variable
     @_('VARNAME')
     def left_value(self, p):
-        """ Can we create a node for this as well? 
-
-        data_type = self.get_data_type(p.VARNAME)
-        return AstNode(Operator.A_VARIABLE, value=p.VARNAME, data_type=data_type)
-
-        """
-        # return ["varname", str(p[0])]
-
         data_type = self.get_data_type(p.VARNAME)
         self.check_if_variable(p.VARNAME)
 

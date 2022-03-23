@@ -25,7 +25,8 @@ from Preprocessing import preprocessor
 from LexicalAnalysis import lexer
 from SyntaxAnalysis import parser as Parser
 def compile(filename, optimization_level, save_preprocessed_file, save_intermediate_code):
-    print("Compiling", filename, optimization_level)
+    print(
+        f"Compiling {filename} (with optimization level: {optimization_level})")
     with open(filename, "r") as f:
         inputFile = f.read()
     pre = preprocessor.Preprocessor()
@@ -36,8 +37,9 @@ def compile(filename, optimization_level, save_preprocessed_file, save_intermedi
     tokens = lex.tokenize(preprcessed_output)
     parser = Parser.Parser()
     if save_intermediate_code:
-        parser.output_file = "./Output/" + filename.split("/")[-1].replace(".sq", ".tac")
-    #print(filename)
+        parser.output_file = "./Output/" + \
+            filename.split("/")[-1].replace(".sq", ".tac")
+    # print(filename)
     #print('parser output', parser.output_file)
     parser.parse(tokens)
 

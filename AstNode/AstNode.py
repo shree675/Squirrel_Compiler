@@ -82,12 +82,12 @@ class Operator(Enum):
 #typeChecker = TypeChecker.TypeChecker()
 
 default_values = {
-    "int" : "0",
-    "float" : "0.0",
-    "char" : "\'\0\'",
-    "string" : "\"\"",
-    "bool" : "false",
-    "void" : ""
+    "int": "0",
+    "float": "0.0",
+    "char": "\'\0\'",
+    "string": "\"\"",
+    "bool": "false",
+    "void": ""
 }
 
 
@@ -137,15 +137,6 @@ class AstNode:
             # head.code = left.code + '\n' + left.next + ':\n'
             head.code = left.code
 
-            # TODO: place this output file in the Output folder and rename the file
-            # output_path = self.output_file if os.getcwd().endswith(
-            #     "Squirrel_Compiler") else "../" + self.output_file
-            # with open(output_path, "w") as f:
-            #     # format code
-            #     output = re.sub(r"\n{3,}", "\n\n", head.code, flags=re.DOTALL)
-            #     # print(output)
-            #     f.write(output)
-
             return head.code
 
         # --------------------------------------------------
@@ -183,13 +174,12 @@ class AstNode:
 
             # head.code = statements.code + "\n" + head.next + ":\n" + "return\n"
 
-            head.code = function_name + ":\n" + statements.code + "\n" + f'return {default_values[head.value["return_type"]]}' + "\n"
+            head.code = function_name + ":\n" + statements.code + "\n" + \
+                f'return {default_values[head.value["return_type"]]}' + "\n"
 
         # ------------------------------------------------------------
 
         elif head.operator == Operator.A_AND:
-            # TODO: Ask Kranthi about this and add TAC for type casting
-
             left, right = head.left, head.right
             true, false = head.true, head.false
 
@@ -204,7 +194,7 @@ class AstNode:
                 head.code = left.code + '\n' + right.code
                 label1 = parser.get_new_label()
                 label2 = parser.get_new_label()
-                print(left.data_type, right.data_type, head.data_type)
+                # print(left.data_type, right.data_type, head.data_type)
                 typecast_variable_left = left.value
                 typecast_variable_right = right.value
                 if left.data_type != 'int':
@@ -213,7 +203,7 @@ class AstNode:
                 if right.data_type != 'int':
                     typecast_variable_right = parser.get_new_temp("int")
                     head.code += f"{typecast_variable_right} = (int){right.value}\n"
-                    
+
                 head.code += f"if {typecast_variable_left} == 0 goto {label2}\n"
                 head.code += f"if {typecast_variable_right} == 0 goto {label2}\n"
                 head.code += f"{head.value} = true\n"
@@ -245,8 +235,6 @@ class AstNode:
         # ------------------------------------------------------------
 
         elif head.operator == Operator.A_OR:
-            # TODO: Ask Kranthi aboutthis and add TAC for type casting
-
             left, right = head.left, head.right
             true, false = head.true, head.false
 
@@ -314,7 +302,6 @@ class AstNode:
             if head.true == None or head.false == None:
                 temp = parser.get_new_temp("bool")
                 # head.code += f"{temp} = {left.value} {relop} {right.value}"
-                
 
                 if left_type == 'int' and right_type == 'int':
                     head.code += f"{temp} = {left.value} {relop} {right.value}\n"
@@ -469,7 +456,7 @@ class AstNode:
 
         elif head.operator == Operator.A_SWITCHPARENT or head.operator == Operator.A_IFPARENT or head.operator == Operator.A_FORPARENT:
 
-            print(head.operator.value + " ?")
+            # print(head.operator.value + " ?")
             left = head.left
 
             head.next = parser.get_new_label()
@@ -488,7 +475,7 @@ class AstNode:
             head.value = left
             right.value = head.value
             right.next = head.next
-            print('a_switch', right.next)
+            # print('a_switch', right.next)
 
             AstNode.generateCode(right, parser)
 
@@ -777,10 +764,11 @@ class AstNode:
             while cur.operator == Operator.A_ARR_EXPR_REC:
                 num_dimensions -= 1
                 cur = cur.left
-            
+
             if num_dimensions != 0:
-                AstNode.raise_error(f'Semantic Error: Inappropriate usage of the array variable \"{array_variable.value["varname"]}\".')
-                
+                AstNode.raise_error(
+                    f'Semantic Error: Inappropriate usage of the array variable \"{array_variable.value["varname"]}\".')
+
             # temp = parser.get_new_temp(data_type)
             temp = parser.get_new_temp("int")
 
@@ -815,7 +803,6 @@ class AstNode:
 
                 # temp = parser.get_new_temp(head.data_type)
                 temp = parser.get_new_temp("int")
-                # TODO : check if this is fine
                 # head.value["val"] = parser.get_new_temp(head.data_type)
                 head.value["val"] = parser.get_new_temp("int")
 
@@ -847,8 +834,8 @@ class AstNode:
                 ))
                 i = index
                 dimension = 1
-                print("i", index)
-                print(variable[0]["dimension"])
+                # print("i", index)
+                # print(variable[0]["dimension"])
                 for j in range(i, len(variable[0]["dimension"])):
                     dimension *= variable[0]["dimension"][j]
 
@@ -861,8 +848,6 @@ class AstNode:
         # --------------------------------------------------------------------
 
         elif head.operator == Operator.A_ASSIGN_STMT:
-            # TODO: Test this
-
             left_value, expr = head.left, head.right
 
             AstNode.generateCode(left_value, parser)
@@ -900,7 +885,6 @@ class AstNode:
             # to distinguish between init and declaration
             if head.right is not None:
                 # initialization
-                # TODO: check if the type of right side matches left and perform appropriate implicit cast
                 right = head.right
 
                 AstNode.generateCode(right, parser)
@@ -955,7 +939,6 @@ class AstNode:
 
         elif head.operator == Operator.A_ARR_LITERAL:
 
-            # TODO: Check for need of type casting here
             left, right = head.left, head.right
 
             if right == None:
@@ -996,16 +979,9 @@ class AstNode:
         elif head.operator == Operator.A_BOOL:
 
             left = head.left
-            print('unique here', left.value)
+            # print('unique here', left.value)
 
             AstNode.generateCode(left, parser)
-            # TODO: I dont think is required - follow the type checking rules of NOT AND OR
-            # left variable type is assumed to be "int" or "float"
-            # for other types we need to generate code accordingly after semantic analysis
-            # for bool : a == true
-            # for char : a != '\0'
-            # for string : a != ""
-
             temp_false = "" if head.false is None else "\ngoto " + head.false
             temp_true = "" if head.true is None else "\ngoto " + head.true
 
@@ -1013,8 +989,7 @@ class AstNode:
                     left.operator == Operator.A_MULTIPLY or left.operator == Operator.A_DIVIDE or \
                     left.operator == Operator.A_MODULO:
 
-                # TODO: Why is left.code empty here?
-                print("left.code", left.value is None)
+                # print("left.code", left.value is one)
                 head.code = left.code + "\n" + "if " + left.value + \
                     " " + "!=" + " 0 goto " + head.true + temp_false
 
@@ -1048,6 +1023,20 @@ class AstNode:
         elif head.operator == Operator.A_RETURN:
 
             left = head.left
+
+            cur = head
+            while cur.operator != Operator.A_FUNC:
+                cur = cur.parent
+
+            if (left != None and left.data_type != cur.value["return_type"]):
+                AstNode.raise_error(
+                    f'Semantic Error: return type of the function \"{cur.value["return_type"]}\" ' + \
+                     f'doesn\'t match with the datatype \"{left.data_type}\" of the returned value.\n')
+
+            elif(left == None and cur.value["return_type"] != "void"):
+                AstNode.raise_error(
+                    f'Semantic Error: return type of the function \"void\" ' + \
+                      f'doesn\'t match with the datatype \"{left.data_type}\" of the returned value.\n')
 
             if left:
                 AstNode.generateCode(left, parser)
