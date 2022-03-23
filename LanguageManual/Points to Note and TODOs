@@ -58,6 +58,8 @@ Kranthi 13. Stitching together parser with preprocessor - run from main method 1
 
 20. Should we change the way we represent string variables in TAC?
 
+21. Semantic check for the return statements - are we returning the right type - Aashrith
+
 Wednesday, March 23rd, 2022
 
 Friday Presentation:

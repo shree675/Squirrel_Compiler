@@ -81,6 +81,15 @@ class Operator(Enum):
 
 #typeChecker = TypeChecker.TypeChecker()
 
+default_values = {
+    "int" : "0",
+    "float" : "0.0",
+    "char" : "\'\0\'",
+    "string" : "\"\"",
+    "bool" : "false",
+    "void" : ""
+}
+
 
 class AstNode:
     '''
@@ -168,12 +177,13 @@ class AstNode:
         elif head.operator == Operator.A_FUNC:
             params, statements = head.left, head.right
             # function_name is same as the label
-            function_name = head.value
+            function_name = head.value["function_name"]
 
             AstNode.generateCode(statements, parser)
 
             # head.code = statements.code + "\n" + head.next + ":\n" + "return\n"
-            head.code = function_name + ":\n" + statements.code + "\n"
+
+            head.code = function_name + ":\n" + statements.code + "\n" + f'return {default_values[head.value["return_type"]]}' + "\n"
 
         # ------------------------------------------------------------
 
