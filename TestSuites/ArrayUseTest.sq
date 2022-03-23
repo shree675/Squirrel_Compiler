@@ -18,7 +18,7 @@ void @start() {
     int c=18;
 
     float floatArray[2][3] = {1.1, 2.2, 3.3, 4.4, 5.5, 6.6};
-    floatArray[a+b][j] = 7.7;
+    floatArray = 7.7;
 
     a=floatArray[i][j];
 }

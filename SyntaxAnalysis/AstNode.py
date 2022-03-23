@@ -711,7 +711,16 @@ class AstNode:
                 parser.symbol_table
             ))
             data_type = variable[0]["type"]
+            num_dimensions = len(variable[0]["dimension"])
 
+            cur = array_variable
+            while cur.operator == Operator.A_ARR_EXPR_REC:
+                num_dimensions -= 1
+                cur = cur.left
+            
+            if num_dimensions != 0:
+                AstNode.raise_error(f'Semantic Error: Inappropriate usage of the array variable \"{array_variable.value["varname"]}\".')
+                
             # temp = parser.get_new_temp(data_type)
             temp = parser.get_new_temp("int")
 
