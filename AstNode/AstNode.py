@@ -138,13 +138,15 @@ class AstNode:
             head.code = left.code
 
             # TODO: place this output file in the Output folder and rename the file
-            output_path = "Output/output.tac" if os.getcwd().endswith(
-                "Squirrel_Compiler") else "../Output/output.tac"
-            with open(output_path, "w") as f:
-                # format code
-                output = re.sub(r"\n{3,}", "\n\n", head.code, flags=re.DOTALL)
-                # print(output)
-                f.write(output)
+            # output_path = self.output_file if os.getcwd().endswith(
+            #     "Squirrel_Compiler") else "../" + self.output_file
+            # with open(output_path, "w") as f:
+            #     # format code
+            #     output = re.sub(r"\n{3,}", "\n\n", head.code, flags=re.DOTALL)
+            #     # print(output)
+            #     f.write(output)
+
+            return head.code
 
         # --------------------------------------------------
 
