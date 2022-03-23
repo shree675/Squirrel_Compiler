@@ -243,7 +243,9 @@ class Parser(SlyParser):
     @_('DATATYPE FUNCNAME LPAREN scope_open params RPAREN LBRACE statements RBRACE scope_close')
     def method(self, p):
         head = AstNode(Operator.A_FUNC, left=p.params, right=p.statements,
-                       next_label=self.get_new_label(), value=p.FUNCNAME[1:])
+                       next_label=self.get_new_label(), 
+                       value={"function_name" : p.FUNCNAME[1:], "return_type" : p.DATATYPE})
+
         # no AstNode for params here
         p.statements.parent = head
 
