@@ -144,7 +144,7 @@ class Parser(SlyParser):
         num_dimensions = len(res[0]["dimension"])
         if num_dimensions != 0:
             Parser.error(
-                f"Semantic Error: \"{varname}\" is not an array variable.")
+                f"Semantic Error: \"{varname}\" is an array variable.")
 
     def print_tree(self, root):
 
