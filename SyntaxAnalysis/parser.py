@@ -125,7 +125,7 @@ class Parser(SlyParser):
         if len(matched) == 0:
             Parser.error(f"Semantic error : function call {function_name}({','.join(args_types)})"
                          + " doesn't match any of the defined function signatures.\n")
-    
+
     def check_if_variable(self, varname):
         i = -1
         current_scope = self.scope_id_stack[i]
@@ -143,8 +143,8 @@ class Parser(SlyParser):
 
         num_dimensions = len(res[0]["dimension"])
         if num_dimensions != 0:
-            Parser.error(f"Semantic Error: \"{varname}\" is not an array variable.")
-
+            Parser.error(
+                f"Semantic Error: \"{varname}\" is an array variable.")
 
     def print_tree(self, root):
 
@@ -883,7 +883,7 @@ if __name__ == '__main__':
     lex = lexer.Lexer()
     parser = Parser()
 
-    with open(os.path.join(TEST_SUITES_DIR, "ArrayUseTest.sq"), 'r') as f:
+    with open(os.path.join(TEST_SUITES_DIR, "ScopeTest.sq"), 'r') as f:
         text = f.read()
 
     parser.parse(lex.tokenize(text))
