@@ -24,7 +24,7 @@ class Preprocessor():
             if re.match("import", line):
                 tokens = line.split(" ")
                 #print(tokens)
-                import_file_name = tokens[3]
+                import_file_name = tokens[3][1:-1]
                 function_name = tokens[1]
                 #print("importing file", import_file_name)
                 try:

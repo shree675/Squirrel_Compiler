@@ -1,0 +1,5 @@
+void @start() {
+    ``int if = 4;``
+    float q = (int) 9.8; 
+
+}

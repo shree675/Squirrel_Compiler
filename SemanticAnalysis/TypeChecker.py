@@ -58,8 +58,8 @@ class TypeChecker:
             print("float const")
             return 'float'
         elif operator.value == Operator.A_STRINGCONST.value:
-            print("str const")
-            return 'str'
+            print("string const")
+            return 'string'
         elif operator.value == Operator.A_BOOLCONST.value:
             print("bool const")
             return 'bool'
@@ -73,7 +73,7 @@ class TypeChecker:
                 return 'int'
             elif left_type == 'float':
                 return 'float'
-            elif left_type == 'str':
+            elif left_type == 'string':
                 print("This is the operator", operator)
                 TypeChecker.raise_error(left_type, operator)
             elif left_type == 'bool':
@@ -91,7 +91,7 @@ class TypeChecker:
                 # TODO: Modify the symbol table here maybe?
                 return 'bool'
            
-            elif left_type == 'str':
+            elif left_type == 'string':
                 TypeChecker.raise_error(left_type, operator)
                 
             elif left_type == 'bool':
@@ -99,8 +99,8 @@ class TypeChecker:
             
         #------------------------------Binary Operators----------------------------------
         elif operator.value == Operator.A_PLUS.value or operator.value == Operator.A_MINUS.value or operator.value == Operator.A_MULTIPLY.value or operator.value == Operator.A_DIVIDE.value:
-            if left_type == 'str' or right_type == 'str':
-                raise_error('str', operator)
+            if left_type == 'string' or right_type == 'string':
+                TypeChecker.raise_error('string', operator)
             elif left_type == 'int' and right_type == 'int':
                 return 'int'
             elif left_type == 'float' and right_type == 'float':
@@ -116,8 +116,8 @@ class TypeChecker:
         elif operator.value == Operator.A_MODULO.value:
             if left_type == 'int' and right_type == 'int':
                 return 'int'
-            elif left_type == 'float' or right_type == 'float' or left_type == 'str' or right_type == 'str':
-                raise_error(left_type, operator)
+            elif left_type == 'float' or right_type == 'float' or left_type == 'string' or right_type == 'string':
+                TypeChecker.raise_error(left_type, operator)
             else:
                 print("Implicitly casting to int")
                 # TODO: Modify the symbol table here maybe?
@@ -127,8 +127,8 @@ class TypeChecker:
                 return 'bool'
             elif left_type == 'float' and right_type == 'float':
                 return 'bool'
-            elif left_type == 'str' or right_type == 'str':
-                raise_error(left_type, operator)
+            elif left_type == 'string' or right_type == 'string':
+                TypeChecker.raise_error(left_type, operator)
             elif left_type == 'float' or right_type == 'float':
                 print("Implicitly casting to float")
                 # TODO: Modify the symbol table here maybe?
@@ -141,12 +141,16 @@ class TypeChecker:
         elif operator.value == Operator.A_AND.value or operator.value == Operator.A_OR.value:
             if left_type == 'bool' and right_type == 'bool':
                 return 'bool'
-            elif left_type == 'str' or right_type == 'str':
-                raise_error(left_type, operator) #change error
+            elif left_type == 'string' or right_type == 'string':
+                TypeChecker.raise_error(data_type1 = left_type, operator = operator, data_type2 = right_type)
             else:
                 print("Implicitly casting to bool")
                 # TODO: Modify the symbol table here maybe?
                 return 'bool'
+        elif operator.value == Operator.A_TYPECAST.value:
+            print("Typecast check")
+            if left_type == 'string' or right_type == 'string':
+                TypeChecker.raise_error(data_type1='string',condition_type='bool or char or int or float', operator=operator)
        
         return 'fuzzy'
 
@@ -163,8 +167,8 @@ class TypeChecker:
             print("bool condition check")
             if expr_type == 'bool':
                 return
-            if expr_type == 'str':
-                TypeChecker.raise_error(data_type1='str',condition_type='bool or char or int', operator=operator)
+            if expr_type == 'string':
+                TypeChecker.raise_error(data_type1='string',condition_type='bool or char or int', operator=operator)
             if expr_type == 'int' or expr_type == 'char' or expr_type == 'float':
                 print("Implicitly casting to bool")
                 # TODO: Modify the symbol table here maybe?  
@@ -173,7 +177,8 @@ class TypeChecker:
             if expr_type == 'int':
                 return
             else:
-                TypeChecker.raise_error(data_type1=expr_type,condition_type='int', operator=operator)       
+                TypeChecker.raise_error(data_type1=expr_type,condition_type='int', operator=operator) 
+           
 
         return
     

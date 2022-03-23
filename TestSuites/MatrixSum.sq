@@ -1,11 +1,14 @@
 ``math.acorn is a library that provides
 useful functions like sum, min, max and many more``
+
 import intSum from <math.acorn>
 
-void @start{
+void @start(){
+	int a = -1;
+	int b = 2;
 	int x=a-b;
-	float[2][2] mat1 = {-1, 2.5, 0, 6.14};
-	float[][2] mat2 = {-6.241, 0, 4.5, 6.22};	a 2x2 array
+	float mat1[2][2] = {1, 2.5, 0, 6.14};
+	float mat2[2][2] = {6.241, 0, 4.5, 6.22};	``a 2x2 array``
 	int i;
 	int j;
 	for(i=0;i<2;i=i+1){

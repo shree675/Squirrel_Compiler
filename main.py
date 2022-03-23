@@ -12,7 +12,7 @@ Flags:
 5. -O3 : To optimize compilation on level 3 (default)"""
 
 """ 
-Commend to run the compiler
+Command to run the compiler
 python3 main.py [-flags] <filename1>.sq <filename2>.sq ... <filenameN>.sq """
 
 # think about what names to save output file with - lets go with <original filename>.asm or filename.s
@@ -35,7 +35,10 @@ def compile(filename, optimization_level, save_preprocessed_file, save_intermedi
     lex = lexer.Lexer()
     tokens = lex.tokenize(preprcessed_output)
     parser = Parser.Parser()
-    parser.output_file = "./Output/" + filename.split('.')[0].split("/")[-1] + '.sq'
+    if save_intermediate_code:
+        parser.output_file = "./Output/" + filename.split("/")[-1].replace(".sq", ".tac")
+    #print(filename)
+    #print('parser output', parser.output_file)
     parser.parse(tokens)
 
 

@@ -1,16 +1,14 @@
-1. Semantic analysis for FUNCTION CALLS - no.of args, type of args,
-   type of return value.
-
-   - When a function is defined, check for unique name and signature combination
+✓ 1. Semantic analysis for FUNCTION CALLS - no.of args, type of args,
+   - When a function is defined, check for unique name and signature combination. 
 
 ✓ 2. error in testcase: string f3 = -"hello";
 Probably unary operator in declaration is not working
 
-3. What do we do about all the warnings? - Kranthi (later)
+3. What do we do about all the warnings? - Kranthi (later) - need to find a sly command to disable the warnings
 
 ✓ 4. jump statements - shreetesh (check)
 
-5. Explicit and implicit type casting TAC? - most probabply done
+✓ 5. Explicit and implicit type casting TAC? - most probably done
 
 ✓ 6. Not able to do semantic analysis for for loop until the get_datatype method of the symbol table is implemented correctly - breaks in case of for loop
 
@@ -23,7 +21,7 @@ we have to declare/define the function before use
 
 9. Semantic analysis for function definitions : check the return type
    and check if the value of the same type is being returned in the
-   function body. (check inside if, else, etc.)
+   function body. (check inside if, else, etc.) - Aashrith
 
 10. Look into the possibility of creating a control flow graph for
     semantic checks and optimizations - this is a very important - how to make this -
@@ -31,17 +29,15 @@ we have to declare/define the function before use
 
 ✓ 11. Labels issue - some repeated labels and some are missing - Shreetesh, Kranthi - tomorrow
 
-12. just add an implicit return in case user missed it, no need for the semantic check - Aashrith
+✓ 12. just add an implicit return in case user missed it, no need for the semantic check - Aashrith
 
 13. Dynamically create the instance variables in the AstNodes
 
-14. Semantic checks for explicit casts that are not allowed
+14. Semantic checks for explicit casts that are not allowed - Debeshee
 
 ✓ Aashrith - refactor generatecode method - passing parser instead of individual methods
 
-comparing enum - Operator.value instead of Operator
-
-16. Semantic check for trying to use array variables inappropriately - eg. a[2] = {5,2};
+✓ 16. Semantic check for trying to use array variables inappropriately - eg. a[2] = {5,2};
     a = 2; // should give an error
 
 17. Can we return AstNodes everywhere? - it will make life peaceful
@@ -50,15 +46,28 @@ comparing enum - Operator.value instead of Operator
 
 Kranthi 13. Stitching together parser with preprocessor - run from main method 14. test recursion - and all test cases
 ✓ 15. output.tac file, move it to output folder
-✓ 16. formatting the TAC file - write a post processing method to clean up the TAC 17. @captnTardigrade: Can we remove empty labels without messing up anything in the TAC - while post processing the TAC?
+✓ 16. formatting the TAC file - write a post processing method to clean up the TAC 
 
-18. TAC for input() and output()
+19. @captnTardigrade: Can we remove empty labels without messing up anything in the TAC - while post processing the TAC?
 
-19. for "@sum", what is the function name?
+✓ 18. TAC for input() and output()
+
+✓ 19. for "@sum", what is the function name?
 
 20. Should we change the way we represent string variables in TAC?
 
-21. Semantic check for the return statements - are we returning the right type - Aashrith
+✓ 21. Type casting in assignment of AND OR NOT 
+
+22. Negative numbers not working in INTVAL in arrays. - Shreetesh
+
+23. comparing enum - Operator.value instead of Operator
+--------------------------------------------------------------------------------------------------------------------
+Learnings:
+@captnTardigrade:
+
+Cherry-picked test cases:
+@Shreetesh
+
 
 Wednesday, March 23rd, 2022
 

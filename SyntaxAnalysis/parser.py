@@ -6,6 +6,8 @@ import os
 import re
 import logging as logger
 logger.exception = logger.error
+import warnings
+warnings.filterwarnings("ignore")
 
 TEST_SUITES_DIR = os.path.join("..", "TestSuites") if os.getcwd().endswith(
     "SyntaxAnalysis") else os.path.join("TestSuites")
@@ -225,6 +227,8 @@ class Parser(SlyParser):
         code = AstNode.generateCode(root, self)
         output_path = self.output_file if os.getcwd().endswith(
                 "Squirrel_Compiler") else "../" + self.output_file
+
+        print('out_put file', output_path)
         with open(output_path, "w") as f:
             # format code
             output = re.sub(r"\n{3,}", "\n\n", code, flags=re.DOTALL)
@@ -716,6 +720,7 @@ class Parser(SlyParser):
 
     @_('expr AND expr')
     def expr(self, p):
+        print('first',p.expr0.data_type,'second',p.expr1.data_type)
         data_type = self.type_checker.return_datatype(
             left_type=p.expr0.data_type, right_type=p.expr1.data_type, operator=Operator.A_AND)
         return AstNode(Operator.A_AND, left=p.expr0, right=p.expr1, data_type=data_type)
@@ -754,7 +759,10 @@ class Parser(SlyParser):
     @_('LPAREN DATATYPE RPAREN expr %prec TYPECASTING')
     def expr(self, p):
         # TODO: check if DATATYPE and expr is compatible
-        return AstNode(Operator.A_TYPECAST, left=p.DATATYPE, right=p.expr)
+        print("***", p.expr.data_type)
+        print(p.DATATYPE)
+        data_type = self.type_checker.return_datatype(left_type = p.DATATYPE, right_type = p.expr.data_type, operator=Operator.A_TYPECAST)
+        return AstNode(Operator.A_TYPECAST, left=p.DATATYPE, right=p.expr, data_type = data_type)
 
     # assignment_statement -> left_value = expr
     @_('left_value ASSIGN expr')

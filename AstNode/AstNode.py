@@ -204,12 +204,22 @@ class AstNode:
                 head.code = left.code + '\n' + right.code
                 label1 = parser.get_new_label()
                 label2 = parser.get_new_label()
-                head.code += f"if {left.value} == 0 goto {label2}\n"
-                head.code += f"if {right.value} == 0 goto {label2}\n"
-                head.code += f"{head.value} = 1\n"
+                print(left.data_type, right.data_type, head.data_type)
+                typecast_variable_left = left.value
+                typecast_variable_right = right.value
+                if left.data_type != 'int':
+                    typecast_variable_left = parser.get_new_temp("int")
+                    head.code += f"{typecast_variable_left} = (int){left.value}\n"
+                if right.data_type != 'int':
+                    typecast_variable_right = parser.get_new_temp("int")
+                    head.code += f"{typecast_variable_right} = (int){right.value}\n"
+                    
+                head.code += f"if {typecast_variable_left} == 0 goto {label2}\n"
+                head.code += f"if {typecast_variable_right} == 0 goto {label2}\n"
+                head.code += f"{head.value} = true\n"
                 head.code += f"goto {label1}\n"
                 head.code += f"{label2}:\n"
-                head.code += f"{head.value} = 0\n"
+                head.code += f"{head.value} = false\n"
                 head.code += f"{label1}:\n"
                 return
 
@@ -251,12 +261,20 @@ class AstNode:
                 head.code = left.code + '\n' + right.code + "\n"
                 label1 = parser.get_new_label()
                 label2 = parser.get_new_label()
-                head.code += f"if {left.value} != 0 goto {label2}\n"
-                head.code += f"if {right.value} != 0 goto {label2}\n"
-                head.code += f"{head.value} = 0\n"
+                typecast_variable_left = left.value
+                typecast_variable_right = right.value
+                if left.data_type != 'int':
+                    typecast_variable_left = parser.get_new_temp("int")
+                    head.code += f"{typecast_variable_left} = (int){left.value}\n"
+                if right.data_type != 'int':
+                    typecast_variable_right = parser.get_new_temp("int")
+                    head.code += f"{typecast_variable_right} = (int){right.value}\n"
+                head.code += f"if {typecast_variable_left} != 0 goto {label2}\n"
+                head.code += f"if {typecast_variable_right} != 0 goto {label2}\n"
+                head.code += f"{head.value} = false\n"
                 head.code += f"goto {label1}\n"
                 head.code += f"{label2}:\n"
-                head.code += f"{head.value} = 1\n"
+                head.code += f"{head.value} = true\n"
                 head.code += f"{label1}:\n"
                 return
 
@@ -294,9 +312,35 @@ class AstNode:
             "if " + left.value + " " + relop + " " + right.value + " goto " + head.true + "\n" + "goto " + head.false """
 
             if head.true == None or head.false == None:
-                temp0 = parser.get_new_temp("int")
-                head.code += f"{temp0}={left.value} {relop} {right.value}"
-                head.value = temp0
+                temp = parser.get_new_temp("bool")
+                # head.code += f"{temp} = {left.value} {relop} {right.value}"
+                
+
+                if left_type == 'int' and right_type == 'int':
+                    head.code += f"{temp} = {left.value} {relop} {right.value}\n"
+                elif left_type == 'float' and right_type == 'float':
+                    head.code += f"{temp} = {left.value} {relop} {right.value}\n"
+                elif left_type == 'float' or right_type == 'float':
+                    if left_type == 'float':
+                        typecast_variable = parser.get_new_temp("float")
+                        head.code += f"{typecast_variable} = (float){right.value}\n"
+                        head.code += f"{temp} = {left.value} {relop} {typecast_variable}"
+                    else:
+                        typecast_variable = parser.get_new_temp("float")
+                        head.code += f"{typecast_variable} = (float){left.value}\n"
+                        head.code += f"{temp} = {typecast_variable} {relop} {right.value}"
+
+                else:
+                    typecast_variable_left = left.value
+                    typecast_variable_right = right.value
+                    if left_type != 'int':
+                        typecast_variable_left = parser.get_new_temp("int")
+                        head.code += f"{typecast_variable_left} = (int){left.value}\n"
+                    if right_type != 'int':
+                        typecast_variable_right = parser.get_new_temp("int")
+                        head.code += f"{typecast_variable_right} = (int){right.value}\n"
+                    head.code += f"{temp} = {typecast_variable_left} {relop} {typecast_variable_right}"
+                head.value = temp
                 return
 
             if left_type == 'int' and right_type == 'int':
@@ -339,11 +383,15 @@ class AstNode:
                 head.code = left.code + '\n'
                 label1 = parser.get_new_label()
                 label2 = parser.get_new_label()
-                head.code += f"if {left.value} == 0 goto {label2}\n"
-                head.code += f"{head.value} = 0\n"
+                typecast_variable_left = left.value
+                if left.data_type != 'int':
+                    typecast_variable_left = parser.get_new_temp("int")
+                    head.code += f"{typecast_variable_left} = (int){left.value}\n"
+                head.code += f"if {typecast_variable_left} == 0 goto {label2}\n"
+                head.code += f"{head.value} = false\n"
                 head.code += f"goto {label1}\n"
                 head.code += f"{label2}:\n"
-                head.code += f"{head.value} = 1\n"
+                head.code += f"{head.value} = true\n"
                 head.code += f"{label1}:\n"
                 return
 

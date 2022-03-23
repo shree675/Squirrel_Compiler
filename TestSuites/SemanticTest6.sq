@@ -1,8 +1,9 @@
 void @start() {
-    int b;
-    int c;
+    float b;
+    bool c;
     int d;
-    ``int a=b>c==d;``
+    ``char a=b&&c;``
+    int a=b>c==d;
     ``int a=b&&!c||d;``
-    int a=b&&!c||d>=b;
+    ``int a=b&&!c||d>=b;``
 }
