@@ -1,0 +1,14 @@
+``standard library function``
+import intMax from <math.acorn>
+
+void @start() {
+    int arr[2][3][1] = {-1,2,3,-4,5,6};     ``multi-dimensional array``
+    float floatArr[2] = {8.2,-2.5};
+    char charArray[3][1] = {'a','b','c'};
+
+    int i;
+    int j;
+    int k;
+
+    arr[i][j][k] = intMax(j,2);
+}

@@ -1,21 +1,17 @@
-
-
 void @start(){
     int var1;
     int var2;
 
+    `` switch statements can be
+    nested, and they can have
+    multiple cases for the same ``
+    
     switch(var1){
-        case (20): switch(var2){
-                        case (50): int n;
-
-                        default: int a;
-                    }
-                    break;
-
+        case (20): float myFloat;
+                   break;
         case (4): char myChar;
                   myChar = 'v';
                   break;
-
-        default: output(var1);
+        default: bool b;
     }
 }
