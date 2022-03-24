@@ -12,6 +12,10 @@ class Lexer(SlyLexer):
 
     # Tokens
     PLUS = r'\+'
+    # FLOATVAL = r'(\d+\.\d+)|(\d+\.)|\-(\d+\.\d+)|\-(\d+\.)'
+    # INTVAL = r'\d+|\-\d+'
+    # CHARVAL = r'\'\w\''
+    # STRINGVAL = r'\"[^\"]*\"'
     MINUS = r'-'
     MULT = r'\*'
     DIVIDE = r'/'

@@ -783,9 +783,18 @@ class Parser(SlyParser):
         # return AstNode(Operator.A_INTCONST, value=p.INTVAL)
         return [Operator.A_INTCONST, p.INTVAL]
 
+    @_('MINUS INTVAL')
+    def constant(self, p):
+        # return AstNode(Operator.A_INTCONST, value=p.INTVAL)
+        return [Operator.A_INTCONST, "-"+str(p.INTVAL)]
+
     @_('FLOATVAL')
     def constant(self, p):
         return [Operator.A_FLOATCONST, p.FLOATVAL]
+
+    @_('MINUS FLOATVAL')
+    def constant(self, p):
+        return [Operator.A_FLOATCONST, "-"+str(p.FLOATVAL)]
 
     @_('CHARVAL')
     def constant(self, p):
