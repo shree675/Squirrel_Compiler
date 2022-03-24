@@ -58,7 +58,7 @@ Kranthi 13. Stitching together parser with preprocessor - run from main method 1
 
 ✓ 21. Type casting in assignment of AND OR NOT 
 
-22. Negative numbers not working in INTVAL in arrays. - Shreetesh
+✓ 22. Negative numbers not working in INTVAL in arrays. - Shreetesh
 
 23. comparing enum - Operator.value instead of Operator
 --------------------------------------------------------------------------------------------------------------------
