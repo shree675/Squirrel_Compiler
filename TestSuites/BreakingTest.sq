@@ -1,5 +1,11 @@
 void @start() {
-    ``int if = 4;``
-    float q = (int) 9.8; 
-
+    int a[2]={-1,2};
+    int b=-1/5;
+    int d;
+    int c=-d-b;
+    int e=--b;
+    switch (d) {
+        case (-5): int b;
+    }
+    output(-2);
 }

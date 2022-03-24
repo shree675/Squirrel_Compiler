@@ -1,8 +1,9 @@
 void @start() {
-    int a = 3.6;
+    int a = -3.6-5;
     bool b;
-    float c = 4.5;
+    float c = -4.5;
     c = a+b;
-    a = a && a;
+    a = -2 && a;
+    int i;
+    i=i-1;
 }
-
