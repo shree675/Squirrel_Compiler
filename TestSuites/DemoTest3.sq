@@ -1,5 +1,4 @@
-
-
+``standard library function``
 import intSum from <math.acorn>
 
 void @start() {

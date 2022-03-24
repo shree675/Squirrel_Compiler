@@ -1,16 +1,15 @@
-
-
 void @start() {
+
     int b = 5;
-    int c = 15;
-
-    int a = b+c;
-    float d = a*5;
-    char e = (char) 10;
+    int c;              ``implicit initialization``
+    bool b2 = true;
+    string s = "this is a test";
+    int a = b-c;
+    float d = a*5;      ``implicit type conversion``
+    char e = (char) 10; ``explicit type conversion``
     
-    a = -a/(b+c)%6;
+    a = -a/(b+c)%6;     ``all operators and their combinations``
+
+    bool f = a && b;
+
 }
-
-
-
-
