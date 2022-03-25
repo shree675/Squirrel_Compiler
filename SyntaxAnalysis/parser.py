@@ -259,10 +259,10 @@ class Parser(SlyParser):
         head.right = p.statements
         p.statements.parent = head
         return p.function_signature
-    
+
     @_('DATATYPE FUNCNAME LPAREN scope_open params RPAREN')
     def function_signature(self, p):
-        head = AstNode(Operator.A_FUNC, left=p.params, 
+        head = AstNode(Operator.A_FUNC, left=p.params,
                        next_label=self.get_new_label(),
                        value={"function_name": p.FUNCNAME[1:], "return_type": p.DATATYPE})
 
@@ -425,12 +425,11 @@ class Parser(SlyParser):
     # array_init -> DATATYPE VARNAME array_variable = { array_list }
     @_("DATATYPE array_variable ASSIGN LBRACE array_list RBRACE")
     def array_init(self, p):
+        if p.DATATYPE == 'string':
+            AstNode.raise_error(
+                "Semantic Error: String type arrays are not allowed")
         self.push_to_ST(
             p.DATATYPE, p.array_variable.value["varname"], p.array_variable.value["list"])
-        #data_type = self.get_data_type(p.VARNAME)
-        # dimension_prod=int(math.prod(p.array_variable.value['list']))
-        # if dimension_prod!=len(p.array_list.value):
-        #     Parser.raise_error("Semantic Error: Array dimension and declaration mismatch")
         return AstNode(Operator.A_ARR_DECL, left=p.array_variable, right=p.array_list, data_type=p.DATATYPE, value=p.array_variable.value["varname"])
 
     # array_variable -> VARNAME [INTVAL]
@@ -452,8 +451,39 @@ class Parser(SlyParser):
     @_("constant")
     def array_list(self, p):
         #print("The const type", p.constant[0])
+        if p.constant[0] == Operator.A_STRINGCONST:
+            AstNode.raise_error(
+                "Semantic Error: String constants are not allowed in arrays")
         data_type = self.type_checker.return_datatype(operator=p.constant[0])
         return AstNode(Operator.A_ARR_LITERAL, left=p.constant, data_type=data_type)
+
+    @_("MINUS constant")
+    def array_list(self, p):
+        #print("The const type", p.constant[0])
+        # semantic check here to not allow negative strings and chars
+        if p.constant[0] == Operator.A_STRINGCONST:
+            AstNode.raise_error(
+                "Semantic Error: String constants are not allowed in arrays")
+        if p.constant[0] == Operator.A_CHARCONST or p.constant[0] == Operator.A_BOOLCONST:
+            AstNode.raise_error(
+                "Semantic Error: MINUS operator is not allowed for boolean values and chars")
+        p.constant[1] = "-"+p.constant[1]
+        data_type = self.type_checker.return_datatype(operator=p.constant[0])
+        return AstNode(Operator.A_ARR_LITERAL, left=p.constant, data_type=data_type)
+
+    # @_("neg_int_constant")
+    # def array_list(self, p):
+    #     #print("The const type", p.constant[0])
+    #     data_type = self.type_checker.return_datatype(
+    #         operator=p.neg_int_constant[0])
+    #     return AstNode(Operator.A_ARR_LITERAL, left=p.neg_int_constant, data_type=data_type)
+
+    # @_("neg_float_constant")
+    # def array_list(self, p):
+    #     #print("The const type", p.constant[0])
+    #     data_type = self.type_checker.return_datatype(
+    #         operator=p.neg_float_constant[0])
+    #     return AstNode(Operator.A_ARR_LITERAL, left=p.neg_float_constant, data_type=data_type)
 
 # ---------------------------------------------------------------------------
 
@@ -604,6 +634,41 @@ class Parser(SlyParser):
         p.statements.parent = head
         return head
 
+    @_('CASE LPAREN MINUS constant RPAREN COLON scope_open statements scope_close')
+    def case_statement(self, p):
+        #print("P constant", p.constant[0])
+        # semantic check here to not allow negative strings and chars
+        if p.constant[0] != Operator.A_INTCONST and p.constant[0] != Operator.A_CHARCONST:
+            Parser.error("Case statement variable must be of type int or char")
+        if p.constant[0] == Operator.A_CHARCONST:
+            AstNode.raise_error(
+                "Semantic Error: MINUS operator is not allowed for character constants")
+        p.constant[1] = "-"+p.constant[1]
+        head = AstNode(Operator.A_CASESINGLE,
+                       left=p.constant, right=p.statements)
+        p.statements.parent = head
+        return head
+
+    # @_('CASE LPAREN neg_int_constant RPAREN COLON scope_open statements scope_close')
+    # def case_statement(self, p):
+    #     #print("P constant", p.constant[0])
+    #     if p.neg_int_constant[0] != Operator.A_INTCONST and p.neg_int_constant[0] != Operator.A_CHARCONST:
+    #         Parser.error("Case statement variable must be of type int or char")
+    #     head = AstNode(Operator.A_CASESINGLE,
+    #                    left=p.neg_int_constant, right=p.statements)
+    #     p.statements.parent = head
+    #     return head
+
+    # @_('CASE LPAREN neg_float_constant RPAREN COLON scope_open statements scope_close')
+    # def case_statement(self, p):
+    #     #print("P constant", p.constant[0])
+    #     if p.neg_float_constant[0] != Operator.A_INTCONST and p.neg_float_constant[0] != Operator.A_CHARCONST:
+    #         Parser.error("Case statement variable must be of type int or char")
+    #     head = AstNode(Operator.A_CASESINGLE,
+    #                    left=p.neg_float_constant, right=p.statements)
+    #     p.statements.parent = head
+    #     return head
+
     # default_statement -> DEFAULT COLON statements
     @_('DEFAULT COLON scope_open statements scope_close')
     def default_statement(self, p):
@@ -647,9 +712,22 @@ class Parser(SlyParser):
     def output_statement(self, p):
         return AstNode(Operator.A_OUTPUT, left=p.constant)
 
-    @_('OUTPUT LPAREN neg_int_constant RPAREN')
+    @_('OUTPUT LPAREN MINUS constant RPAREN')
     def output_statement(self, p):
+        # semantic check here to not allow negative strings and chars
+        if p.constant[0] == Operator.A_CHARCONST or p.constant[0] == Operator.A_STRINGCONST or p.constant[0] == Operator.A_BOOLCONST:
+            AstNode.raise_error(
+                "Semantic Error: MINUS operator is not allowed for strings, chars and boolean values")
+        p.constant[1] = "-"+p.constant[1]
         return AstNode(Operator.A_OUTPUT, left=p.constant)
+
+    # @_('OUTPUT LPAREN neg_int_constant RPAREN')
+    # def output_statement(self, p):
+    #     return AstNode(Operator.A_OUTPUT, left=p.neg_int_constant)
+
+    # @_('OUTPUT LPAREN neg_float_constant RPAREN')
+    # def output_statement(self, p):
+    #     return AstNode(Operator.A_OUTPUT, left=p.neg_float_constant)
 
     # jump_statement -> BREAK | return_statement
     @_('BREAK')
@@ -765,6 +843,22 @@ class Parser(SlyParser):
         # p.constant = [Operator.A_CHARCONST, 't'] for a character
         return AstNode(p.constant[0], value=p.constant[1], data_type=data_type)
 
+    # @_('neg_int_constant')
+    # def expr(self, p):
+    #     #print("The const type", p.constant[0])
+    #     data_type = self.type_checker.return_datatype(
+    #         operator=p.neg_int_constant[0])
+    #     # p.constant = [Operator.A_CHARCONST, 't'] for a character
+    #     return AstNode(p.neg_int_constant[0], value=p.neg_int_constant[1], data_type=data_type)
+
+    # @_('neg_float_constant')
+    # def expr(self, p):
+    #     #print("The const type", p.constant[0])
+    #     data_type = self.type_checker.return_datatype(
+    #         operator=p.neg_float_constant[0])
+    #     # p.constant = [Operator.A_CHARCONST, 't'] for a character
+    #     return AstNode(p.neg_float_constant[0], value=p.neg_float_constant[1], data_type=data_type)
+
     # expr -> (DATATYPE) expr#
     @_('LPAREN DATATYPE RPAREN expr %prec TYPECASTING')
     def expr(self, p):
@@ -795,18 +889,19 @@ class Parser(SlyParser):
         # return AstNode(Operator.A_INTCONST, value=p.INTVAL)
         return [Operator.A_INTCONST, p.INTVAL]
 
-    @_('MINUS INTVAL')
-    def neg_int_constant(self, p):
-        # return AstNode(Operator.A_INTCONST, value=p.INTVAL)
-        return [Operator.A_INTCONST, "-"+str(p.INTVAL)]
+    # @_('MINUS INTVAL')
+    # def neg_int_constant(self, p):
+    #     # return AstNode(Operator.A_INTCONST, value=p.INTVAL)
+    #     print("minus here")
+    #     return [Operator.A_INTCONST, "-"+str(p.INTVAL)]
 
     @_('FLOATVAL')
     def constant(self, p):
         return [Operator.A_FLOATCONST, p.FLOATVAL]
 
-    @_('MINUS FLOATVAL')
-    def constant(self, p):
-        return [Operator.A_FLOATCONST, "-"+str(p.FLOATVAL)]
+    # @_('MINUS FLOATVAL')
+    # def neg_float_constant(self, p):
+    #     return [Operator.A_FLOATCONST, "-"+str(p.FLOATVAL)]
 
     @_('CHARVAL')
     def constant(self, p):

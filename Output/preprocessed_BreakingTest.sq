@@ -1,0 +1,13 @@
+
+void @start() {
+``string a[2]={-"abc","1"};``
+int b=-1/5;
+int d=1-2;
+int f=d-b;
+int c=-d-b;
+int e=--b;
+switch (d) {
+case (-'a'): int b;
+}
+``output(-"abc");``
+}

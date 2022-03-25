@@ -67,6 +67,10 @@ Kranthi 13. Stitching together parser with preprocessor - run from main method 1
 
 25. In fibonacci recursive test case, one extra implicit type casting is done --> "t5 = (int) t2"
 
+✓ 26. Add semantic checks in all the newly added negative constant rules in parser.py
+
+27. int e=--b; -> look into it later
+
 ---
 
 Learnings:
