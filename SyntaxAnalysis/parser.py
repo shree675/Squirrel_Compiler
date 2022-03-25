@@ -639,6 +639,10 @@ class Parser(SlyParser):
     def output_statement(self, p):
         return AstNode(Operator.A_OUTPUT, left=p.constant)
 
+    @_('OUTPUT LPAREN neg_int_constant RPAREN')
+    def output_statement(self, p):
+        return AstNode(Operator.A_OUTPUT, left=p.constant)
+
     # jump_statement -> BREAK | return_statement
     @_('BREAK')
     def jump_statement(self, p):
@@ -784,7 +788,7 @@ class Parser(SlyParser):
         return [Operator.A_INTCONST, p.INTVAL]
 
     @_('MINUS INTVAL')
-    def constant(self, p):
+    def neg_int_constant(self, p):
         # return AstNode(Operator.A_INTCONST, value=p.INTVAL)
         return [Operator.A_INTCONST, "-"+str(p.INTVAL)]
 
