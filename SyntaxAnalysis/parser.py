@@ -94,6 +94,8 @@ class Parser(SlyParser):
             "parameters_types": parameters_types
         })
 
+        return
+
     # this method should be used in parser.py ONLY
     def get_data_type(self, varname):
 
@@ -251,14 +253,20 @@ class Parser(SlyParser):
         return head
 
     # method -> DATATYPE FUNCNAME ( params ) { statements }
-    @_('DATATYPE FUNCNAME LPAREN scope_open params RPAREN LBRACE statements RBRACE scope_close')
+    @_('function_signature LBRACE statements RBRACE scope_close')
     def method(self, p):
-        head = AstNode(Operator.A_FUNC, left=p.params, right=p.statements,
+        head = p.function_signature
+        head.right = p.statements
+        p.statements.parent = head
+        return p.function_signature
+    
+    @_('DATATYPE FUNCNAME LPAREN scope_open params RPAREN')
+    def function_signature(self, p):
+        head = AstNode(Operator.A_FUNC, left=p.params, 
                        next_label=self.get_new_label(),
                        value={"function_name": p.FUNCNAME[1:], "return_type": p.DATATYPE})
 
         # no AstNode for params here
-        p.statements.parent = head
 
         # Push the function to the symbol table
         # p.params is a list of data types of parameters
@@ -885,7 +893,7 @@ if __name__ == '__main__':
     lex = lexer.Lexer()
     parser = Parser()
 
-    with open(os.path.join(TEST_SUITES_DIR, "ScopeTest.sq"), 'r') as f:
+    with open(os.path.join(TEST_SUITES_DIR, "LiveDemoTest5.sq"), 'r') as f:
         text = f.read()
 
     parser.parse(lex.tokenize(text))
