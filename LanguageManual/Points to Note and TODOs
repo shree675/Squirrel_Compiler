@@ -1,5 +1,6 @@
 ✓ 1. Semantic analysis for FUNCTION CALLS - no.of args, type of args,
-   - When a function is defined, check for unique name and signature combination. 
+
+- When a function is defined, check for unique name and signature combination.
 
 ✓ 2. error in testcase: string f3 = -"hello";
 Probably unary operator in declaration is not working
@@ -38,7 +39,7 @@ we have to declare/define the function before use
 ✓ Aashrith - refactor generatecode method - passing parser instead of individual methods
 
 ✓ 16. Semantic check for trying to use array variables inappropriately - eg. a[2] = {5,2};
-    a = 2; // should give an error
+a = 2; // should give an error
 
 17. Can we return AstNodes everywhere? - it will make life peaceful
 
@@ -46,7 +47,7 @@ we have to declare/define the function before use
 
 Kranthi 13. Stitching together parser with preprocessor - run from main method 14. test recursion - and all test cases
 ✓ 15. output.tac file, move it to output folder
-✓ 16. formatting the TAC file - write a post processing method to clean up the TAC 
+✓ 16. formatting the TAC file - write a post processing method to clean up the TAC
 
 19. @captnTardigrade: Can we remove empty labels without messing up anything in the TAC - while post processing the TAC?
 
@@ -56,18 +57,23 @@ Kranthi 13. Stitching together parser with preprocessor - run from main method 1
 
 20. Should we change the way we represent string variables in TAC?
 
-✓ 21. Type casting in assignment of AND OR NOT 
+✓ 21. Type casting in assignment of AND OR NOT
 
 ✓ 22. Negative numbers not working in INTVAL in arrays. - Shreetesh
 
 23. comparing enum - Operator.value instead of Operator
---------------------------------------------------------------------------------------------------------------------
+
+24. Add something to the temp variable name so that it wont be the same as normal variables, append scope to it
+
+25. In fibonacci recursive test case, one extra implicit type casting is done --> "t5 = (int) t2"
+
+---
+
 Learnings:
 @captnTardigrade:
 
 Cherry-picked test cases:
 @Shreetesh
-
 
 Wednesday, March 23rd, 2022
 
