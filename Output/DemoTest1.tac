@@ -14,7 +14,7 @@ s = (string) "this is a test"
 
 L12:
 
-t0 = b + c
+t0 = b - c
 
 a = (int) t0
 

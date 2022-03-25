@@ -2,8 +2,8 @@
 import intSum from <math.acorn>
 
 void @start() {
-    int A[2][2] = {1,2,3,4};
-    int B[2][2] = {9,68,7,60};
+    int A[2][2] = {1,-2,3,4};
+    int B[2][2] = {9,68,7,-60};
     int result[2][2] = {0,0,0,0};
 
     int i=0;

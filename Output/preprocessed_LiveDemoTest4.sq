@@ -1,0 +1,29 @@
+
+``preprocessor directive``
+
+void @start() {
+
+int n;
+input(n);           ``taking input from the user``
+
+float sum = 141.8;
+
+for(int i=0; i<n; i=i+1){
+sum = sum + i;
+}
+
+``nested loops and selection
+statements are supported``
+
+if(sum>2*141.8){
+output(sum);
+}
+elif(sum==141.8){
+output(141.8);
+}
+else{
+float temp = sum + 1;
+output(temp);
+}
+
+}
