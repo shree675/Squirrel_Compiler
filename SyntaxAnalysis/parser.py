@@ -36,7 +36,7 @@ class Parser(SlyParser):
             ]
         '''
 
-    @staticmethod
+    # @staticmethod
     def error(message="Syntax Error"):
         """Function to raise custom errors for the parser, suppressing the stack trace, takes the error message as parameter"""
         try:
