@@ -12,7 +12,7 @@ start:
 
 int A[16]
 A[0]=1
-A[4]=2
+A[4]=-2
 A[8]=3
 A[12]=4
 
@@ -21,7 +21,7 @@ int B[16]
 B[0]=9
 B[4]=68
 B[8]=7
-B[12]=60
+B[12]=-60
 
 L13:
 int result[16]
@@ -61,17 +61,6 @@ t6 = (int) 0
 result[t5] = t6
 
 L36:
-temp = (int) 0
-L34:
-
-k = (int) 0
-
-L41:
-
-if k < 2 goto L42
-goto L39
-
-L42:
 
 t8 = i * 2
 t9 = j * 1
@@ -79,73 +68,94 @@ t10 = t8 + t9
 
 t11 = t10 * 4
 
-if result[t11] < 0 goto L46
-goto L47
+if result[t11] != 0 goto L40
+if 1 != 0 goto L40
+t7 = false
+goto L39
+L40:
+t7 = true
+L39:
 
-L46:
+temp = (int) t7
 
-t12 = i * 2
-t13 = j * 1
-t14 = t12 + t13
+L34:
 
-t15 = t14 * 4
+k = (int) 0
 
-t16 = - 1
+L44:
 
-t17 = (int) t16
-result[t15] = t17
+if k < 2 goto L45
+goto L42
 
-L48:
-goto L45
-L47:
+L45:
 
-t18 = i * 2
-t19 = j * 1
-t20 = t18 + t19
+t13 = i * 2
+t14 = j * 1
+t15 = t13 + t14
 
-t21 = t20 * 4
+t16 = t15 * 4
 
-if result[t21] == 0 goto L50
-goto L51
+if result[t16] < 0 goto L49
+goto L50
 
+L49:
+
+t17 = i * 2
+t18 = j * 1
+t19 = t17 + t18
+
+t20 = t19 * 4
+
+t21 = - 1
+
+t22 = (int) t21
+result[t20] = t22
+
+L51:
+goto L48
 L50:
 
-t22 = i * 2
-t23 = j * 1
-t24 = t22 + t23
+t23 = i * 2
+t24 = j * 1
+t25 = t23 + t24
 
-t25 = t24 * 4
+t26 = t25 * 4
 
-t26 = (int) 0
-result[t25] = t26
+if result[t26] == 0 goto L53
+goto L54
 
-L52:
-goto L45
-L51:
+L53:
 
-t28 = i * 2
-t29 = k * 1
-t30 = t28 + t29
+t27 = i * 2
+t28 = j * 1
+t29 = t27 + t28
 
-t31 = t30 * 4
+t30 = t29 * 4
 
-t32 = k * 2
-t33 = j * 1
-t34 = t32 + t33
+t31 = (int) 0
+result[t30] = t31
 
-t35 = t34 * 4
+L55:
+goto L48
+L54:
 
-t27 = A[t31] * B[t35]
+t33 = i * 2
+t34 = k * 1
+t35 = t33 + t34
 
-temp = t27
+t36 = t35 * 4
 
-L56:
+t37 = k * 2
+t38 = j * 1
+t39 = t37 + t38
 
-t36 = i * 2
-t37 = j * 1
-t38 = t36 + t37
+t40 = t39 * 4
 
-t39 = t38 * 4
+t32 = A[t36] * B[t40]
+
+temp = t32
+
+L59:
 
 t41 = i * 2
 t42 = j * 1
@@ -153,32 +163,38 @@ t43 = t41 + t42
 
 t44 = t43 * 4
 
-L58:
+t46 = i * 2
+t47 = j * 1
+t48 = t46 + t47
+
+t49 = t48 * 4
+
+L61:
 param temp
-param result[t44]
-t40 = call intSum,2
+param result[t49]
+t45 = call intSum,2
 
-result[t39] = t40
+result[t44] = t45
 
-L54:
+L57:
 
-L45:
+L48:
 
-t7 = k + 1
+t12 = k + 1
 
-k = t7
+k = t12
 
-goto L41
-L39:
+goto L44
+L42:
 
-L38:
+L41:
 
-t45 = i * 2
-t46 = j * 1
-t47 = t45 + t46
+t50 = i * 2
+t51 = j * 1
+t52 = t50 + t51
 
-t48 = t47 * 4
-output int, result[t48]
+t53 = t52 * 4
+output int, result[t53]
 
 L30:
 
@@ -194,9 +210,9 @@ output string, "\n"
 
 L21:
 
-t49 = i + 1
+t54 = i + 1
 
-i = t49
+i = t54
 
 L19:
 goto L17
