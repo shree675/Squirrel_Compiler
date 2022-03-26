@@ -2,11 +2,7 @@ int @fibonacci(int n){
     if(n==0 || n==1){
         return n;
     }
-    int prev=n-1;
-    int prev_prev=n-2;
-    int t=fibonacci(prev)+fibonacci(prev_prev);
-    ``int t=fibonacci(0);``
-    return t;
+    return (fibonacci(n-1)+fibonacci(n-2));
 }
 
 void @start(){

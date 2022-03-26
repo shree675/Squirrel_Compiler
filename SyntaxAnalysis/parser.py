@@ -447,6 +447,17 @@ class Parser(SlyParser):
     def array_list(self, p):
         return AstNode(Operator.A_ARR_LITERAL, left=p.array_list, right=p.constant)
 
+    @_("array_list COMMA MINUS constant")
+    def array_list(self, p):
+        if p.constant[0] == Operator.A_STRINGCONST:
+            AstNode.raise_error(
+                "Semantic Error: String constants are not allowed in arrays")
+        if p.constant[0] == Operator.A_CHARCONST or p.constant[0] == Operator.A_BOOLCONST:
+            AstNode.raise_error(
+                "Semantic Error: MINUS operator is not allowed for boolean values and chars")
+        p.constant[1] = "-"+p.constant[1]
+        return AstNode(Operator.A_ARR_LITERAL, left=p.array_list, right=p.constant)
+
     # array_list -> constant
     @_("constant")
     def array_list(self, p):
