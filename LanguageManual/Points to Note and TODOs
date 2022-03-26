@@ -71,6 +71,8 @@ Kranthi 13. Stitching together parser with preprocessor - run from main method 1
 
 27. int e=--b; -> look into it later
 
+28. Push the array variable initializations to the symbol table
+
 ---
 
 Learnings:

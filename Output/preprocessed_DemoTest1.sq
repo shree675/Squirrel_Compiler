@@ -9,7 +9,7 @@ int a = b-c;
 float d = a*5;      ``implicit type conversion``
 char e = (char) 10; ``explicit type conversion``
 
-a = -a/(b+c)%6;     ``all operators and their combinations``
+a = -a/(b+c)%6;     ``complex combination of operators``
 
 bool f = a && b;
 

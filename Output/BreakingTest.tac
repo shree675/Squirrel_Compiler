@@ -35,7 +35,7 @@ t6 = - t7
 e = (int) t6
 
 L4:
-ifFalse d == -5 goto L15
+ifFalse d == 'a' goto L15
 b = (int) 0
 L16:
 L15:

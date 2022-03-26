@@ -6,7 +6,7 @@ void @start() {
     int c=-d-b;
     int e=--b;
     switch (d) {
-        case (-'a'): int b;
+        case ('a'): int b;
     }
     ``output(-"abc");``
 }
