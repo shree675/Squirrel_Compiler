@@ -142,11 +142,15 @@ class AstNode:
 
         if head.operator == Operator.A_ROOT:
 
-            left, right = head.left, head.right
+            left, mid, right = head.left, head.mid,  head.right
             #typeChecker.check(head, parser.symbol_table)
             AstNode.generateCode(left, parser)
             # head.code = left.code + '\n' + left.next + ':\n'
             head.code = left.code
+
+            if mid:
+                AstNode.generateCode(mid, parser)
+                head.code += '\n' + mid.code
 
             if right:
                 AstNode.generateCode(right, parser)

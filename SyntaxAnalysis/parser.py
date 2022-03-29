@@ -224,25 +224,25 @@ class Parser(SlyParser):
             output = re.sub(r"\n{3,}", "\n\n", code, flags=re.DOTALL)
             f.write(output)
 
-    @_('simple_init SEMICOL program')
-    def program(self, p):
-        return AstNode(Operator.A_ROOT, left=p.simple_init, right=p.program)
-
     # program -> methods
-    @_('methods')
+    @_('main')
     def program(self, p):
-        return AstNode(Operator.A_ROOT, left=p.methods)
+        return AstNode(Operator.A_ROOT, left=p.main)
+
+    @_('simple_init SEMICOL main')
+    def main(self, p):
+        return AstNode(Operator.A_ROOT, left=p.simple_init, right=p.main)
 
     # methods -> methods method
-    @_('methods method')
-    def methods(self, p):
-        head = AstNode(Operator.A_NODE, left=p.methods, right=p.method)
-        p.methods.parent = head
+    @_('method main')
+    def main(self, p):
+        head = AstNode(Operator.A_NODE, left=p.method, right=p.main)
+        p.main.parent = head
         p.method.parent = head
         return head
 
     @_('method')
-    def methods(self, p):
+    def main(self, p):
         head = AstNode(Operator.A_NODE, left=p.method)
         p.method.parent = head
         return head
