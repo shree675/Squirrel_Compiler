@@ -54,10 +54,10 @@ class Parser(SlyParser):
         """Generates and returns a new temporary variable, globally unique"""
         if data_type == "float":
             self.num_ftemp += 1
-            return "tf|" + str(self.num_ftemp - 1)
+            return "~tf" + str(self.num_ftemp - 1)
         else:
             self.num_temp += 1
-            return "t|" + str(self.num_temp - 1)
+            return "~t" + str(self.num_temp - 1)
 
     # dimension = [2, 3] =>  2 rows, 3 cols
     def push_to_ST(self, data_type, varname, dimension):
@@ -69,7 +69,7 @@ class Parser(SlyParser):
         ))
         if len(repeated_vars) > 0:
             Parser.error(
-                f"Error : variable \"{varname}\" already declared in current scope")
+                f"Error : variable \"{varname.split('`')[0]}\" already declared in current scope")
         # else append the variable to the symbol table
         self.symbol_table.append({
             "identifier_name": varname,
@@ -118,7 +118,7 @@ class Parser(SlyParser):
             return res[0]["type"]
         else:
             Parser.error(
-                f"Error : variable \"{varname}\" not declared in the scope")
+                f"Error : variable \"{varname.split('`')[0]}\" not declared in the scope")
 
     def check_function_signature(self, function_name, args_types):
 
@@ -148,7 +148,7 @@ class Parser(SlyParser):
         num_dimensions = len(res[0]["dimension"])
         if num_dimensions != 0:
             Parser.error(
-                f"Semantic Error: \"{varname}\" is an array variable.")
+                f"Semantic Error: \"{varname.split('`')[0]}\" is an array variable.")
 
     def print_tree(self, root):
 
@@ -287,12 +287,16 @@ class Parser(SlyParser):
 
     @_('DATATYPE VARNAME COMMA params_rec')
     def params_rec(self, p):
-        self.push_to_ST(p.DATATYPE, p.VARNAME, [])
+        scope = self.scope_id_stack[-1]
+        varname = p.VARNAME + '`' + str(scope)
+        self.push_to_ST(p.DATATYPE, varname, [])
         return [p.DATATYPE, *p.params_rec]
 
     @_('DATATYPE VARNAME')
     def params_rec(self, p):
-        self.push_to_ST(p.DATATYPE, p.VARNAME, [])
+        scope = self.scope_id_stack[-1]
+        varname = p.VARNAME + '`' + str(scope)
+        self.push_to_ST(p.DATATYPE, varname, [])
         return [p.DATATYPE]
 
     # statements -> statements statement
@@ -407,18 +411,22 @@ class Parser(SlyParser):
     # simple_init -> DATATYPE VARNAME | DATATYPE VARNAME = expr
     @_("DATATYPE VARNAME")
     def simple_init(self, p):
-        self.push_to_ST(p.DATATYPE, p.VARNAME, [])
-        data_type = self.get_data_type(p.VARNAME)
+        scope = self.scope_id_stack[-1]
+        varname = p.VARNAME + '`' + str(scope)
+        self.push_to_ST(p.DATATYPE, varname, [])
+        data_type = self.get_data_type(varname)
         node = AstNode(Operator.A_DECL, left=[
-                       p.DATATYPE, p.VARNAME], data_type=data_type,)
+                       p.DATATYPE, varname], data_type=data_type,)
         node.code = ""
         return node
 
     @_("DATATYPE VARNAME ASSIGN expr")
     def simple_init(self, p):
-        self.push_to_ST(p.DATATYPE, p.VARNAME, [])
-        data_type = self.get_data_type(p.VARNAME)
-        return AstNode(Operator.A_DECL, left=[p.DATATYPE, p.VARNAME], right=p.expr, data_type=data_type)
+        scope = self.scope_id_stack[-1]
+        varname = p.VARNAME + '`' + str(scope)
+        self.push_to_ST(p.DATATYPE, varname, [])
+        data_type = self.get_data_type(varname)
+        return AstNode(Operator.A_DECL, left=[p.DATATYPE, varname], right=p.expr, data_type=data_type)
 
 # ----------------------- ARRAY INIT ---------------------------------
 
@@ -435,7 +443,9 @@ class Parser(SlyParser):
     # array_variable -> VARNAME [INTVAL]
     @_("VARNAME LSQB INTVAL RSQB")
     def array_variable(self, p):
-        return AstNode(Operator.A_ARRAY_REC, value={"list": [int(p.INTVAL)], "varname": p.VARNAME})
+        scope = self.scope_id_stack[-1]
+        varname = p.VARNAME + '`' + str(scope)
+        return AstNode(Operator.A_ARRAY_REC, value={"list": [int(p.INTVAL)], "varname": varname})
 
     # array_variable [INTVAL]
     @_("array_variable LSQB INTVAL RSQB")
@@ -501,16 +511,14 @@ class Parser(SlyParser):
     # array_variable -> VARNAME [expr]
     @_("VARNAME LSQB expr RSQB")
     def array_var_use(self, p):
-        #print("Array expr type", p.expr.value, p.expr.data_type)
-
         i = -1
         current_scope = self.scope_id_stack[i]
 
         res = []
         while current_scope >= 1 and len(res) == 0:
-
             res = list(filter(
-                lambda item: item["scope"] == current_scope and item["identifier_name"] == p.VARNAME,
+                lambda item: item["scope"] == current_scope and item["identifier_name"].split("`")[
+                    0] == p.VARNAME,
                 self.symbol_table
             ))
 
@@ -519,12 +527,13 @@ class Parser(SlyParser):
 
             i -= 1
             current_scope = self.scope_id_stack[i]
+        varname = p.VARNAME + '`' + str(current_scope)
 
         self.type_checker.check_datatype(
             expr_type=p.expr.data_type, operator=Operator.A_ARR_EXPR_REC)
-        data_type = self.get_data_type(p.VARNAME)
+        data_type = self.get_data_type(varname)
         return AstNode(Operator.A_ARR_EXPR_REC, left=p.expr,
-                       value={"varname": p.VARNAME, "val": "",
+                       value={"varname": varname, "val": "",
                               "index": 1, "scope": current_scope},
                        data_type=data_type)
 
@@ -838,9 +847,26 @@ class Parser(SlyParser):
 
     @_('VARNAME')
     def expr(self, p):
-        data_type = self.get_data_type(p.VARNAME)
-        self.check_if_variable(p.VARNAME)
-        return AstNode(Operator.A_VARIABLE, value=p.VARNAME, data_type=data_type)
+        i = -1
+        current_scope = self.scope_id_stack[i]
+
+        res = []
+        while current_scope >= 1 and len(res) == 0:
+            res = list(filter(
+                lambda item: item["scope"] == current_scope and item["identifier_name"].split("`")[
+                    0] == p.VARNAME,
+                self.symbol_table
+            ))
+
+            if(len(res) > 0):
+                break
+
+            i -= 1
+            current_scope = self.scope_id_stack[i]
+        varname = p.VARNAME + '`' + str(current_scope)
+        data_type = self.get_data_type(varname)
+        self.check_if_variable(varname)
+        return AstNode(Operator.A_VARIABLE, value=varname, data_type=data_type)
 
     @_('array_var_use')
     def expr(self, p):
@@ -885,10 +911,27 @@ class Parser(SlyParser):
     # left_value -> VARNAME | array_variable
     @_('VARNAME')
     def left_value(self, p):
-        data_type = self.get_data_type(p.VARNAME)
-        self.check_if_variable(p.VARNAME)
+        i = -1
+        current_scope = self.scope_id_stack[i]
 
-        return AstNode(Operator.A_VARIABLE, value=p.VARNAME, data_type=data_type)
+        res = []
+        while current_scope >= 1 and len(res) == 0:
+            res = list(filter(
+                lambda item: item["scope"] == current_scope and item["identifier_name"].split("`")[
+                    0] == p.VARNAME,
+                self.symbol_table
+            ))
+
+            if(len(res) > 0):
+                break
+
+            i -= 1
+            current_scope = self.scope_id_stack[i]
+        varname = p.VARNAME + '`' + str(current_scope)
+        data_type = self.get_data_type(varname)
+        self.check_if_variable(varname)
+
+        return AstNode(Operator.A_VARIABLE, value=varname, data_type=data_type)
 
     @_('array_var_use')
     def left_value(self, p):
@@ -971,13 +1014,6 @@ class Parser(SlyParser):
     @_('expr')
     def argument_list_rec(self, p):
         return p.expr
-
-    # argument -> VARNAME | constant | array_variable
-    # @_('VARNAME',
-        # 'constant',
-        # 'array_variable')
-    # def argument(self, p):
-        # return str(p[0])
 
     @_('')
     def empty(self, p):

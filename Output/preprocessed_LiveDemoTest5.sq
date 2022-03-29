@@ -7,7 +7,7 @@ return (fibonacci(n-1)+fibonacci(n-2));
 }
 
 void @start(){
-int length
+int length;
 input(length);
 int result = fibonacci(length);
 output(result);

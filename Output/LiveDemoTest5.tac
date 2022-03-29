@@ -1,34 +1,34 @@
 fibonacci:
 
-if n == 0 goto L10
+if n`2 == 0 goto L10
 goto L11
 
 L11:
 
-if n == 1 goto L10
+if n`2 == 1 goto L10
 goto L9
 
 L10:
 
-return n
+return n`2
 L12:
 
 L9:
 
-t|1 = n - 1
+~t1 = n`2 - 1
 
-param t|1
-t|0 = call fibonacci,1
+param ~t1
+~t0 = call fibonacci,1
 
-t|3 = n - 2
+~t3 = n`2 - 2
 
-param t|3
-t|2 = call fibonacci,1
+param ~t3
+~t2 = call fibonacci,1
 
-t|5 = (int) t|0
-t|4 = t|5 + t|2
+~t5 = (int) ~t0
+~t4 = ~t5 + ~t2
 
-return t|4
+return ~t4
 L5:
 return 0
 
@@ -36,19 +36,19 @@ L4:
 
 start:
 
-length = (int) 0
+length`4 = (int) 0
 L20:
-input int, length
+input int, length`4
 
 L18:
 
-param length
-t|6 = call fibonacci,1
+param length`4
+~t6 = call fibonacci,1
 
-result = (int) t|6
+result`4 = (int) ~t6
 
 L16:
-output int, result
+output int, result`4
 
 L14:
 return 
