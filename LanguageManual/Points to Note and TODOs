@@ -63,7 +63,7 @@ Kranthi 13. Stitching together parser with preprocessor - run from main method 1
 
 23. comparing enum - Operator.value instead of Operator
 
-24. Add something to the temp variable name so that it wont be the same as normal variables, append scope to it
+✓ 24. Add something to the temp variable name so that it wont be the same as normal variables, append scope to it
 
 25. In fibonacci recursive test case, one extra implicit type casting is done --> "t5 = (int) t2"
 

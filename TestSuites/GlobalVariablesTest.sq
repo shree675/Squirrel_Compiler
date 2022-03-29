@@ -1,0 +1,22 @@
+int y;
+
+import intMax from <math.acorn>
+replace z 'a'
+
+int first=8978979;
+char f='v';
+float x;
+
+int @de(int a, int b){
+    first=b;
+    char f=z;
+    y=2;
+    return first;
+}
+
+int next=1;
+
+void @start() {
+    int first=8;
+    output(next);
+}
