@@ -1,0 +1,11 @@
+int first=8978979;
+char f='v';
+
+int @de(int a, int b){
+    first=b;
+    return first;
+}
+
+void @start() {
+    int first=8;
+}

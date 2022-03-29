@@ -36,7 +36,7 @@ class Parser(SlyParser):
             ]
         '''
 
-    # @staticmethod
+    @staticmethod
     def error(message="Syntax Error"):
         """Function to raise custom errors for the parser, suppressing the stack trace, takes the error message as parameter"""
         try:
@@ -190,7 +190,7 @@ class Parser(SlyParser):
     Each function corresponds to a production rule in the grammar. The rule is mentioned as a comment just above 
     corresponding function. SLY works on SDDs, so the body of the method is executed after the entire production is matched"""
 
-    start = "program"  # start symbol of the grammar
+    start = "init"  # start symbol of the grammar
     tokens = lexer.Lexer.tokens
     debugfile = 'parser.out'  # SLY parser writes debug information to this file
     precedence = (
@@ -210,33 +210,28 @@ class Parser(SlyParser):
         ('right', 'PAREN')
     )
 
-    # @_('simple_init program')
-    # def program(self, p):
-    #     pass
-
-    # program -> methods
-    @_('methods')
-    def program(self, p):
-        """Starting production, top of the parsing tree, calls the recursive generateCode() method"""
-        root = AstNode(Operator.A_ROOT, left=p.methods)
+    @_('program')
+    def init(self, p):
+        root = AstNode(Operator.A_START, left=p.program)
         root.output_file = self.output_file
-        p.methods.parent = root
-        # self.print_tree(root)
-
-        # AstNode.generateCode(root, self.get_new_label,
-        # self.get_new_temp, self.symbol_table)
+        p.program.parent = root
 
         code = AstNode.generateCode(root, self)
         output_path = self.output_file if os.getcwd().endswith(
             "Squirrel_Compiler") else "../" + self.output_file
 
         with open(output_path, "w") as f:
-            # format code
             output = re.sub(r"\n{3,}", "\n\n", code, flags=re.DOTALL)
-            # print(output)
             f.write(output)
-        #print(*self.symbol_table, sep="\n")
-        #print(*self.function_symbol_table, sep="\n")
+
+    @_('simple_init SEMICOL program')
+    def program(self, p):
+        return AstNode(Operator.A_ROOT, left=p.simple_init, right=p.program)
+
+    # program -> methods
+    @_('methods')
+    def program(self, p):
+        return AstNode(Operator.A_ROOT, left=p.methods)
 
     # methods -> methods method
     @_('methods method')
@@ -668,26 +663,6 @@ class Parser(SlyParser):
                        left=p.constant, right=p.statements)
         p.statements.parent = head
         return head
-
-    # @_('CASE LPAREN neg_int_constant RPAREN COLON scope_open statements scope_close')
-    # def case_statement(self, p):
-    #     #print("P constant", p.constant[0])
-    #     if p.neg_int_constant[0] != Operator.A_INTCONST and p.neg_int_constant[0] != Operator.A_CHARCONST:
-    #         Parser.error("Case statement variable must be of type int or char")
-    #     head = AstNode(Operator.A_CASESINGLE,
-    #                    left=p.neg_int_constant, right=p.statements)
-    #     p.statements.parent = head
-    #     return head
-
-    # @_('CASE LPAREN neg_float_constant RPAREN COLON scope_open statements scope_close')
-    # def case_statement(self, p):
-    #     #print("P constant", p.constant[0])
-    #     if p.neg_float_constant[0] != Operator.A_INTCONST and p.neg_float_constant[0] != Operator.A_CHARCONST:
-    #         Parser.error("Case statement variable must be of type int or char")
-    #     head = AstNode(Operator.A_CASESINGLE,
-    #                    left=p.neg_float_constant, right=p.statements)
-    #     p.statements.parent = head
-    #     return head
 
     # default_statement -> DEFAULT COLON statements
     @_('DEFAULT COLON scope_open statements scope_close')

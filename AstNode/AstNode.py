@@ -77,6 +77,7 @@ class Operator(Enum):
     A_ARRAY_VARIABLE = "array variable"
     A_ARREXPR_VARIABLE = "array expr variable"
     A_ARR_EXPR_REC = "array expr rec"
+    A_START = "init"
 
 
 #typeChecker = TypeChecker.TypeChecker()
@@ -129,13 +130,27 @@ class AstNode:
 
         # --------------------------------------------------
 
-        if head.operator == Operator.A_ROOT:
+        if head.operator == Operator.A_START:
 
             left = head.left
+            AstNode.generateCode(left, parser)
+            head.code = left.code
+
+            return head.code
+
+        # --------------------------------------------------
+
+        if head.operator == Operator.A_ROOT:
+
+            left, right = head.left, head.right
             #typeChecker.check(head, parser.symbol_table)
             AstNode.generateCode(left, parser)
             # head.code = left.code + '\n' + left.next + ':\n'
             head.code = left.code
+
+            if right:
+                AstNode.generateCode(right, parser)
+                head.code += '\n' + right.code
 
             return head.code
 
