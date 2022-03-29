@@ -15,20 +15,20 @@ L12:
 
 L9:
 
-t1 = n - 1
+t|1 = n - 1
 
-param t1
-t0 = call fibonacci,1
+param t|1
+t|0 = call fibonacci,1
 
-t3 = n - 2
+t|3 = n - 2
 
-param t3
-t2 = call fibonacci,1
+param t|3
+t|2 = call fibonacci,1
 
-t5 = (int) t0
-t4 = t5 + t2
+t|5 = (int) t|0
+t|4 = t|5 + t|2
 
-return t4
+return t|4
 L5:
 return 0
 
@@ -43,9 +43,9 @@ input int, length
 L18:
 
 param length
-t6 = call fibonacci,1
+t|6 = call fibonacci,1
 
-result = (int) t6
+result = (int) t|6
 
 L16:
 output int, result

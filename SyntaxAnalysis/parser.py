@@ -54,10 +54,10 @@ class Parser(SlyParser):
         """Generates and returns a new temporary variable, globally unique"""
         if data_type == "float":
             self.num_ftemp += 1
-            return "tf" + str(self.num_ftemp - 1)
+            return "tf|" + str(self.num_ftemp - 1)
         else:
             self.num_temp += 1
-            return "t" + str(self.num_temp - 1)
+            return "t|" + str(self.num_temp - 1)
 
     # dimension = [2, 3] =>  2 rows, 3 cols
     def push_to_ST(self, data_type, varname, dimension):

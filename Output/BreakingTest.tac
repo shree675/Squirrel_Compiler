@@ -1,38 +1,38 @@
 start:
 
-t1 = - 1
+t|1 = - 1
 
-t0 = t1 / 5
+t|0 = t|1 / 5
 
-b = (int) t0
+b = (int) t|0
 
 L12:
 
-t2 = 1 - 2
+t|2 = 1 - 2
 
-d = (int) t2
+d = (int) t|2
 
 L10:
 
-t3 = d - b
+t|3 = d - b
 
-f = (int) t3
+f = (int) t|3
 
 L8:
 
-t5 = - d
+t|5 = - d
 
-t4 = t5 - b
+t|4 = t|5 - b
 
-c = (int) t4
+c = (int) t|4
 
 L6:
 
-t7 = - b
+t|7 = - b
 
-t6 = - t7
+t|6 = - t|7
 
-e = (int) t6
+e = (int) t|6
 
 L4:
 ifFalse d == 'a' goto L15
