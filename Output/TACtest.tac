@@ -30,9 +30,9 @@ goto L20
 
 L19:
 
-t0 = a + b
+t|0 = a + b
 
-if t0 == c goto L29
+if t|0 == c goto L29
 goto L28
 
 L29:
@@ -44,11 +44,11 @@ L28:
 j = (int) 0
 L24:
 
-t1 = a + b
+t|1 = a + b
 
-t2 = t1 + c
+t|2 = t|1 + c
 
-j = t2
+j = t|2
 
 L22:
 goto L12
@@ -61,11 +61,11 @@ L32:
 k = (int) 0
 L37:
 
-t3 = b * c
+t|3 = b * c
 
-t4 = a + t3
+t|4 = a + t|3
 
-k = t4
+k = t|4
 
 L35:
 goto L12
@@ -74,15 +74,15 @@ L33:
 x = (int) 0
 L41:
 
-t7 = - a
+t|7 = - a
 
-t8 = b + c
+t|8 = b + c
 
-t6 = t7 / t8
+t|6 = t|7 / t|8
 
-t5 = t6 % d
+t|5 = t|6 % d
 
-x = t5
+x = t|5
 
 L39:
 

@@ -19,26 +19,26 @@ goto L13
 
 L16:
 
-tf1 = (float) i
-tf0 = sum + tf1
+tf|1 = (float) i
+tf|0 = sum + tf|1
 
-sum = tf0
+sum = tf|0
 
 L17:
 
-t0 = i + 1
+t|0 = i + 1
 
-i = t0
+i = t|0
 
 goto L15
 L13:
 
 L12:
 
-tf3 = (float) 2
-tf2 = tf3 * 141.8
+tf|3 = (float) 2
+tf|2 = tf|3 * 141.8
 
-if sum > tf2 goto L20
+if sum > tf|2 goto L20
 goto L21
 
 L20:
@@ -60,10 +60,10 @@ L26:
 goto L19
 L25:
 
-tf5 = (float) 1
-tf4 = sum + tf5
+tf|5 = (float) 1
+tf|4 = sum + tf|5
 
-temp = (float) tf4
+temp = (float) tf|4
 
 L30:
 output float, temp
