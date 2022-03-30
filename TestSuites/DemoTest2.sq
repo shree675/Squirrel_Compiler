@@ -1,5 +1,7 @@
+int var1;
+float myFloat=1.2;
+
 void @start(){
-    int var1;
     int var2;
 
     `` switch statements can be
@@ -7,10 +9,9 @@ void @start(){
     multiple cases for the same ``
     
     switch(var1){
-        case (20): float myFloat;
+        case (20): myFloat=8.4;
                    break;
-        case (4): char myChar;
-                  myChar = 'v';
+        case (4): var2=82;
                   break;
         default: bool b;
     }
