@@ -1,19 +1,19 @@
 fibonacci:
 
-if n`2 == 0 goto L10
-goto L11
-
-L11:
-
-if n`2 == 1 goto L10
-goto L9
+if n`2 == 0 goto L9
+goto L10
 
 L10:
 
-return n`2
-L12:
+if n`2 == 1 goto L9
+goto L8
 
 L9:
+
+return n`2
+L11:
+
+L8:
 
 ~t1 = n`2 - 1
 
@@ -29,10 +29,8 @@ param ~t3
 ~t4 = ~t5 + ~t2
 
 return ~t4
-L5:
-return 0
-
 L4:
+return 0
 
 start:
 
@@ -52,5 +50,7 @@ output int, result`4
 
 L14:
 return 
+
+L13:
 
 L2:

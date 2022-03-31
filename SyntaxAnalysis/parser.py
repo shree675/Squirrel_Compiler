@@ -192,6 +192,7 @@ class Parser(SlyParser):
 
     start = "init"  # start symbol of the grammar
     tokens = lexer.Lexer.tokens
+    tokens.remove('FUZZY')
     debugfile = 'parser.out'  # SLY parser writes debug information to this file
     precedence = (
         ('left', 'COMMA'),
