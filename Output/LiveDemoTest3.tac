@@ -1,22 +1,20 @@
 intMax:
 
-if a`2 >= b`2 goto L8
-goto L9
-
-L8:
-
-return a`2
-L10:
-goto L7
-L9:
-
-return b`2
-L12:
+if a`2 >= b`2 goto L7
+goto L8
 
 L7:
-return 0
 
-L4:
+return a`2
+L9:
+goto L6
+L8:
+
+return b`2
+L11:
+
+L6:
+return 0
 
 start:
 
@@ -64,5 +62,7 @@ arr`5[~t5] = ~t6
 
 L14:
 return 
+
+L13:
 
 L2:
