@@ -10,6 +10,15 @@ class Lexer(SlyLexer):
     ignore_comment = r'``(.|\n)[^``]*``'
     ignore_newline = r'\n+'
 
+    @_(r'\n+')
+    def ignore_newline(self, t):
+        self.lineno += len(t.value)
+
+    @_(r'``(.|\n)[^``]*``')
+    def ignore_comment(self, t):
+        if len(t.value.split('\n')) > 1:
+            self.lineno += (len(t.value.split('\n'))-1)
+
     # Tokens
     PLUS = r'\+'
     MINUS = r'-'

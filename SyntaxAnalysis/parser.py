@@ -36,14 +36,28 @@ class Parser(SlyParser):
             ]
         '''
 
+    # def error(self, p):
+    #     if p:
+    #         print("Syntax error at", p)
+    #         self.errok()
+    #     else:
+    #         print("Syntax error at EOF")
+
     @staticmethod
-    def error(message="Syntax Error"):
+    def custom_error(message="Syntax Error"):
         """Function to raise custom errors for the parser, suppressing the stack trace, takes the error message as parameter"""
         try:
             raise Exception(message)   # raise exception with message
         except Exception as ex:
             logger.exception(ex)
             quit()
+
+    def error(self, p):
+        """Function to raise custom errors for the parser, suppressing the stack trace, takes the error message as parameter"""
+        if p:
+            print("Syntax error at line", str(p.lineno) + ":", p.value)
+        else:
+            print("Syntax error at EOF")
 
     def get_new_label(self):
         """Generates and returns a new label, globally unique"""
@@ -68,7 +82,7 @@ class Parser(SlyParser):
             self.symbol_table
         ))
         if len(repeated_vars) > 0:
-            Parser.error(
+            Parser.custom_error(
                 f"Error : variable \"{varname.split('`')[0]}\" already declared in current scope")
         # else append the variable to the symbol table
         self.symbol_table.append({
@@ -85,7 +99,7 @@ class Parser(SlyParser):
                                self.function_symbol_table))
 
         if len(repeated) > 0:
-            Parser.error(
+            Parser.custom_error(
                 f"The function {function_name}({','.join(parameters_types)}) is already defined.\n")
 
         self.function_symbol_table.append({
@@ -117,7 +131,7 @@ class Parser(SlyParser):
             # print(res[0]["type"])
             return res[0]["type"]
         else:
-            Parser.error(
+            Parser.custom_error(
                 f"Error : variable \"{varname.split('`')[0]}\" not declared in the scope")
 
     def check_function_signature(self, function_name, args_types):
@@ -127,8 +141,8 @@ class Parser(SlyParser):
                               self.function_symbol_table))
 
         if len(matched) == 0:
-            Parser.error(f"Semantic error : function call {function_name}({','.join(args_types)})"
-                         + " doesn't match any of the defined function signatures.\n")
+            Parser.custom_error(f"Semantic error : function call {function_name}({','.join(args_types)})"
+                                + " doesn't match any of the defined function signatures.\n")
 
     def check_if_variable(self, varname):
         i = -1
@@ -147,7 +161,7 @@ class Parser(SlyParser):
 
         num_dimensions = len(res[0]["dimension"])
         if num_dimensions != 0:
-            Parser.error(
+            Parser.custom_error(
                 f"Semantic Error: \"{varname.split('`')[0]}\" is an array variable.")
 
     def print_tree(self, root):
@@ -610,7 +624,7 @@ class Parser(SlyParser):
     def switch_statement(self, p):
 
         if p.left_value.data_type != 'int' and p.left_value.data_type != 'char':
-            Parser.error(
+            Parser.custom_error(
                 "Switch statement variable must be of type int or char")
 
         """ try:
@@ -644,7 +658,8 @@ class Parser(SlyParser):
     def case_statement(self, p):
         #print("P constant", p.constant[0])
         if p.constant[0] != Operator.A_INTCONST and p.constant[0] != Operator.A_CHARCONST:
-            Parser.error("Case statement variable must be of type int or char")
+            Parser.custom_error(
+                "Case statement variable must be of type int or char")
         head = AstNode(Operator.A_CASESINGLE,
                        left=p.constant, right=p.statements)
         p.statements.parent = head
@@ -655,7 +670,8 @@ class Parser(SlyParser):
         #print("P constant", p.constant[0])
         # semantic check here to not allow negative strings and chars
         if p.constant[0] != Operator.A_INTCONST and p.constant[0] != Operator.A_CHARCONST:
-            Parser.error("Case statement variable must be of type int or char")
+            Parser.custom_error(
+                "Case statement variable must be of type int or char")
         if p.constant[0] == Operator.A_CHARCONST:
             AstNode.raise_error(
                 "Semantic Error: MINUS operator is not allowed for character constants")

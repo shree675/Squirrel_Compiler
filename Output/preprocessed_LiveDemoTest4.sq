@@ -9,7 +9,7 @@ input(n);           ``taking input from the user``
 float sum = 141.8;
 
 for(int i=0; i<n; i=i+1){
-sum = sum + i;
+sum = sum + i
 }
 
 ``nested loops and selection
