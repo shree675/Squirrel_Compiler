@@ -62,7 +62,7 @@ class Parser(SlyParser):
     def get_new_label(self):
         """Generates and returns a new label, globally unique"""
         self.num_labels += 1
-        return "L" + str(self.num_labels - 1)
+        return "#L" + str(self.num_labels - 1)
 
     def get_new_temp(self, data_type):
         """Generates and returns a new temporary variable, globally unique"""
@@ -232,12 +232,16 @@ class Parser(SlyParser):
         p.program.parent = root
 
         code = AstNode.generateCode(root, self)
+        
+
         output_path = self.output_file if os.getcwd().endswith(
             "Squirrel_Compiler") else "../" + self.output_file
 
         with open(output_path, "w") as f:
             output = re.sub(r"\n{3,}", "\n\n", code, flags=re.DOTALL)
             f.write(output)
+
+        return code
 
     # program -> methods
     @_('main')
