@@ -1,12 +1,23 @@
+string @function(){
+    return "function";
+}
+
 void @start() {
     int a = 3;
+
     float b = 0.5;
-    ``int a;``
+    ``int a;
     int x = a + b;
     bool c = true;
-    char d = 'a';
+    char d = 'a';``
+
     string e = "hello";
+
+    string abc = "aklfjas alkf jkalsdf";
+    abc= " aklfjas";
+
     ``string f3 = -"hello";``
+    
     int f;
     f = a + b;
 
