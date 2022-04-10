@@ -18,12 +18,12 @@ return n`2
 ~t1 = n`2 - 1
 
 param ~t1
-~t0 = call fibonacci,1
+~t0 = call fibonacci, 1
 
 ~t3 = n`2 - 2
 
 param ~t3
-~t2 = call fibonacci,1
+~t2 = call fibonacci, 1
 
 ~t5 = (int) ~t0
 ~t4 = ~t5 + ~t2
@@ -41,7 +41,7 @@ input int, length`4
 #L18:
 
 param length`4
-~t6 = call fibonacci,1
+~t6 = call fibonacci, 1
 
 result`4 = (int) ~t6
 
