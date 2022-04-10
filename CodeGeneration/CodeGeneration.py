@@ -7,7 +7,7 @@ class CodeGeneration:
     def generate_target_code(intermediate_code):
 
         # intermediate_code = "#L1:\ngoto #L3\n#L2:\n#L3:\n#L4:\n#L8:\ngoto #L4\ngoto #L8\nhello"
-        intermediate_code = "~t3 = n`2 - 2\nparam ~t3\n~t2 = call fibonacci, 1\n"
+        # intermediate_code = "~t3 = n`2 - 2\nparam ~t3\n~t2 = call fibonacci, 1\n"
         goto_labels = set()
         for lines in intermediate_code.splitlines():
             if 'goto' in lines:
