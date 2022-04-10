@@ -7,7 +7,8 @@ class CodeGeneration:
     def generate_target_code(intermediate_code):
 
         # intermediate_code = "#L1:\ngoto #L3\n#L2:\n#L3:\n#L4:\n#L8:\ngoto #L4\ngoto #L8\nhello"
-        # intermediate_code = "~t3 = n`2 - 2\nparam ~t3\n~t2 = call fibonacci, 1\n"
+        # intermediate_code = "abc:\n\n\nif a == 5 goto L5\n"
+
         goto_labels = set()
         for lines in intermediate_code.splitlines():
             if 'goto' in lines:
@@ -120,10 +121,10 @@ class CodeGeneration:
         if block_line != "":
             blocks.append(block_line)
 
-        # print(len(blocks))
-        # for x in blocks:
-        #     print(x)
-        #     print('----------------------------------------------------------------')
+        print(len(blocks))
+        for x in blocks:
+            print(x)
+            print('----------------------------------------------------------------')
 
         """
         -1 -> either dead or no next use
@@ -134,15 +135,16 @@ class CodeGeneration:
         reserved_all_live_keywords = "if return ifFalse input output call param"
         reserved_all_dead_keywords = "int float string bool char"
         reserved_words = set(reserved_operators.split())
-        live_and_next_use = []
+        live_and_next_use_blocks = []
 
         for block in blocks:
             num_lines = len(block.split('\n'))
             lines = re.sub(r"\(.+\)", '', block).split('\n')
+            live_and_next_use = []
 
             for i in range(num_lines-1, -1, -1):
 
-                if lines[i].startswith('goto') or lines[i].startswith('#L') or len(lines[i].strip()) == 0:
+                if lines[i].startswith('goto') or ':' in lines[i] or len(lines[i].strip()) == 0:
                     continue
 
                 temp = lines[i].split(' ')
@@ -221,8 +223,11 @@ class CodeGeneration:
                             'live': -1, 'next_use': -1}}
 
                 live_and_next_use.append(var_dict)
+                live_and_next_use = list(reversed(live_and_next_use))
 
-            live_and_next_use = list(reversed(live_and_next_use))
+            live_and_next_use_blocks.append(live_and_next_use)
 
-            for i in live_and_next_use:
-                print(i)
+        # for x in live_and_next_use_blocks:
+        #     for y in x:
+        #         print(y)
+        #     print()
