@@ -5,6 +5,10 @@ int @start(){
     int c;
     int d;
 
+    char ab='a';
+    char bc='b';
+    char de = ab+bc;
+
     if(false || true && false){
         int i;
     }

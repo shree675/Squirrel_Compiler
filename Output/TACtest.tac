@@ -1,92 +1,107 @@
 start:
 
 a`2 = (int) 0
-#L10:
-b`2 = (int) 0
-#L8:
-c`2 = (int) 0
-#L6:
-d`2 = (int) 0
-#L4:
-goto #L15
-#L15:
-goto #L16
 #L16:
-goto #L14
-#L13:
-
-i`3 = (int) 0
-#L17:
-goto #L12
+b`2 = (int) 0
 #L14:
+c`2 = (int) 0
+#L12:
+d`2 = (int) 0
+#L10:
 
-if a`2 >= b`2 goto #L21
-goto #L20
+ab`2 = (char) 'a'
 
+#L8:
+
+bc`2 = (char) 'b'
+
+#L6:
+
+~t1 = (int) ab`2
+~t0 = ~t1 + bc`2
+
+de`2 = (char) ~t0
+
+#L4:
+goto #L21
 #L21:
-
-if c`2 != d`2 goto #L19
+goto #L22
+#L22:
 goto #L20
-
 #L19:
 
-~t0 = a`2 + b`2
-
-if ~t0 == c`2 goto #L29
-goto #L28
-
-#L29:
-
-ab`5 = (int) 0
-#L30:
-
-#L28:
-j`4 = (int) 0
-#L24:
-
-~t1 = a`2 + b`2
-
-~t2 = ~t1 + c`2
-
-j`4 = ~t2
-
-#L22:
-goto #L12
+i`3 = (int) 0
+#L23:
+goto #L18
 #L20:
-goto #L32
-#L34:
-goto #L33
-#L32:
 
-k`6 = (int) 0
-#L37:
+if a`2 >= b`2 goto #L27
+goto #L26
 
-~t3 = b`2 * c`2
+#L27:
 
-~t4 = a`2 + ~t3
+if c`2 != d`2 goto #L25
+goto #L26
 
-k`6 = ~t4
+#L25:
+
+~t2 = a`2 + b`2
+
+if ~t2 == c`2 goto #L35
+goto #L34
 
 #L35:
-goto #L12
-#L33:
 
-x`7 = (int) 0
+ab`5 = (int) 0
+#L36:
+
+#L34:
+j`4 = (int) 0
+#L30:
+
+~t3 = a`2 + b`2
+
+~t4 = ~t3 + c`2
+
+j`4 = ~t4
+
+#L28:
+goto #L18
+#L26:
+goto #L38
+#L40:
+goto #L39
+#L38:
+
+k`6 = (int) 0
+#L43:
+
+~t5 = b`2 * c`2
+
+~t6 = a`2 + ~t5
+
+k`6 = ~t6
+
 #L41:
-
-~t7 = - a`2
-
-~t8 = b`2 + c`2
-
-~t6 = ~t7 / ~t8
-
-~t5 = ~t6 % d`2
-
-x`7 = ~t5
-
+goto #L18
 #L39:
 
-#L12:
+x`7 = (int) 0
+#L47:
+
+~t9 = - a`2
+
+~t10 = b`2 + c`2
+
+~t8 = ~t9 / ~t10
+
+~t7 = ~t8 % d`2
+
+x`7 = ~t7
+
+#L45:
+
+#L18:
 return 0
 
 #L1:

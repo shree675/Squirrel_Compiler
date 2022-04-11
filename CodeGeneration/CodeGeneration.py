@@ -38,12 +38,174 @@ class CodeGeneration:
         self.address_descriptor = defaultdict(list)
         self.return_string_count = 0
         self.array_addresses = defaultdict()
+        self.string_addresses = defaultdict()
+        self.memory_pointer = 0x10010000
 
-    def allocate_registers(self, blocks, live_and_next_use_blocks, intermediate_code_final):
+    def is_arithmetic_instruction_binary(self, instruction):
+        arithmetic_operands = set(
+            "+ - * / % && || > < >= <= ! != = ==".split())
+        instruction_set = set(instruction.split())
+        difference = instruction_set.difference(arithmetic_operands)
+        if len(difference) > 2:
+            return True
+        return False
+
+    def is_arithmetic_instruction_unary(self, instruction):
+        arithmetic_operands = set(
+            "+ - * / % && || > < >= <= ! != = ==".split())
+        instruction_set = set(instruction.split())
+        difference = instruction_set.difference(arithmetic_operands)
+        if len(difference) == 2:
+            return True
+        return False
+
+    def is_function_call_with_return(self, instruction):
+        if '=' in instruction and 'call' in instruction:
+            return True
+        return False
+
+    def is_function_call_without_return(self, instruction):
+        if 'call' in instruction and '=' not in instruction:
+            return True
+        return False
+
+    def is_assignment_instruction(self, instruction):
+        instruction = re.sub(r'\(.+\)', '', instruction)
+        if '=' in instruction and len(instruction.split()) == 3:
+            return True
+        return False
+
+    def is_if_statement(self, instruction):
+        if 'if' in instruction:
+            return True
+        return False
+
+    def is_return_statement(self, instruction):
+        if 'return' in instruction:
+            return True
+        return False
+
+    def is_param_instruction(self, instruction):
+        if 'param' in instruction:
+            return True
+        return False
+
+    def is_input(self, instruction):
+        if 'input' in instruction:
+            return True
+        return False
+
+    def is_output(self, instruction):
+        if 'output' in instruction:
+            return True
+        return False
+
+    def is_array_initialization(self, instruction):
+        data_types = "int float char bool string"
+        try:
+            if instruction.split()[0] in data_types and '[' in instruction.split()[1]:
+                return True
+            return False
+        except IndexError:
+            return False
+
+    def is_array_assignment(self, instruction):
+        try:
+            if '[' in instruction.split()[0] and instruction.split()[1] == '=':
+                return True
+            return False
+        except IndexError:
+            return False
+
+    def free_all(self):
+        self.register_descriptor = defaultdict(list)
+        self.address_descriptor = defaultdict(list)
+
+    def get_reg(self, live_and_next_use_blocks, index):
+
+        # if there is an empty register available
+        for reg in self.register_map:
+            if not self.register_descriptor[reg]:
+                return (reg, 0)
+
+        # otherwise choose the register occupied by a temporary variable with no next use
+        for record in live_and_next_use_blocks[index]:
+            for var in record:
+                if var[0] == '~' and record[var]['next_use'] == -1:
+                    temp_var = var
+                    for reg in self.register_descriptor[reg]:
+                        if temp_var in self.register_descriptor[reg]:
+                            self.register_descriptor[reg].remove(temp_var)
+                            return (reg, 0)
+
+        # else choose the register occupied by a non-temporary variable with no next use
+        for record in live_and_next_use_blocks[index]:
+            for var in record:
+                if record[var]['next_use'] == -1:
+                    temp_var = var
+                    for reg in self.register_descriptor[reg]:
+                        if temp_var in self.register_descriptor[reg]:
+                            self.register_descriptor[reg].remove(temp_var)
+                            return (reg, 1)
+
+        # else choose the register occupied by a temporary variable with the farthest nextuse
+        temp_with_farthest_next_use = ''
+        farthest_next_use = -1
+        for record in live_and_next_use_blocks[index]:
+            for var in record:
+                if var[0] == '~' and record[var]['next_use'] > farthest_next_use:
+                    farthest_next_use = record[var]['next_use']
+                    temp_with_farthest_next_use = var
+        if farthest_next_use != -1:
+            for reg in self.register_descriptor:
+                if temp_with_farthest_next_use in self.register_descriptor[reg]:
+                    self.register_descriptor[reg].remove(
+                        temp_with_farthest_next_use)
+                    return (reg, 1)
+
+        # else choose the register occupied by a non-temporary variable with the farthest nextuse
+        temp_with_farthest_next_use = ''
+        farthest_next_use = -1
+        for record in live_and_next_use_blocks[index]:
+            for var in record:
+                if record[var]['next_use'] > farthest_next_use:
+                    farthest_next_use = record[var]['next_use']
+                    temp_with_farthest_next_use = var
+        if farthest_next_use != -1:
+            for reg in self.register_descriptor:
+                if temp_with_farthest_next_use in self.register_descriptor[reg]:
+                    self.register_descriptor[reg].remove(
+                        temp_with_farthest_next_use)
+                    return (reg, 1)
+
+    def allocate_registers(self, blocks, live_and_next_use_blocks):
+
+        text_segment = ''
+
+        self.free_all()
+
+        for block in blocks:
+            lines = block.splitlines()
+
+            lines_generator = (
+                i for i in lines)
+
+            for line in lines_generator:
+                if ':' in line:
+                    text_segment += line+'\n'
+
+                elif line.startswith('goto'):
+                    text_segment += f'j {line.split()[1]}\n'
+
+                # elif self.is_arithmetic_instruction_binary(line):
+
+        assembly_code = f"\n.text\n.globl start\n\n{text_segment}\n"
+        return assembly_code
+
+    def preamble(self, intermediate_code_final):
 
         array_initializations = ''
         string_constants = ''
-        text_segment = ''
         data_types = "int float char bool string"
 
         intermediate_code_generator = (
@@ -62,6 +224,8 @@ class CodeGeneration:
                     self.return_string_count += 1
                     string_const = tokens[-1]
                 string_constants += f'{string_var}:\n\t.asciiz {string_const}\n'
+                self.string_addresses[string_var] = self.memory_pointer
+                self.memory_pointer += len(string_const) + 1
 
             else:
                 tokens = line.split()
@@ -74,7 +238,8 @@ class CodeGeneration:
                         next_line = next(intermediate_code_generator)
                         array.append(next_line.split('=')[-1])
                     self.array_addresses[variable_name] = (
-                        array, tokens[0])
+                        array, tokens[0], self.memory_pointer)
+                    self.memory_pointer += size
 
         for array_var in self.array_addresses:
             array_initializations += f'\t{array_var}:\n'
@@ -90,12 +255,14 @@ class CodeGeneration:
                     array_initializations += f'{self.array_addresses[array_var][0][i].strip()}, '
             array_initializations = array_initializations[:-2] + '\n'
 
-        assembly_code = f".data\n{array_initializations}\n\n{string_constants}\n\n.text\n.globl start\n\n{text_segment}\n"
+        self.free_all()
 
+        assembly_code = f".data\n{array_initializations}\n\n{string_constants}\n"
         print(assembly_code)
 
-    @ staticmethod
-    def generate_target_code(intermediate_code):
+        return assembly_code
+
+    def generate_target_code(self, intermediate_code, optimization_level):
 
         if not intermediate_code:
             return
@@ -215,10 +382,10 @@ class CodeGeneration:
         if block_line != "":
             blocks.append(block_line)
 
-        # print(len(blocks))
-        # for x in blocks:
-        #     print(x)
-        #     print('----------------------------------------------------------------')
+        print(len(blocks))
+        for x in blocks:
+            print(x)
+            print('----------------------------------------------------------------')
 
         """
         -1 -> either dead or no next use
@@ -327,4 +494,8 @@ class CodeGeneration:
         #     for y in x:
         #         print(y)
         #     print()
-        return blocks, live_and_next_use_blocks, intermediate_code_final
+
+        data_segment = self.preamble(intermediate_code_final)
+        code_segment = self.allocate_registers(
+            blocks, live_and_next_use_blocks)
+        return data_segment+'\n' + code_segment

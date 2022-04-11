@@ -42,11 +42,16 @@ def compile(filename, optimization_level, save_preprocessed_file, save_intermedi
             filename.split("/")[-1].replace(".sq", ".tac")
     # print(filename)
     #print('parser output', parser.output_file)
-    blocks, live_and_next_use_blocks, intermediate_code_final = CodeGeneration.CodeGeneration.generate_target_code(
-        parser.parse(tokens))
+
+    # blocks, live_and_next_use_blocks, intermediate_code_final = CodeGeneration.CodeGeneration.generate_target_code(
+    #     parser.parse(tokens))
+    # code_generator = CodeGeneration.CodeGeneration()
+    # code_generator.preamble(
+    #     blocks, live_and_next_use_blocks, intermediate_code_final)
+    # code_generator.allocate_registers()
+
     code_generator = CodeGeneration.CodeGeneration()
-    code_generator.allocate_registers(
-        blocks, live_and_next_use_blocks, intermediate_code_final)
+    target_code = code_generator.generate_target_code(parser.parse(tokens), optimization_level)
 
 
 def main(*argv):
