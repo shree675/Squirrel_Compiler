@@ -85,7 +85,7 @@ class TypeChecker:
                 return 'int'
             elif left_type == 'char':
                 #print("Implicitly casting from char to int")
-                return 'int'
+                TypeChecker.raise_error(left_type, operator)
 
         elif operator.value == Operator.A_NOT.value:
             if left_type == 'int' or left_type == 'char' or left_type == 'float':

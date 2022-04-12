@@ -73,6 +73,8 @@ Kranthi 13. Stitching together parser with preprocessor - run from main method 1
 
 28. Push the array variable initializations to the symbol table
 
+29. Change the input for strings grammar and TAC generation
+
 ---
 
 Learnings:

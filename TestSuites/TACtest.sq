@@ -1,6 +1,6 @@
 int @start(){
     ``string a=-"hello";``
-    int a;
+    ``int a;
     int b;
     int c;
     int d;
@@ -26,5 +26,7 @@ int @start(){
     else{
         int x;
         x=-a/(b+c)%d;
-    }
+    }``
+    bool b;
+    bool a = !b;
 }
