@@ -139,6 +139,7 @@ class CodeGeneration:
                             return (reg, 0)
 
         # else choose the register occupied by a non-temporary variable with no next use
+        # spill the register
         for record in live_and_next_use_blocks[index]:
             for var in record:
                 if record[var]['next_use'] == -1:
@@ -149,6 +150,7 @@ class CodeGeneration:
                             return (reg, 1)
 
         # else choose the register occupied by a temporary variable with the farthest nextuse
+        # spill the register
         temp_with_farthest_next_use = ''
         farthest_next_use = -1
         for record in live_and_next_use_blocks[index]:
@@ -164,6 +166,7 @@ class CodeGeneration:
                     return (reg, 1)
 
         # else choose the register occupied by a non-temporary variable with the farthest nextuse
+        # spill the register
         temp_with_farthest_next_use = ''
         farthest_next_use = -1
         for record in live_and_next_use_blocks[index]:
@@ -338,6 +341,7 @@ class CodeGeneration:
         optimized_code4 = ""
         optimized_code_list = optimized_code3.splitlines()
         i = 0
+        # TODO: Check this case again-> what if someone else uses that label
         while i < len(optimized_code_list):
             lines = optimized_code_list[i]
             if lines.startswith('goto'):
@@ -407,7 +411,8 @@ class CodeGeneration:
 
                 if lines[i].startswith('goto') or ':' in lines[i] or len(lines[i].strip()) == 0:
                     continue
-
+                # for arrays arr[i] -> i is dead implies arr[i] is dead and i is alive implies arr[i] is alive
+                # for arrays we are removing the arr and proceeding with i for the live analysis
                 temp = lines[i].split(' ')
                 for index, word in enumerate(temp):
                     if ']' in word:
@@ -422,6 +427,9 @@ class CodeGeneration:
 
                 var_dict = {}
 
+                # binary arithmetic expression 
+                # live and dead is decided based on rigth side or left side of the equality sign
+                # we store line number for next use of the variable
                 if len(operators) == 2 and len(variables) == 3:
                     line_variables = re.sub(
                         reserved_operators_pattern, '', lines[i]).split()
@@ -430,6 +438,7 @@ class CodeGeneration:
                     var_dict = {left_variable: {'live': -1, 'next_use': -1}, right_variables[0]: {
                         'live': 1, 'next_use': i}, right_variables[1]: {'live': 1, 'next_use': i}}
 
+                # for unary assignment and NOT operator
                 elif len(operators) == 2 and len(variables) == 2:
                     line_variables = re.sub(
                         reserved_operators_pattern, '', lines[i]).split()
@@ -438,12 +447,14 @@ class CodeGeneration:
                     var_dict = {left_variable: {'live': -1, 'next_use': -1}, right_variable: {
                         'live': 1, 'next_use': i}}
 
+                #for function call with equality sign
                 elif len(operators) == 1 and len(variables) == 4:
                     left_variable = lines[i].split(" ")[0]
                     right_variable = lines[i].split(" ")[-1]
                     var_dict = {left_variable: {'live': -1, 'next_use': -1}, right_variable: {
                         'live': 1, 'next_use': i}}
 
+                # simple assignment eg. a=b
                 elif len(operators) == 1 and len(variables) == 2:
                     line_variables = re.sub(
                         reserved_operators_pattern, '', lines[i]).split()
