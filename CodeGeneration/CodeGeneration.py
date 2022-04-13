@@ -101,8 +101,9 @@ class CodeGeneration:
         return False
 
     def is_assignment_instruction(self, instruction):
-        instruction = re.sub(r'\(.+\)', '', instruction)
         # The case of a simple assignment statement like a=b or f=10
+        # In case the type casting is mentioned, replace it with '' using the following regex 
+        instruction = re.sub(r'\(.+\)', '', instruction)
         if '=' in instruction and len(instruction.split()) == 3:
             return True
         return False
@@ -202,6 +203,7 @@ class CodeGeneration:
             for var in record:
                 if record[var]['next_use'] == -1:
                     temp_var = var
+                    # TODO: Check the naming convention - inconsistent for variable in self.register_descriptor
                     for reg in self.register_descriptor[reg]:
                         if temp_var in self.register_descriptor[reg]:
                             self.register_descriptor[reg].remove(temp_var)
@@ -251,6 +253,8 @@ class CodeGeneration:
     def allocate_registers(self, blocks, live_and_next_use_blocks, data_segment):
         """
         allocate_registers function allocates registers and generates the MIPS code that is stored in the text_segment
+        Note: The cases, i.e., the different types of statements are identified as using elifs in this function, 
+        but this function is called inside generate_target_code() function
         """
         text_segment = ''
         variables_map = defaultdict()
@@ -277,6 +281,7 @@ class CodeGeneration:
                     for _ in range(num_of_elements):
                         next(lines_generator)
 
+                # A label is a line that contains a colon
                 elif ':' in line:
                     text_segment += line+'\n'
 
@@ -299,6 +304,8 @@ class CodeGeneration:
                     reg[2], spill[2] = self.get_reg(
                         live_and_next_use_blocks, blocks.index(block), operand2)
 
+                    # If any of the registers is spilled, then spill the register
+                    # Updating the address and rigister descriptors accordingly
                     for i in range(3):
                         if spill[i] == 1:
                             for var in self.register_descriptor[reg[i]]:
@@ -307,13 +314,14 @@ class CodeGeneration:
                                     self.address_descriptor[var].remove(reg[i])
                             self.register_descriptor[reg[i]] = []
 
+                    # Corresponding MIPS code for the register spills
                     if spill[1] == 1:
                         text_segment += f"lw {reg[1]}, {operand1}\n"
 
                     if spill[2] == 1:
                         text_segment += f"lw {reg[2]}, {operand2}\n"
 
-                    # TODO: check the operator
+                    # TODO: check the operator - can we NOT use match as it requires Python 3.10 or higher
                     match operator:
                         case '+':
                             text_segment += f"add {reg[0]}, {reg[1]}, {reg[2]}\n"
@@ -344,18 +352,22 @@ class CodeGeneration:
                         self.register_descriptor[reg0] = []
 
                     if operand.isdigit():
+                        # the operand is an integer
                         operand = int(operand)
                         text_segment += f"li {reg0}, {operand}\n"
                         self.address_descriptor[subject].append(reg0)
                         self.register_descriptor[reg0].append(operand)
                     elif "'" in operand:
+                        # The operand is a character
                         text_segment += f"li {reg0}, {operand}\n"
                         self.address_descriptor[subject].append(reg0)
                         self.register_descriptor[reg0].append(operand)
                     elif '"' in operand:
+                        # The operand is a string
                         pass
                     else:
                         # float
+                        # Need to handle everything differently for float type variables
                         pass
 
                 elif self.is_arithmetic_instruction_unary(line):
