@@ -1,0 +1,7 @@
+void @start() {
+    int arr[2]={1,2};
+    arr[1]=8;
+    int i;
+    output(arr[i]);
+    output(arr[1]);
+}

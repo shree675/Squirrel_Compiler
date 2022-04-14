@@ -1,0 +1,13 @@
+void @start() {
+    int a=6;
+    int b;
+    int c;
+    if(2>3){
+        b=5;
+    }
+    else{
+        c=a;
+    }
+    output(c);
+    output(b);
+}

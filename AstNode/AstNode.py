@@ -999,11 +999,22 @@ class AstNode:
 
         # --------------------------------------------------------------------
 
-        elif head.operator == Operator.A_VARIABLE or head.operator == Operator.A_INTCONST or head.operator == Operator.A_STRINGCONST or head.operator == Operator.A_CHARCONST or head.operator == Operator.A_FLOATCONST:
+        # elif head.operator == Operator.A_VARIABLE or head.operator == Operator.A_INTCONST or head.operator == Operator.A_STRINGCONST or head.operator == Operator.A_CHARCONST or head.operator == Operator.A_FLOATCONST:
+
+        #     head.code = ""
+        # --------------------------------------------------------------------
+
+        elif head.operator == Operator.A_VARIABLE:
+
+            head.code = ""
+        # --------------------------------------------------------------------
+
+        elif head.operator == Operator.A_INTCONST or head.operator == Operator.A_STRINGCONST or head.operator == Operator.A_CHARCONST or head.operator == Operator.A_FLOATCONST:
 
             t0 = parser.get_new_temp("int")
             head.code = f"{t0} = {head.value}\n"
             head.value = t0
+            # head.code = ""
         # --------------------------------------------------------------------
 
         elif head.operator == Operator.A_BOOL:
