@@ -232,7 +232,6 @@ class Parser(SlyParser):
         p.program.parent = root
 
         code = AstNode.generateCode(root, self)
-        
 
         output_path = self.output_file if os.getcwd().endswith(
             "Squirrel_Compiler") else "../" + self.output_file
