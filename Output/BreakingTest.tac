@@ -1,46 +1,26 @@
 start:
 
-t|1 = - 1
+~t0 = 0
 
-t|0 = t|1 / 5
+a`2 = (int) ~t0
 
-b = (int) t|0
+#L4:
+~t1 = 3
 
-L12:
+~t2 = 2
 
-t|2 = 1 - 2
+if ~t1 > ~t2 goto #L7
+goto #L6
 
-d = (int) t|2
+#L7:
 
-L10:
+~t3 = 5
 
-t|3 = d - b
+b`3 = (int) ~t3
 
-f = (int) t|3
+#L8:
 
-L8:
-
-t|5 = - d
-
-t|4 = t|5 - b
-
-c = (int) t|4
-
-L6:
-
-t|7 = - b
-
-t|6 = - t|7
-
-e = (int) t|6
-
-L4:
-ifFalse d == 'a' goto L15
-b = (int) 0
-L16:
-L15:
-
-L14:
+#L6:
 return 
 
-L1:
+#L1:
