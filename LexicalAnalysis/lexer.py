@@ -4,7 +4,8 @@ from sly import Lexer as SlyLexer
 class Lexer(SlyLexer):
 
     tokens = {PLUS, MINUS, MULT, DIVIDE, MOD, ASSIGN, LPAREN, RPAREN, LSQB, RSQB, COMMA, INTVAL, FLOATVAL, CHARVAL, STRINGVAL, BOOLVAL,
-              LBRACE, RBRACE, SEMICOL, COLON, VARNAME, IF, ELSE, WHILE, FOR, ELIF, RETURN, BREAK, CONTINUE, FUNCNAME, DATATYPE, RELOP1, RELOP2, AND, OR, NOT, INPUT, OUTPUT, SWITCH, CASE, DEFAULT, FUZZY}
+              LBRACE, RBRACE, SEMICOL, COLON, VARNAME, IF, ELSE, WHILE, FOR, ELIF, RETURN, BREAK, CONTINUE, FUNCNAME, DATATYPE, RELOP1, 
+              RELOP2, AND, OR, NOT, INPUT, OUTPUT, SWITCH, CASE, DEFAULT, FUZZY, INPUT_STRING}
 
     ignore = ' \t'
     ignore_comment = r'``(.|\n)[^``]*``'
@@ -63,6 +64,7 @@ class Lexer(SlyLexer):
     VARNAME['true'] = BOOLVAL
     VARNAME['false'] = BOOLVAL
     VARNAME['input'] = INPUT
+    VARNAME['input_string'] = INPUT_STRING
     VARNAME['output'] = OUTPUT
     VARNAME['switch'] = SWITCH
     VARNAME['case'] = CASE

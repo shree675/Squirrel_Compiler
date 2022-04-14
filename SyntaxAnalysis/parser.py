@@ -1,3 +1,4 @@
+from cmath import log
 import warnings
 from sly import Parser as SlyParser
 from AstNode.AstNode import Operator, AstNode
@@ -718,6 +719,16 @@ class Parser(SlyParser):
     def input_statement(self, p):
         return AstNode(Operator.A_INPUT, left=p.left_value)
         # return str(p[0]+p[1]+p[2]+p[3])
+    
+    @_('input_string_statement')
+    def input_statement(self, p):
+        return AstNode(Operator.A_INPUT, left=p.left_value)
+        # return str(p[0]+p[1]+p[2]+p[3])
+    
+    @_('INPUT_STRING LPAREN left_value COMMA INTVAL RPAREN')
+    def input_string_statement(self, p):
+        # TODO : semntic check for the left value datatype -> only string
+        return AstNode(Operator.A_INPUT_STRING, left=p.left_value, right=p.INTVAL)
 
     # output_statement -> OUTPUT ( left_value )  | OUTPUT ( constant )
     @_('OUTPUT LPAREN left_value RPAREN')

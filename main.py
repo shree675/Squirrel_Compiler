@@ -50,8 +50,8 @@ def compile(filename, optimization_level, save_preprocessed_file, save_intermedi
     #     blocks, live_and_next_use_blocks, intermediate_code_final)
     # code_generator.allocate_registers()
 
-    code_generator = CodeGeneration.CodeGeneration()
-    target_code = code_generator.generate_target_code(parser.parse(tokens), optimization_level)
+    # code_generator = CodeGeneration.CodeGeneration()
+    # target_code = code_generator.generate_target_code(parser.parse(tokens), optimization_level)
 
 
 def main(*argv):
