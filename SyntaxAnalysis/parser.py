@@ -722,7 +722,7 @@ class Parser(SlyParser):
     
     @_('input_string_statement')
     def input_statement(self, p):
-        return AstNode(Operator.A_INPUT, left=p.left_value)
+        return p.input_string_statement
         # return str(p[0]+p[1]+p[2]+p[3])
     
     @_('INPUT_STRING LPAREN left_value COMMA INTVAL RPAREN')

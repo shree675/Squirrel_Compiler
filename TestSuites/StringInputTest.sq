@@ -1,3 +1,4 @@
 void @start() {
     string s;
+    input_string(s, 10);
 }

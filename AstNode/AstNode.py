@@ -1147,6 +1147,9 @@ class AstNode:
         
         elif head.operator == Operator.A_INPUT_STRING:
 
+            left_value = head.left
+            length = head.right
+
             if left_value.operator != Operator.A_VARIABLE:
                 AstNode.raise_error("Semantic Error : \"input_string\" can only be used with a variable.\n")
                 
@@ -1156,10 +1159,8 @@ class AstNode:
                 AstNode.raise_error(
                     f'Semantic Error: variable \"{left_value.value}\" is not of type \"string\"\n')
                 
-            left_value = head.left
-            length = head.right
 
-            head.code = f"input_string {left_value.value}, {length.value}\n"
+            head.code = f"input_string {left_value.value}, {length}\n"
             return 
 
 
