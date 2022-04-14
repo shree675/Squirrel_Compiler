@@ -69,6 +69,7 @@ class CodeGeneration:
         # This is the fixed starting address of data segment on QTSPIM
         self.memory_pointer = 0x10010000
 
+    # started
     def is_arithmetic_instruction_binary(self, instruction):
         instruction_set = set(instruction.split())
         # instruction_set contains all the operators and operands of the given line
@@ -82,6 +83,7 @@ class CodeGeneration:
             return True
         return False
 
+    # started
     def is_arithmetic_instruction_unary(self, instruction):
         instruction_set = set(instruction.split())
         difference = instruction_set.difference(self.arithmetic_operators)
@@ -100,9 +102,11 @@ class CodeGeneration:
             return True
         return False
 
+    # started
     def is_assignment_instruction(self, instruction):
-        instruction = re.sub(r'\(.+\)', '', instruction)
         # The case of a simple assignment statement like a=b or f=10
+        # In case the type casting is mentioned, replace it with '' using the following regex
+        instruction = re.sub(r'\(.+\)', '', instruction)
         if '=' in instruction and len(instruction.split()) == 3:
             return True
         return False
@@ -132,6 +136,7 @@ class CodeGeneration:
             return True
         return False
 
+    # started
     def is_array_initialization(self, instruction):
         data_types = "int float char bool string"
         try:
@@ -143,6 +148,7 @@ class CodeGeneration:
             # occurs when you check for some other type of instruction but split()[1] does not exist
             return False
 
+    # started
     def is_array_assignment(self, instruction):
         try:
             # this identifies the pattern of an array assignment: arr`2[4] = 2
@@ -202,6 +208,7 @@ class CodeGeneration:
             for var in record:
                 if record[var]['next_use'] == -1:
                     temp_var = var
+                    # TODO: Check the naming convention - inconsistent for variable in self.register_descriptor
                     for reg in self.register_descriptor[reg]:
                         if temp_var in self.register_descriptor[reg]:
                             self.register_descriptor[reg].remove(temp_var)
@@ -251,6 +258,8 @@ class CodeGeneration:
     def allocate_registers(self, blocks, live_and_next_use_blocks, data_segment):
         """
         allocate_registers function allocates registers and generates the MIPS code that is stored in the text_segment
+        Note: The cases, i.e., the different types of statements are identified as using elifs in this function, 
+        but this function is called inside generate_target_code() function
         """
         text_segment = ''
         variables_map = defaultdict()
@@ -277,12 +286,14 @@ class CodeGeneration:
                     for _ in range(num_of_elements):
                         next(lines_generator)
 
+                # A label is a line that contains a colon
                 elif ':' in line:
                     text_segment += line+'\n'
 
                 elif line.startswith('goto'):
                     text_segment += f'j {line.split()[1]}\n'
 
+                # there will be no type casting involved here
                 elif self.is_arithmetic_instruction_binary(line):
                     # Same as reg = [0,1,2] -> We just need to initialize the list with 3 elements
                     reg = [i for i in range(3)]
@@ -299,6 +310,8 @@ class CodeGeneration:
                     reg[2], spill[2] = self.get_reg(
                         live_and_next_use_blocks, blocks.index(block), operand2)
 
+                    # If any of the registers is spilled, then spill the register
+                    # Updating the address and rigister descriptors accordingly
                     for i in range(3):
                         if spill[i] == 1:
                             for var in self.register_descriptor[reg[i]]:
@@ -307,84 +320,31 @@ class CodeGeneration:
                                     self.address_descriptor[var].remove(reg[i])
                             self.register_descriptor[reg[i]] = []
 
+                    # Corresponding MIPS code for the register spills
                     if spill[1] == 1:
                         text_segment += f"lw {reg[1]}, {operand1}\n"
 
                     if spill[2] == 1:
                         text_segment += f"lw {reg[2]}, {operand2}\n"
 
-                    # TODO: check the operator
-                    match operator:
-                        case '+':
-                            text_segment += f"add {reg[0]}, {reg[1]}, {reg[2]}\n"
-                        case '-':
-                            text_segment += f"sub {reg[0]}, {reg[1]}, {reg[2]}\n"
-                        case '*':
-                            text_segment += f"mult {reg[1]}, {reg[2]}\n"
-                            text_segment += f"mflo {reg[0]}\n"
-                        case '/':
-                            text_segment += f"div {reg[1]}, {reg[2]}\n"
-                            text_segment += f"mflo {reg[0]}\n"
-                        case '%':
-                            text_segment += f"div {reg[1]}, {reg[2]}\n"
-                            text_segment += f"mfhi {reg[0]}\n"
-
-                elif self.is_assignment_instruction(line):
-                    # TODO: check for type casting
-                    subject, operand = line.split()[0], line.split()[2]
-
-                    reg0, spill0 = self.get_reg(
-                        live_and_next_use_blocks, blocks.index(block), subject)
-
-                    if spill0 == 1:
-                        for var in self.register_descriptor[reg0]:
-                            text_segment += f"sw {reg0}, {var}\n"
-                            if reg0 in self.address_descriptor[var]:
-                                self.address_descriptor[var].remove(reg0)
-                        self.register_descriptor[reg0] = []
-
-                    if operand.isdigit():
-                        operand = int(operand)
-                        text_segment += f"li {reg0}, {operand}\n"
-                        self.address_descriptor[subject].append(reg0)
-                        self.register_descriptor[reg0].append(operand)
-                    elif "'" in operand:
-                        text_segment += f"li {reg0}, {operand}\n"
-                        self.address_descriptor[subject].append(reg0)
-                        self.register_descriptor[reg0].append(operand)
-                    elif '"' in operand:
-                        pass
-                    else:
-                        # float
-                        pass
-
-                elif self.is_arithmetic_instruction_unary(line):
-                    # TODO: check for type casting
-                    subject, operand = line.split()[0], line.split()[2]
-
-                    reg0, spill0 = self.get_reg(
-                        live_and_next_use_blocks, blocks.index(block), subject)
-
-                    if spill0 == 1:
-                        for var in self.register_descriptor[reg0]:
-                            text_segment += f"sw {reg0}, {var}\n"
-                            if reg0 in self.address_descriptor[var]:
-                                self.address_descriptor[var].remove(reg0)
-                        self.register_descriptor[reg0] = []
-
-                    if operand.isdigit():
-                        operand = int(operand)
-                        text_segment += f"li {reg0}, {operand}\n"
-                        text_segment += f"sub {reg0}, $zero, {reg0}\n"
-                        self.address_descriptor[subject].append(reg0)
-                        self.register_descriptor[reg0].append(operand)
-                    else:
-                        # float
-                        pass
+                    if operator == '+':
+                        text_segment += f"add {reg[0]}, {reg[1]}, {reg[2]}\n"
+                    elif operator == '-':
+                        text_segment += f"sub {reg[0]}, {reg[1]}, {reg[2]}\n"
+                    elif operator == '*':
+                        text_segment += f"mult {reg[1]}, {reg[2]}\n"
+                        text_segment += f"mflo {reg[0]}\n"
+                    elif operator == '/':
+                        text_segment += f"div {reg[1]}, {reg[2]}\n"
+                        text_segment += f"mflo {reg[0]}\n"
+                    elif operator == '%':
+                        text_segment += f"div {reg[1]}, {reg[2]}\n"
+                        text_segment += f"mfhi {reg[0]}\n"
 
                 elif self.is_array_assignment(line):
                     # arr[x] = b
                     array_name = line.split()[0].split('[')[0]
+                    # var_index will never be a constant in the TAC
                     var_index = line.split()[0].split('[')[:-1]
                     data_type = self.array_addresses[array_name][1]
 
@@ -411,15 +371,131 @@ class CodeGeneration:
                         pass
 
                     else:
-                        if var_index.isdigit():
+                        self.address_descriptor[var_index].append(reg0)
+                        self.register_descriptor[reg0].append(var_index)
+                        text_segment += f"sw {reg1}, {array_name}({reg0})\n"
+
+                elif self.is_assignment_instruction(line):
+                    # TODO: check for type casting
+                    if '(' in line:
+                        subject, operand, cast_type = line.split()[0], line.split()[
+                            3], line.split()[2]
+
+                        if cast_type == 'int':
+                            # if operand is char and cast type is int, do nohting because mips will take care of it
+
+                            # here, we just need to check if the operand is a float or not
+                            # if the operand is not float, do nothing
                             pass
-                        elif "'" in var_index:
-                            pass
-                        elif '"' in var_index:
+
+                        # elif cast_type == ''
+
+                    else:
+                        subject, operand = line.split()[0], line.split()[2]
+
+                        reg0, spill0 = self.get_reg(
+                            live_and_next_use_blocks, blocks.index(block), subject)
+
+                        if spill0 == 1:
+                            for var in self.register_descriptor[reg0]:
+                                text_segment += f"sw {reg0}, {var}\n"
+                                if reg0 in self.address_descriptor[var]:
+                                    self.address_descriptor[var].remove(reg0)
+                            self.register_descriptor[reg0] = []
+
+                        if operand.isdigit():
+                            # the operand is an integer
+                            operand = int(operand)
+                            text_segment += f"li {reg0}, {operand}\n"
+                            self.address_descriptor[subject].append(reg0)
+                            self.register_descriptor[reg0].append(operand)
+                        elif "'" in operand:
+                            # The operand is a character
+                            text_segment += f"li {reg0}, {operand}\n"
+                            self.address_descriptor[subject].append(reg0)
+                            self.register_descriptor[reg0].append(operand)
+                        elif '"' in operand:
+                            # The operand is a string
                             pass
                         else:
                             # float
+                            # Need to handle everything differently for float type variables
                             pass
+
+                elif self.is_arithmetic_instruction_unary(line):
+                    # TODO: check for type casting
+                    subject, operand = line.split()[0], line.split()[2]
+
+                    reg0, spill0 = self.get_reg(
+                        live_and_next_use_blocks, blocks.index(block), subject)
+
+                    if spill0 == 1:
+                        for var in self.register_descriptor[reg0]:
+                            text_segment += f"sw {reg0}, {var}\n"
+                            if reg0 in self.address_descriptor[var]:
+                                self.address_descriptor[var].remove(reg0)
+                        self.register_descriptor[reg0] = []
+
+                    if operand.isdigit():
+                        operand = int(operand)
+                        text_segment += f"li {reg0}, {operand}\n"
+                        text_segment += f"sub {reg0}, $zero, {reg0}\n"
+                        self.address_descriptor[subject].append(reg0)
+                        self.register_descriptor[reg0].append(operand)
+                    else:
+                        # float
+                        pass
+
+                elif self.is_if_statement(line):
+                    # ifFalse a <= b goto L1
+                    # the operands are never constants
+                    if_stmt, left, operator, right, label = line.split()[0], line.split(
+                    )[1], line.split()[2], line.split()[3], line.split()[-1]
+
+                    if if_stmt == 'if':
+                        reg = [i for i in range(3)]
+                        spill = [0, 0, 0]
+
+                        reg[0], spill[0] = self.get_reg(
+                            live_and_next_use_blocks, blocks.index(block), left)
+                        reg[1], spill[1] = self.get_reg(
+                            live_and_next_use_blocks, blocks.index(block), right)
+                        reg[2], spill[2] = self.get_reg(
+                            live_and_next_use_blocks, blocks.index(block), "~")
+
+                        for i in range(3):
+                            if spill[i] == 1:
+                                for var in self.register_descriptor[reg[i]]:
+                                    text_segment += f"sw {reg[i]}, {var}\n"
+                                    if reg[i] in self.address_descriptor[var]:
+                                        self.address_descriptor[var].remove(
+                                            reg[i])
+                                self.register_descriptor[reg[i]] = []
+
+                        self.address_descriptor[subject].append(reg[0])
+                        self.register_descriptor[reg[0]].append(left)
+
+                        self.address_descriptor[subject].append(reg[1])
+                        self.register_descriptor[reg[1]].append(right)
+
+                        if operator == '<=':
+                            text_segment += f"sub {reg[2]}, {reg[0]}, {reg[1]}\n"
+                            text_segment += f"ble {reg[2]}, $zero, {label}\n"
+                        elif operator == '>=':
+                            text_segment += f"sub {reg[2]}, {reg[1]}, {reg[0]}\n"
+                            text_segment += f"ble {reg[2]}, $zero, {label}\n"
+                        elif operator == '<':
+                            text_segment += f"sub {reg[2]}, {reg[0]}, {reg[1]}\n"
+                            text_segment += f"blt {reg[2]}, $zero, {label}\n"
+                        elif operator == '>':
+                            text_segment += f"sub {reg[2]}, {reg[1]}, {reg[0]}\n"
+                            text_segment += f"blt {reg[2]}, $zero, {label}\n"
+                        elif operator == '==':
+                            text_segment += f"sub {reg[2]}, {reg[0]}, {reg[1]}\n"
+                            text_segment += f"beq {reg[2]}, $zero, {label}\n"
+                        elif operator == '!=':
+                            text_segment += f"sub {reg[2]}, {reg[0]}, {reg[1]}\n"
+                            text_segment += f"bne {reg[2]}, $zero, {label}\n"
 
         print('hello\n', text_segment)
 
@@ -496,7 +572,7 @@ class CodeGeneration:
 
         # intermediate_code = "#L1:\ngoto #L3\n#L2:\n#L3:\n#L4:\n#L8:\ngoto #L4\ngoto #L8\nhello"
         # intermediate_code = "abc:\n\n\nif a == 5 goto L5\n"
-        intermediate_code = f"b = 0\nc = 5\na = b + c\nb = a - c\nc = a {'%'} b"
+        intermediate_code = f"x = 5\narr[x] = 0\n"
         # intermediate_code = f"abc true\n iftrue\ntruecy"
 
         intermediate_code = re.sub(r'\btrue\b', '1', intermediate_code)

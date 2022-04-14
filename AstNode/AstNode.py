@@ -224,8 +224,10 @@ class AstNode:
                     typecast_variable_right = parser.get_new_temp("int")
                     head.code += f"{typecast_variable_right} = (int) {right.value}\n"
 
-                head.code += f"if {typecast_variable_left} == 0 goto {label2}\n"
-                head.code += f"if {typecast_variable_right} == 0 goto {label2}\n"
+                t0 = parser.get_new_temp("int")
+                head.code += f"{t0} = 0\n"
+                head.code += f"if {typecast_variable_left} == {t0} goto {label2}\n"
+                head.code += f"if {typecast_variable_right} == {t0} goto {label2}\n"
                 head.code += f"{head.value} = true\n"
                 head.code += f"goto {label1}\n"
                 head.code += f"{label2}:\n"
@@ -277,8 +279,11 @@ class AstNode:
                 if right.data_type != 'int':
                     typecast_variable_right = parser.get_new_temp("int")
                     head.code += f"{typecast_variable_right} = (int) {right.value}\n"
-                head.code += f"if {typecast_variable_left} != 0 goto {label2}\n"
-                head.code += f"if {typecast_variable_right} != 0 goto {label2}\n"
+
+                t0 = parser.get_new_temp("int")
+                head.code += f"{t0} = 0\n"
+                head.code += f"if {typecast_variable_left} != {t0} goto {label2}\n"
+                head.code += f"if {typecast_variable_right} != {t0} goto {label2}\n"
                 head.code += f"{head.value} = false\n"
                 head.code += f"goto {label1}\n"
                 head.code += f"{label2}:\n"
@@ -394,7 +399,10 @@ class AstNode:
                 if left.data_type != 'int':
                     typecast_variable_left = parser.get_new_temp("int")
                     head.code += f"{typecast_variable_left} = (int) {left.value}\n"
-                head.code += f"if {typecast_variable_left} == 0 goto {label2}\n"
+
+                t0 = parser.get_new_temp("int")
+                head.code += f"{t0} = 0\n"
+                head.code += f"if {typecast_variable_left} == {t0} goto {label2}\n"
                 head.code += f"{head.value} = false\n"
                 head.code += f"goto {label1}\n"
                 head.code += f"{label2}:\n"
@@ -993,7 +1001,9 @@ class AstNode:
 
         elif head.operator == Operator.A_VARIABLE or head.operator == Operator.A_INTCONST or head.operator == Operator.A_STRINGCONST or head.operator == Operator.A_CHARCONST or head.operator == Operator.A_FLOATCONST:
 
-            head.code = ""
+            t0 = parser.get_new_temp("int")
+            head.code = f"{t0} = {head.value}\n"
+            head.value = t0
         # --------------------------------------------------------------------
 
         elif head.operator == Operator.A_BOOL:
@@ -1010,8 +1020,10 @@ class AstNode:
                     left.operator == Operator.A_MODULO:
 
                 # print("left.code", left.value is one)
+                t0 = parser.get_new_temp("int")
+                head.code += f"{t0} = 0\n"
                 head.code = left.code + "\n" + "if " + left.value + \
-                    " " + "!=" + " 0 goto " + head.true + temp_false
+                    " " + "!= " + t0 + " goto " + head.true + temp_false
 
             else:
                 if left.operator == Operator.A_INTCONST and left.value == "0":
