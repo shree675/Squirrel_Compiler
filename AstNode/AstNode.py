@@ -52,6 +52,7 @@ class Operator(Enum):
     A_FUNC = "func"
     A_FUNCCALL = "func call"
     A_INPUT = "input"
+    A_INPUT_STRING = "input string"
     A_OUTPUT = "output"
     A_NODE = "node"
     A_ROOT = "root"
@@ -1143,6 +1144,25 @@ class AstNode:
 
                 head.code = left_value.code
                 head.code += f"input {cur.data_type}, {left_value.value}\n"
+        
+        elif head.operator == Operator.A_INPUT_STRING:
+
+            left_value = head.left
+            length = head.right
+
+            if left_value.operator != Operator.A_VARIABLE:
+                AstNode.raise_error("Semantic Error : \"input_string\" can only be used with a variable.\n")
+                
+            # check if the variable is of type string
+
+            if left_value.data_type != "string":
+                AstNode.raise_error(
+                    f'Semantic Error: variable \"{left_value.value}\" is not of type \"string\"\n')
+                
+
+            head.code = f"input_string {left_value.value}, {length}\n"
+            return 
+
 
         elif head.operator == Operator.A_OUTPUT:
 
