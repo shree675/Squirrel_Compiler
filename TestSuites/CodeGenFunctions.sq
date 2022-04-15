@@ -1,10 +1,13 @@
-int @fun(int x){
-    x = x + 5;
-    return x;
+void @fun1(int n){
+    if(n==0){
+        return;
+    }
+
+    fun1(n-1);
+    return;
 }
 
 void @start(){
-    int a = 12;
-    int b = fun(a);
-    output(b);
+    int a = 10;
+    fun1(a);
 }

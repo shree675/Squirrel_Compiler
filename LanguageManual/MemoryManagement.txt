@@ -1,0 +1,62 @@
+register_descriptor = {
+    "$r1" = ["a", "b"]
+}
+
+address_descriptor = {
+    "name" : {
+        "memory" : "0x12345678"     // get from the stack pointer
+        "registers: []
+    },
+
+    "age" : {
+
+    },
+
+    "t1" : {
+        "memory" : "0x12345678"
+        "registers" : []
+    }
+}
+
+
+Stack allocation :-
+
+my_fun:
+    t1 = t2 
+    // check in the address_descriptor if t1 is there
+    // if not :
+    //      address_descriptor.add(key="t1", {
+    //         memory  
+    //      })
+
+
+// t1 is in $r1
+sub $sp, $sp, 4  // $sp -> 
+sw $sp, $r1
+
+lw $r1, <memory_address>
+
+function_calls (tac):
+
+
+sum:
+    t4 = t5+t6
+    return t4
+
+main:
+    t1 = t2
+    param t1
+    param t2
+    t3 = call sum,2
+    output(t3)
+
+spill for the first time :-
+    
+    // spill $r1
+    // sw <stack_address>, $r1
+    jal sum
+
+    
+
+
+

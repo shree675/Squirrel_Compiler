@@ -672,9 +672,13 @@ class CodeGeneration:
                     num_words = len(line.split())
                     var_name = line.split()[-1]
 
+                    # reg: [set of variables]
+                    # var: [list of reigsters]
+
                     if num_words > 1:
                         # return with value
                         # TODO : get the register from the variable descriptor
+                        # for reg in self.register_descriptor
                         text_segment += f"lw $v0, {line.split()[1]}\n"
                         pass
 

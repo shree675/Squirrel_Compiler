@@ -1,36 +1,43 @@
-fun:
+fun1:
 
-~t0 = 5
+~t0 = 0
 
-~t1 = x`2 + ~t0
+if n`2 == ~t0 goto #L11
+goto #L10
 
-x`2 = ~t1
+#L11:
+
+return
+#L12:
+
+#L10:
+
+~t3 = 1
+
+~t2 = n`2 - ~t3
+
+param ~t2
+~t1 = call fun1, 1
 
 #L6:
-
-return x`2
+return
 #L4:
-return 0
+return 
 
 start:
 
-~t2 = 12
+~t4 = 10
 
-a`3 = (int) ~t2
+a`4 = (int) ~t4
 
-#L13:
+#L17:
 
-param a`3
-~t3 = call fun, 1
+param a`4
+~t5 = call fun1, 1
 
-b`3 = (int) ~t3
-
-#L11:
-output int, b`3
-
-#L9:
+#L15:
 return 
 
-#L8:
+#L14:
 
 #L2:
