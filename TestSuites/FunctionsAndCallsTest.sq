@@ -1,7 +1,7 @@
-``int @sum(int a, int b, float d){
+int @sum(int a, int b, float d){
     int c = a+b;
     return c; 
-}``
+}
 
 int @start(){
 
