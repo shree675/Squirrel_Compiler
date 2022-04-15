@@ -7,7 +7,7 @@ arr`2[8] = 0
 arr`2[12] = 0
 
 #L8:
-~t0 = 0
+~t0 = 1
 
 sum`2 = (int) ~t0
 
@@ -29,21 +29,29 @@ goto #L11
 
 ~t6 = ~t5 * 4
 
-~t7 = (int) i`3
-arr`2[~t6] = ~t7
+~t7 = 1
+
+~t8 = i`3 + ~t7
+
+~t9 = (int) ~t8
+arr`2[~t6] = ~t9
 
 #L19:
 
-~t8 = sum`2 * i`3
+~t11 = i`3 * 1
 
-sum`2 = ~t8
+~t12 = ~t11 * 4
+
+~t10 = sum`2 * arr`2[~t12]
+
+sum`2 = ~t10
 
 #L17:
 
-~t9 = i`3 * 1
+~t13 = i`3 * 1
 
-~t10 = ~t9 * 4
-output int, arr`2[~t10]
+~t14 = ~t13 * 4
+output int, arr`2[~t14]
 
 #L15:
 

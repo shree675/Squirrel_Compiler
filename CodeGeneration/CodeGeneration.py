@@ -6,27 +6,6 @@ import os
 
 class CodeGeneration:
 
-    # registers_map = {
-    #     'r0': '$t0',
-    #     'r1': '$t1',
-    #     'r2': '$t2',
-    #     'r3': '$t3',
-    #     'r4': '$t4',
-    #     'r5': '$t5',
-    #     'r6': '$t6',
-    #     'r7': '$t7',
-    #     'r8': '$s0',
-    #     'r9': '$s1',
-    #     'r10': '$s2',
-    #     'r11': '$s3',
-    #     'r12': '$s4',
-    #     'r13': '$s5',
-    #     'r14': '$s6',
-    #     'r15': '$s7',
-    #     'r16': '$t8',
-    #     'r17': '$t9',
-    # }
-
     registers_map = {
         '$t0': 'r0',
         '$t1': 'r1',
@@ -46,6 +25,32 @@ class CodeGeneration:
         '$s7': 'r15',
         '$t8': 'r16',
         '$t9': 'r17',
+    }
+
+    # 22 registers are available for use
+    floating_point_registers_map = {
+        '$f1': '$f1',
+        '$f3': '$f3',
+        '$f4': '$f4',
+        '$f5': '$f5',
+        '$f6': '$f6',
+        '$f7': '$f7',
+        '$f8': '$f8',
+        '$f9': '$f9',
+        '$f10': '$f10',
+        '$f11': '$f11',
+        '$f20': '$f20',
+        '$f21': '$f21',
+        '$f22': '$f22',
+        '$f23': '$f23',
+        '$f24': '$f24',
+        '$f25': '$f25',
+        '$f26': '$f26',
+        '$f27': '$f27',
+        '$f28': '$f28',
+        '$f29': '$f29',
+        '$f30': '$f30',
+        '$f31': '$f31',
     }
 
     datatype_sizes = {
@@ -69,6 +74,13 @@ class CodeGeneration:
         self.string_addresses = defaultdict()
         # This is the fixed starting address of data segment on QTSPIM
         self.memory_pointer = 0x10010000
+
+    def isfloat(self, num):
+        try:
+            float(num)
+            return True
+        except ValueError:
+            return False
 
     # started
     def is_arithmetic_instruction_binary(self, instruction):
@@ -113,31 +125,28 @@ class CodeGeneration:
 
     # started
     def is_if_statement(self, instruction):
-        if 'if' in instruction:
+        if instruction and (instruction.split()[0] == 'if' or instruction.split()[0] == 'ifFalse'):
             return True
         return False
 
     def is_return_statement(self, instruction):
-        if instruction.split()[0] == 'return':
+        if instruction and instruction.split()[0] == 'return':
             return True
         return False
-        # if 'return' in instruction:
-        #     return True
-        # return False
 
     def is_param_instruction(self, instruction):
-        if 'param' in instruction:
+        if instruction and instruction.split()[0] == 'param':
             return True
         return False
 
     def is_input(self, instruction):
-        if 'input' in instruction:
+        if instruction and instruction.split()[0] == 'input':
             return True
         return False
 
     # started
     def is_output(self, instruction):
-        if 'output' in instruction:
+        if instruction and instruction.split()[0] == 'output':
             return True
         return False
 
@@ -169,7 +178,7 @@ class CodeGeneration:
         self.register_descriptor = defaultdict(list)
         self.address_descriptor = defaultdict(list)
 
-    def get_reg(self, live_and_next_use_blocks, index, variable):
+    def get_reg(self, is_float, live_and_next_use_blocks, index, variable):
         # TODO: Consider passing live_and_next_use_blocks[index] (basically just the block) instead of live_and_next_use_blocks, index
         """
         The get_reg function takes the live analysis information of the relevant block in live_and_next_use_blocks
@@ -184,17 +193,25 @@ class CodeGeneration:
 
         # if the variable is already contained in some register
         # No need to spill. Just return that register
-        for reg in self.register_descriptor:
-            if reg in self.address_descriptor[variable]:
-                return (reg, 0)
-
-        # print(variable)
+        if is_float:
+            for reg in self.register_descriptor:
+                if 'f' in reg and reg in self.address_descriptor[variable]:
+                    return (reg, 0)
+        else:
+            for reg in self.register_descriptor:
+                if reg in self.address_descriptor[variable]:
+                    return (reg, 0)
 
         # if there is an empty register available
         # No need to spill, just return that register
-        for reg in self.registers_map:
-            if not self.register_descriptor[reg]:
-                return (reg, 0)
+        if is_float:
+            for reg in self.floating_point_registers_map:
+                if self.register_descriptor[reg] == []:
+                    return (reg, 0)
+        else:
+            for reg in self.registers_map:
+                if not self.register_descriptor[reg]:
+                    return (reg, 0)
 
         # otherwise choose the register occupied by a temporary variable with no next use
         for record in live_and_next_use_blocks[index]:
@@ -202,10 +219,15 @@ class CodeGeneration:
                 if var[0] == '~' and record[var]['next_use'] == -1:
                     # -1 indicates no next use
                     temp_var = var
-                    for reg in self.register_descriptor[reg]:
-                        if temp_var in self.register_descriptor[reg]:
-                            self.register_descriptor[reg].remove(temp_var)
-                            return (reg, 0)
+                    for reg in self.register_descriptor:
+                        if is_float and 'f' in reg:
+                            if temp_var in self.register_descriptor[reg]:
+                                self.register_descriptor[reg].remove(temp_var)
+                                return (reg, 0)
+                        else:
+                            if temp_var in self.register_descriptor[reg]:
+                                self.register_descriptor[reg].remove(temp_var)
+                                return (reg, 0)
 
         # else choose the register occupied by a non-temporary variable with no next use
         # spill the register
@@ -214,10 +236,16 @@ class CodeGeneration:
                 if record[var]['next_use'] == -1:
                     temp_var = var
                     # TODO: Check the naming convention - inconsistent for variable in self.register_descriptor
-                    for reg in self.register_descriptor[reg]:
-                        if temp_var in self.register_descriptor[reg]:
-                            self.register_descriptor[reg].remove(temp_var)
-                            return (reg, 1)
+                    for reg in self.register_descriptor:
+                        if is_float and 'f' in reg:
+                            if temp_var in self.register_descriptor[reg]:
+                                self.register_descriptor[reg].remove(temp_var)
+                                self.address_descriptor[temp_var].append(reg)
+                                return (reg, 1)
+                        else:
+                            if temp_var in self.register_descriptor[reg]:
+                                self.register_descriptor[reg].remove(temp_var)
+                                return (reg, 1)
 
         # else choose the register occupied by a temporary variable with the farthest nextuse
         # spill the register
@@ -230,10 +258,16 @@ class CodeGeneration:
                     temp_with_farthest_next_use = var
         if farthest_next_use != -1:
             for reg in self.register_descriptor:
-                if temp_with_farthest_next_use in self.register_descriptor[reg]:
-                    self.register_descriptor[reg].remove(
-                        temp_with_farthest_next_use)
-                    return (reg, 1)
+                if is_float and 'f' in reg:
+                    if temp_with_farthest_next_use in self.register_descriptor[reg]:
+                        self.register_descriptor[reg].remove(
+                            temp_with_farthest_next_use)
+                        return (reg, 1)
+                else:
+                    if temp_with_farthest_next_use in self.register_descriptor[reg]:
+                        self.register_descriptor[reg].remove(
+                            temp_with_farthest_next_use)
+                        return (reg, 1)
 
         # else choose the register occupied by a non-temporary variable with the farthest nextuse
         # spill the register
@@ -246,12 +280,16 @@ class CodeGeneration:
                     temp_with_farthest_next_use = var
         if farthest_next_use != -1:
             for reg in self.register_descriptor:
-                if temp_with_farthest_next_use in self.register_descriptor[reg]:
-                    self.register_descriptor[reg].remove(
-                        temp_with_farthest_next_use)
-                    return (reg, 1)
-
-    # def get_float_reg(self, live_and_next_use_blocks, index, variable):
+                if is_float and 'f' in reg:
+                    if temp_with_farthest_next_use in self.register_descriptor[reg]:
+                        self.register_descriptor[reg].remove(
+                            temp_with_farthest_next_use)
+                        return (reg, 1)
+                else:
+                    if temp_with_farthest_next_use in self.register_descriptor[reg]:
+                        self.register_descriptor[reg].remove(
+                            temp_with_farthest_next_use)
+                        return (reg, 1)
 
     def variable_in_register(self, variable):
         for reg in self.register_descriptor:
@@ -313,8 +351,8 @@ class CodeGeneration:
                     if '[' in operand1:
                         array_name = operand1.split('[')[0]
                         var_index = operand1.split('[')[1].split(']')[0]
-                        reg[1], spill[1] = self.get_reg(
-                            live_and_next_use_blocks, blocks.index(block), var_index)
+                        reg[1], spill[1] = self.get_reg(False,
+                                                        live_and_next_use_blocks, blocks.index(block), var_index)
                         if spill[1] == 1:
                             for var in self.register_descriptor[reg[1]]:
                                 text_segment += f"sw {reg[1]}, {var}\n"
@@ -331,8 +369,8 @@ class CodeGeneration:
                     if '[' in operand2:
                         array_name = operand2.split('[')[0]
                         var_index = operand2.split('[')[1].split(']')[0]
-                        reg[2], spill[1] = self.get_reg(
-                            live_and_next_use_blocks, blocks.index(block), var_index)
+                        reg[2], spill[1] = self.get_reg(False,
+                                                        live_and_next_use_blocks, blocks.index(block), var_index)
                         if spill[2] == 1:
                             for var in self.register_descriptor[reg[2]]:
                                 text_segment += f"sw {reg[2]}, {var}\n"
@@ -346,16 +384,16 @@ class CodeGeneration:
                                 var_index)
                         text_segment += f"lw {reg[2]}, {array_name}({reg[2]})\n"
 
-                    reg[0], spill[0] = self.get_reg(
-                        live_and_next_use_blocks, blocks.index(block), subject)
+                    reg[0], spill[0] = self.get_reg(False,
+                                                    live_and_next_use_blocks, blocks.index(block), subject)
                     flag = False
                     if reg[1] == 1:
-                        reg[1], spill[1] = self.get_reg(
-                            live_and_next_use_blocks, blocks.index(block), operand1)
+                        reg[1], spill[1] = self.get_reg(False,
+                                                        live_and_next_use_blocks, blocks.index(block), operand1)
                         flag = True
                     if reg[2] == 2:
-                        reg[2], spill[2] = self.get_reg(
-                            live_and_next_use_blocks, blocks.index(block), operand2)
+                        reg[2], spill[2] = self.get_reg(False,
+                                                        live_and_next_use_blocks, blocks.index(block), operand2)
                         flag = True
 
                         # If any of the registers is spilled, then spill the register
@@ -415,10 +453,10 @@ class CodeGeneration:
                     var_index = line.split()[0].split('[')[1][:-1]
                     data_type = self.array_addresses[array_name][1]
 
-                    reg0, spill0 = self.get_reg(
-                        live_and_next_use_blocks, blocks.index(block), var_index)
-                    reg1, spill1 = self.get_reg(
-                        live_and_next_use_blocks, blocks.index(block), line.split()[-1])
+                    reg0, spill0 = self.get_reg(False,
+                                                live_and_next_use_blocks, blocks.index(block), var_index)
+                    reg1, spill1 = self.get_reg(False,
+                                                live_and_next_use_blocks, blocks.index(block), line.split()[-1])
 
                     if spill0 == 1:
                         for var in self.register_descriptor[reg0]:
@@ -463,13 +501,14 @@ class CodeGeneration:
                             # if the operand is not float, do nothing
                             pass
 
-                        # elif cast_type == ''
+                        elif cast_type == 'float':
+                            pass
 
                     else:
                         subject, operand = line.split()[0], line.split()[2]
 
-                    reg0, spill0 = self.get_reg(
-                        live_and_next_use_blocks, blocks.index(block), subject)
+                    reg0, spill0 = self.get_reg(False,
+                                                live_and_next_use_blocks, blocks.index(block), subject)
 
                     # TODO: spill correctly
                     if spill0 == 1:
@@ -479,24 +518,37 @@ class CodeGeneration:
                                 self.address_descriptor[var].remove(reg0)
                         self.register_descriptor[reg0] = []
 
-                    if operand.isdigit():
+                    if self.isfloat(operand):
+                        # the operand is a float constant
+                        freg0, spill0 = self.get_reg(
+                            True, live_and_next_use_blocks, blocks.index(block), subject)
+                        if spill0 == 1:
+                            for var in self.register_descriptor[freg0]:
+                                text_segment += f"s.s {freg0}, {var}\n"
+                                if freg0 in self.address_descriptor[var]:
+                                    self.address_descriptor[var].remove(freg0)
+                            self.register_descriptor[freg0] = []
+                        text_segment += f"li.s {freg0}, {operand}\n"
+                        self.register_descriptor[freg0].append(subject)
+                        self.address_descriptor[subject].append(freg0)
+                    elif operand.isdigit():
                         # the operand is an integer
                         operand = int(operand)
                         text_segment += f"li {reg0}, {operand}\n"
                         self.address_descriptor[subject].append(reg0)
-                        self.register_descriptor[reg0].append(operand)
-                    # TODO: elif operand is a float
+                        self.register_descriptor[reg0].append(subject)
                     elif "'" in operand:
                         # The operand is a character
                         text_segment += f"li {reg0}, {operand}\n"
                         self.address_descriptor[subject].append(reg0)
-                        self.register_descriptor[reg0].append(operand)
+                        self.register_descriptor[reg0].append(subject)
                     elif '"' in operand:
                         # The operand is a string
                         pass
                     else:
-                        reg1, spill1 = self.get_reg(
-                            live_and_next_use_blocks, blocks.index(block), operand)
+                        # if it is a variable
+                        reg1, spill1 = self.get_reg(False,
+                                                    live_and_next_use_blocks, blocks.index(block), operand)
 
                         if spill1 == 1:
                             for var in self.register_descriptor[reg1]:
@@ -520,8 +572,8 @@ class CodeGeneration:
                     print("line : ", line)
                     subject, operand = line.split()[0], line.split()[2]
 
-                    reg0, spill0 = self.get_reg(
-                        live_and_next_use_blocks, blocks.index(block), subject)
+                    reg0, spill0 = self.get_reg(False,
+                                                live_and_next_use_blocks, blocks.index(block), subject)
 
                     if spill0 == 1:
                         for var in self.register_descriptor[reg0]:
@@ -549,12 +601,12 @@ class CodeGeneration:
                     reg = [i for i in range(3)]
                     spill = [0, 0, 0]
 
-                    reg[0], spill[0] = self.get_reg(
-                        live_and_next_use_blocks, blocks.index(block), left)
-                    reg[1], spill[1] = self.get_reg(
-                        live_and_next_use_blocks, blocks.index(block), right)
-                    reg[2], spill[2] = self.get_reg(
-                        live_and_next_use_blocks, blocks.index(block), "~")
+                    reg[0], spill[0] = self.get_reg(False,
+                                                    live_and_next_use_blocks, blocks.index(block), left)
+                    reg[1], spill[1] = self.get_reg(False,
+                                                    live_and_next_use_blocks, blocks.index(block), right)
+                    reg[2], spill[2] = self.get_reg(False,
+                                                    live_and_next_use_blocks, blocks.index(block), "~")
 
                     for i in range(3):
                         if spill[i] == 1:
@@ -640,8 +692,8 @@ class CodeGeneration:
                         array_name = variable.split('[')[0]
                         variable = variable.split('[')[1][:-1]
 
-                    reg0, spill0 = self.get_reg(
-                        live_and_next_use_blocks, blocks.index(block), variable)
+                    reg0, spill0 = self.get_reg(False,
+                                                live_and_next_use_blocks, blocks.index(block), variable)
 
                     if spill0 == 1:
                         for var in self.register_descriptor[reg0]:
@@ -715,8 +767,10 @@ class CodeGeneration:
 
         for array_var in self.array_addresses:
             array_initializations += f'\t{array_var}:\n'
-            if self.array_addresses[array_var][1] == 'int' or self.array_addresses[array_var][1] == 'float':
+            if self.array_addresses[array_var][1] == 'int':
                 array_initializations += f'\t\t.word '
+            elif self.array_addresses[array_var][1] == 'float':
+                array_initializations += f'\t\t.float '
             elif self.array_addresses[array_var][1] == 'char' or self.array_addresses[array_var][1] == 'bool':
                 array_initializations += f'\t\t.byte '
             for i in range(len(self.array_addresses[array_var][0])):
@@ -729,7 +783,7 @@ class CodeGeneration:
 
         self.free_all()
 
-        assembly_code = f".data\n{array_initializations}\n\n{string_constants}\n"
+        assembly_code = f".data\n{array_initializations}{string_constants}\n"
 
         return assembly_code
 
