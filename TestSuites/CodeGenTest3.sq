@@ -1,11 +1,9 @@
 void @start() {
     int arr[4] = { 0, 0, 0, 0 };
-    int sum=0;
+    int sum=1;
     for(int i = 0; i < 4; i=i+1) {
-        arr[i]=i;
-        sum = sum * i;
-        ``sum = sum * arr[i];``
-        ``sum = sum + arr[i];``
+        arr[i]=i+1;
+        sum = sum * arr[i];
         output(arr[i]);
     }
     output(sum);
