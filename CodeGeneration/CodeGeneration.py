@@ -3,8 +3,6 @@ import re
 from collections import defaultdict
 import os
 
-from matplotlib.pyplot import text
-
 
 class CodeGeneration:
 
@@ -93,12 +91,14 @@ class CodeGeneration:
         return False
 
     def is_function_call_with_return(self, instruction):
-        if '=' in instruction and 'call' in instruction:
+        words = instruction.split()
+        if words[1] == "=" and words[2] == 'call':
             return True
         return False
 
     def is_function_call_without_return(self, instruction):
-        if 'call' in instruction and '=' not in instruction:
+        words = instruction.split()
+        if words[0] == "call":
             return True
         return False
 
@@ -118,9 +118,12 @@ class CodeGeneration:
         return False
 
     def is_return_statement(self, instruction):
-        if 'return' in instruction:
+        if instruction.split()[0] == 'return':
             return True
         return False
+        # if 'return' in instruction:
+        #     return True
+        # return False
 
     def is_param_instruction(self, instruction):
         if 'param' in instruction:
@@ -514,6 +517,7 @@ class CodeGeneration:
 
                 elif self.is_arithmetic_instruction_unary(line):
                     # TODO: check for type casting
+                    print("line : ", line)
                     subject, operand = line.split()[0], line.split()[2]
 
                     reg0, spill0 = self.get_reg(
@@ -613,6 +617,19 @@ class CodeGeneration:
                             text_segment += f"bne {reg[2]}, $zero, {label}\n"
 
                 elif self.is_return_statement(line):
+                    num_words = len(line.split())
+                    var_name = line.split()[-1]
+
+                    reg: [set of variables]
+                    var: [list of reigsters]
+
+                    if num_words > 1:
+                        # return with value
+                        # TODO : get the register from the variable descriptor
+                        for reg in self.register_descriptor
+                        text_segment += f"lw $v0, {line.split()[1]}\n"
+                        pass
+
                     text_segment += f"jr $ra\n"
 
                 elif self.is_output(line):

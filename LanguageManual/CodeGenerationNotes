@@ -1,1 +1,24 @@
 https://www2.engr.arizona.edu/~ece369/Resources/spim/QtSPIM_examples.pdf
+
+Phase 2 Todos :
+
+1. Making CFG from basic blocks
+2. Deadcode elimination
+3. Any other optimization ?
+4. Function calls
+5. Binaray multiplication not working
+6. Input statements
+7. Type casting
+8. Spilling the registers logic not correct - updating the register descriptor
+9. Some optimization can be faulty
+
+Done :
+
+1. Output statements
+2. GOTO
+3. If and IfFalse statements for integers
+4. assignment without explicit type casting
+5. bin. arithmetic statements for integers
+6. Array variable assignment for int
+7. Return without value
+8.
