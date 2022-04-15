@@ -4,7 +4,7 @@ register_descriptor = {
 
 address_descriptor = {
     "name" : {
-        "memory" : "0x12345678"     // get from the stack pointer
+        "offset" : "0x12345678"     // get from the stack pointer
         "registers: []
     },
 
@@ -13,7 +13,7 @@ address_descriptor = {
     },
 
     "t1" : {
-        "memory" : "0x12345678"
+        "offset" : "0x12345678"
         "registers" : []
     }
 }
