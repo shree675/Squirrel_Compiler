@@ -56,7 +56,26 @@ spill for the first time :-
     // sw <stack_address>, $r1
     jal sum
 
+
+
+TAC
+
+sum:
+    t1 = t2+t3
+    t4 = t1 + t5
+    return t4 
+
+main:
+    t9 = t8+t7
+    t11 = t10 + t6
+    return t11
+
+--------------------------------------------
+MIPS :
+
+sum:
+    move $t0, $sp
     
-
-
+    sub $sp,$sp,8
+    sw  
 
