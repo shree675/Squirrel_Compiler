@@ -5,7 +5,7 @@ register_descriptor = {
 address_descriptor = {
     "name" : {
         "offset" : "0x12345678"     // get from the stack pointer
-        "registers: []
+        "registers": []
     },
 
     "age" : {
