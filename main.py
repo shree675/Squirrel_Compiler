@@ -24,7 +24,8 @@ import sys
 from Preprocessing import preprocessor
 from LexicalAnalysis import lexer
 from SyntaxAnalysis import parser as Parser
-from CodeGeneration import CodeGeneration
+from CodeGeneration import CodeGen
+
 def compile(filename, optimization_level, save_preprocessed_file, save_intermediate_code):
     print(
         f"Compiling {filename} (with optimization level: {optimization_level})")
@@ -40,18 +41,13 @@ def compile(filename, optimization_level, save_preprocessed_file, save_intermedi
     if save_intermediate_code:
         parser.output_file = "./Output/" + \
             filename.split("/")[-1].replace(".sq", ".tac")
-    # print(filename)
-    #print('parser output', parser.output_file)
 
-    # blocks, live_and_next_use_blocks, intermediate_code_final = CodeGeneration.CodeGeneration.generate_target_code(
-    #     parser.parse(tokens))
     # code_generator = CodeGeneration.CodeGeneration()
-    # code_generator.preamble(
-    #     blocks, live_and_next_use_blocks, intermediate_code_final)
-    # code_generator.allocate_registers()
+    # target_code = code_generator.generate_target_code(parser.parse(tokens), optimization_level)
 
-    code_generator = CodeGeneration.CodeGeneration()
-    target_code = code_generator.generate_target_code(parser.parse(tokens), optimization_level)
+    code_generator = CodeGen.CodeGen()
+    target_code = code_generator.generate_target_code(
+        parser.parse(tokens), optimization_level)
 
 
 def main(*argv):
