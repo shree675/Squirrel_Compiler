@@ -1,0 +1,10 @@
+void @start() {
+    int a;
+    input(a);
+
+    char b;
+    input(b);
+
+    float c;
+    input(c);
+}
