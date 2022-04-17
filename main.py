@@ -49,6 +49,13 @@ def compile(filename, optimization_level, save_preprocessed_file, save_intermedi
     target_code = code_generator.generate_target_code(
         parser.parse(tokens), optimization_level)
 
+    output_file_path = "./Output/" + \
+            filename.split("/")[-1].replace(".sq", ".asm")
+
+    f = open(output_file_path, "w")
+    f.write(target_code)
+    f.close()
+
 
 def main(*argv):
     #print('Arguments:', argv[0])
