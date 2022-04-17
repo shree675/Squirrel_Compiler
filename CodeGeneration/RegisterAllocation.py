@@ -1,5 +1,6 @@
 
 from atexit import register
+from ctypes import addressof
 import re
 from collections import defaultdict
 import os
@@ -28,31 +29,31 @@ default_reg_des = {
 
 class RegisterAllocation:
 
-    # registers_map = {
-    #     '$t0': 'r0',
-    #     '$t1': 'r1',
-    #     '$t2': 'r2',
-    #     '$t3': 'r3',
-    #     '$t4': 'r4',
-    #     '$t5': 'r5',
-    #     '$t6': 'r6',
-    #     '$t7': 'r7',
-    #     '$s0': 'r8',
-    #     '$s1': 'r9',
-    #     '$s2': 'r10',
-    #     '$s3': 'r11',
-    #     '$s4': 'r12',
-    #     '$s5': 'r13',
-    #     '$s6': 'r14',
-    #     '$s7': 'r15',
-    #     '$t8': 'r16',
-    #     '$t9': 'r17',
-    # }
-
     registers_map = {
         '$t0': 'r0',
         '$t1': 'r1',
+        '$t2': 'r2',
+        '$t3': 'r3',
+        '$t4': 'r4',
+        '$t5': 'r5',
+        '$t6': 'r6',
+        '$t7': 'r7',
+        '$s0': 'r8',
+        '$s1': 'r9',
+        '$s2': 'r10',
+        '$s3': 'r11',
+        '$s4': 'r12',
+        '$s5': 'r13',
+        '$s6': 'r14',
+        '$s7': 'r15',
+        '$t8': 'r16',
+        '$t9': 'r17',
     }
+
+    # registers_map = {
+    #     '$t0': 'r0',
+    #     '$t1': 'r1',
+    # }
 
     # 22 registers are available for use
     floating_point_registers_map = {
@@ -92,14 +93,17 @@ class RegisterAllocation:
 
     def __init__(self):
         # TODO: change the structure of register_descriptor
-        self.register_descriptor = default_reg_des.copy()
+        # We should add float registers as well
+        self.register_descriptor = default_reg_des
         self.address_descriptor = {}
         self.offset = 4
+        self.text_segment = ''
 
     def isfloat(self, num):
         try:
-            float(num)
-            return True
+            if "'" in num or '"' in num:
+                return False
+            
         except ValueError:
             return False
 
@@ -196,7 +200,8 @@ class RegisterAllocation:
 
     def free_all(self):
         # Reinitialize the register_descriptor and address_descriptor
-        self.register_descriptor = defaultdict(list)
+        # We should add float registers as well
+        self.register_descriptor = default_reg_des
         self.address_descriptor = {}
 
     def get_reg(self, is_float, live_and_next_use_blocks, index, variable):
@@ -221,19 +226,19 @@ class RegisterAllocation:
                     return (reg, 0, 0)
         else:
             for reg in self.register_descriptor:
-                if reg in self.address_descriptor[variable]['registers']:
+                if variable in self.address_descriptor and reg in self.address_descriptor[variable]['registers']:
                     return (reg, 0, 0)
 
         # if there is an empty register available
         # No need to spill, just return that register
-        
+
         if is_float:
             for reg in self.floating_point_registers_map:
-                if self.register_descriptor[reg] == None:
+                if reg in self.register_descriptor and self.register_descriptor[reg] == None:
                     return (reg, 0, 1)
         else:
             for reg in self.registers_map:
-                if self.register_descriptor[reg] == None:
+                if reg in self.register_descriptor and self.register_descriptor[reg] == None:
                     return (reg, 0, 1)
 
         """ The Remaining cases are the ones that involves SPILL"""
@@ -246,13 +251,13 @@ class RegisterAllocation:
                     for reg in self.register_descriptor:
                         if is_float and 'f' in reg:
                             if temp_var == self.register_descriptor[reg]:
-                                #self.register_descriptor[reg].remove(temp_var)
+                                # self.register_descriptor[reg].remove(temp_var)
                                 return (reg, 1, 1)
                         else:
                             if temp_var == self.register_descriptor[reg]:
-                                #self.register_descriptor[reg].remove(temp_var)
+                                # self.register_descriptor[reg].remove(temp_var)
                                 return (reg, 1, 1)
-                    #return (reg,1,1) # Not sure if I need to return temp_ var
+                    # return (reg,1,1) # Not sure if I need to return temp_ var
 
         # else choose the register occupied by a non-temporary variable with no next use
         # spill the register
@@ -263,14 +268,14 @@ class RegisterAllocation:
                     # TODO: Check the naming convention - inconsistent for variable in self.register_descriptor
                     for reg in self.register_descriptor:
                         if is_float and 'f' in reg:
-                            if temp_var == self.register_descriptor[reg]:
-                                #self.register_descriptor[reg].remove(temp_var)
-                                #self.address_descriptor[temp_var]['registers'].append(reg)
-                                return (reg, 1,1)
+                            if reg in self.register_descriptor and temp_var == self.register_descriptor[reg]:
+                                # self.register_descriptor[reg].remove(temp_var)
+                                # self.address_descriptor[temp_var]['registers'].append(reg)
+                                return (reg, 1, 1)
                         else:
-                            if temp_var == self.register_descriptor[reg]:
-                                #self.register_descriptor[reg].remove(temp_var)
-                                return (reg, 1,1)
+                            if reg in self.register_descriptor and temp_var == self.register_descriptor[reg]:
+                                # self.register_descriptor[reg].remove(temp_var)
+                                return (reg, 1, 1)
 
         # else choose the register occupied by a temporary variable with the farthest nextuse
         # spill the register
@@ -315,17 +320,18 @@ class RegisterAllocation:
                         # self.register_descriptor[reg].remove(
                         #     temp_with_farthest_next_use)
                         return (reg, 1, 1)
+        return ('$t9', 1, 1)
 
     def spill_reg(self, register):
         for var in self.register_descriptor[register]:
             try:
                 offset = self.address_descriptor[var]['offset']
-                text_segment += f"sw {register}, {offset}($s8)\n"
+                self.text_segment += f"sw {register}, {offset}($s8)\n"
                 # self.address_descriptor[var]['registers'].remove(register)
             except KeyError:
                 self.offset -= 4
-                text_segment += f"addi $sp, $sp, -4\n"
-                text_segment += f"sw {register}, 4($sp)\n"
+                self.text_segment += f"addi $sp, $sp, -4\n"
+                self.text_segment += f"sw {register}, 4($sp)\n"
                 # self.address_descriptor.push({
                 #     var: {
                 #         'offset': self.offset,
@@ -361,6 +367,7 @@ class RegisterAllocation:
         :param params: The corresponding requirements for the updates (list)
         :return: nothing
         """
+        # TODOD: Think about - do we need to have a  store case as well
         if protocol == 'load':
             # params = [register, variable]
             register = params[0]
@@ -372,12 +379,12 @@ class RegisterAllocation:
             for var in self.address_descriptor:
                 if register in self.address_descriptor[var]['registers']:
                     self.address_descriptor[var]['registers'].remove(register)
-                    
+
             try:
                 self.address_descriptor[variable]['registers'].append(register)
 
             except KeyError:
-                # This exception will never happen  
+                # This exception will never happen
                 self.address_descriptor[variable] = {
                     'offset': self.offset,
                     'registers': [register]
@@ -390,7 +397,8 @@ class RegisterAllocation:
             if self.address_descriptor[variable]['offset'] == None:
                 # Memory not allocated for the variable
                 self.address_descriptor[variable]['offset'] = self.offset
-                self.address_descriptor[variable]['registers'].append(register)
+                # TODO: CHeck -> No need to update registers field of address descriptor
+                # self.address_descriptor[variable]['registers'].append(register)
             else:
                 # Already memory is allocated
                 # Do nothing
@@ -413,14 +421,16 @@ class RegisterAllocation:
 
             try:
                 self.address_descriptor[variable]['registers'].append(register)
-                pass
+
             except KeyError:
                 # If the variable is loaded for the first time into the register
                 self.address_descriptor[variable] = {
                     'offset': None,
                     'registers': [register]
                 }
-
+        print('end of update', protocol)
+        print("address_descriptor",self.address_descriptor)
+        print("register_descriptor",self.address_descriptor)
 
     def allocate_registers(self, blocks, live_and_next_use_blocks, data_segment, array_addresses):
         """
@@ -428,8 +438,6 @@ class RegisterAllocation:
         Note: The cases, i.e., the different types of statements are identified as using elifs in this function, 
         but this function is called inside generate_target_code() function
         """
-        text_segment = ''
-
         self.free_all()
 
         for block in blocks:
@@ -462,11 +470,11 @@ class RegisterAllocation:
                         self.offset = 0
                         line += f"mov $s8, $sp\n"
 
-                    text_segment += line+'\n'
+                    self.text_segment += line+'\n'
 
                 elif line.startswith('goto'):
-                    text_segment += f'j {line.split()[1]}\n'
-#-------------------------------------------------------------------------------------------------
+                    self.text_segment += f'j {line.split()[1]}\n'
+# -------------------------------------------------------------------------------------------------
                 elif self.is_assignment_instruction(line):
                     subject, operand = 0, 0
                     # TODO: Check and handle typecasting
@@ -486,8 +494,8 @@ class RegisterAllocation:
                     else:
                         subject, operand = line.split()[0], line.split()[2]
                     # TODO: Change this block and index passing
-                    reg0, spill0 = self.get_reg(False,
-                                                live_and_next_use_blocks, blocks.index(block), subject)
+                    reg0, spill0, update0 = self.get_reg(False,
+                                                         live_and_next_use_blocks, blocks.index(block), subject)
 
                     if spill0 == 1:
                         self.spill_reg(reg0)
@@ -495,43 +503,16 @@ class RegisterAllocation:
                     else:
                         self.update_descriptors('nospill', [reg0, subject])
 
-                    if self.isfloat(operand):
-                        # the operand is a float constant
-                        freg0, spill0 = self.get_reg(
-                            True, live_and_next_use_blocks, blocks.index(block), subject)
-                        if spill0 == 1:
-                            var = self.register_descriptor[freg0]
-                            if var != None:
-                                text_segment += f"s.s {freg0}, {var}\n"
-                                if freg0 in self.address_descriptor[var]:
-                                    self.address_descriptor[var].remove(freg0)
-                            self.register_descriptor[freg0] = None
-                        text_segment += f"li.s {freg0}, {operand}\n"
-
-                        # self.update_descriptors(freg0, subject)
-
-                        self.register_descriptor[freg0] = subject
-                        self.address_descriptor[subject]['registers'].append(
-                            freg0)
-
-                    elif operand.isdigit():
+                    # Temporarily assuming it is a variable or number
+                    if operand.isnumeric():
                         # the operand is an integer
                         operand = int(operand)
-                        text_segment += f"li {reg0}, {operand}\n"
+                        self.text_segment += f"li {reg0}, {operand}\n"
                         self.update_descriptors(reg0, subject)
-                    elif "'" in operand:
-                        # The operand is a character
-                        text_segment += f"li {reg0}, {operand}\n"
-                        self.address_descriptor[subject]['registers'].append(
-                            reg0)
-                        self.register_descriptor[reg0] = subject
-                    elif '"' in operand:
-                        # The operand is a string
-                        pass
                     else:
                         # if it is a variable
-                        reg1, spill1 = self.get_reg(False,
-                                                    live_and_next_use_blocks, blocks.index(block), operand)
+                        reg1, spill1, update1 = self.get_reg(False,
+                                                             live_and_next_use_blocks, blocks.index(block), operand)
                         if spill1 == 1:
                             self.spill_reg(reg1)
                             self.update_descriptors('spill', [reg1])
@@ -544,16 +525,67 @@ class RegisterAllocation:
                             # if it has nothing, load the variable into the register
                             var = self.register_descriptor[reg1]
                             if var == None:
-                                text_segment += f"lw {reg0}, {self.address_descriptor[operand]['offset']}($s8)\n"
+                                self.text_segment += f"lw {reg0}, {self.address_descriptor[operand]['offset']}($s8)\n"
+
+                    # if self.isfloat(operand):
+                    #     # the operand is a float constant
+                    #     freg0, spill0, update0 = self.get_reg(
+                    #         True, live_and_next_use_blocks, blocks.index(block), subject)
+                    #     if spill0 == 1:
+                    #         var = self.register_descriptor[freg0]
+                    #         if var != None:
+                    #             self.text_segment += f"s.s {freg0}, {var}\n"
+                    #             if freg0 in self.address_descriptor[var]:
+                    #                 self.address_descriptor[var].remove(freg0)
+                    #         self.register_descriptor[freg0] = None
+                    #     self.text_segment += f"li.s {freg0}, {operand}\n"
+
+                    #     # self.update_descriptors(freg0, subject)
+
+                    #     self.register_descriptor[freg0] = subject
+                    #     self.address_descriptor[subject]['registers'].append(
+                    #         freg0)
+
+                    # elif operand.isdigit():
+                    #     # the operand is an integer
+                    #     operand = int(operand)
+                    #     self.text_segment += f"li {reg0}, {operand}\n"
+                    #     self.update_descriptors(reg0, subject)
+                    # elif "'" in operand:
+                    #     # The operand is a character
+                    #     self.text_segment += f"li {reg0}, {operand}\n"
+                    #     self.address_descriptor[subject]['registers'].append(
+                    #         reg0)
+                    #     self.register_descriptor[reg0] = subject
+                    # elif '"' in operand:
+                    #     # The operand is a string
+                    #     pass
+                    # else:
+                    #     # if it is a variable
+                    #     reg1, spill1, update1 = self.get_reg(False,
+                    #                                          live_and_next_use_blocks, blocks.index(block), operand)
+                    #     if spill1 == 1:
+                    #         self.spill_reg(reg1)
+                    #         self.update_descriptors('spill', [reg1])
+
+                    #         # load the variable into the register
+                    #     else:
+                    #         self.update_descriptors('nospill', [reg1, operand])
+
+                    #         # check here if the register has nothing
+                    #         # if it has nothing, load the variable into the register
+                    #         var = self.register_descriptor[reg1]
+                    #         if var == None:
+                    #             self.text_segment += f"lw {reg0}, {self.address_descriptor[operand]['offset']}($s8)\n"
 
                         # if spill1 == 1:
                         #     var = self.register_descriptor[reg1]
                         #     if var != None:
-                        #         text_segment += f"sw {reg1}, {var}\n"
+                        #         self.text_segment += f"sw {reg1}, {var}\n"
                         #         if reg1 in self.address_descriptor[var]:
                         #             self.address_descriptor[var].remove(reg1)
                         #     self.register_descriptor[reg1] = None
-                        #     text_segment += f"lw {reg1}, {operand}\n"
+                        #     self.text_segment += f"lw {reg1}, {operand}\n"
                         #     self.address_descriptor[operand].append(reg1)
                         #     self.register_descriptor[reg1] = operand
 
@@ -564,9 +596,9 @@ class RegisterAllocation:
                         #     reg1)
                         # self.register_descriptor[reg1] = operand
 
-                        text_segment += f"addi {reg0}, {reg1}, 0\n"
-#-------------------------------------------------------------------------------------------------
-        assembly_code = f".text\n.globl main\n\n{text_segment}\n"
+                        self.text_segment += f"addi {reg0}, {reg1}, 0\n"
+# -------------------------------------------------------------------------------------------------
+        assembly_code = f".text\n.globl main\n\n{self.text_segment}\n"
         assembly_code = re.sub('start:', 'main:', assembly_code)
 
         return assembly_code
