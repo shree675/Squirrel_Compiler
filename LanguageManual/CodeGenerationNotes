@@ -23,17 +23,21 @@ Done :
 7. Return without value
 8.
 
-
 List of Statement types----------------------------
+
 1. is_arithmetic_instruction_binary
 2. is_arithmetic_instruction_unary
-3. is_function_call_with_return
+3. is_function_call_with_return (Done, bug in TAC)
 4. is_function_call_without_return
-5. is_assignment_instruction
+5. is_assignment_instruction - Done
 6. is_if_statement
-7. is_return_statement
-8. is_param_instruction
+7. is_return_statement - Done
+8. is_param_instruction - ??? (we are not using it anywhere)
 9. is_input
 10. is_output
 11. is_array_initialization
 12. is_array_assignment
+
+TODO statements :
+
+13. is_input_string

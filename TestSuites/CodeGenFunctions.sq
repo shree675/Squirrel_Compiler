@@ -1,13 +1,12 @@
-void @fun1(int n){
-    if(n==0){
-        return;
-    }
-
-    fun1(n-1);
-    return;
+void @fun1(int n, int a, int b, int c){
+    a = 5;
 }
 
 void @start(){
-    int a = 10;
-    fun1(a);
+    int n=5;
+    int a=5;
+    int b=5;
+    int c=5;
+
+    fun1(n, a+b, b, c);
 }

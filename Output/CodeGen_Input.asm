@@ -1,5 +1,3 @@
-.data
-
 .text
 .globl main
 
