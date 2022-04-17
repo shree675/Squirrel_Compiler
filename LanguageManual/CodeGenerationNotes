@@ -22,3 +22,18 @@ Done :
 6. Array variable assignment for int
 7. Return without value
 8.
+
+
+List of Statement types----------------------------
+1. is_arithmetic_instruction_binary
+2. is_arithmetic_instruction_unary
+3. is_function_call_with_return
+4. is_function_call_without_return
+5. is_assignment_instruction
+6. is_if_statement
+7. is_return_statement
+8. is_param_instruction
+9. is_input
+10. is_output
+11. is_array_initialization
+12. is_array_assignment
