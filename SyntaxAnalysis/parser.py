@@ -718,12 +718,12 @@ class Parser(SlyParser):
     def input_statement(self, p):
         return AstNode(Operator.A_INPUT, left=p.left_value)
         # return str(p[0]+p[1]+p[2]+p[3])
-    
+
     @_('input_string_statement')
     def input_statement(self, p):
         return p.input_string_statement
         # return str(p[0]+p[1]+p[2]+p[3])
-    
+
     @_('INPUT_STRING LPAREN left_value COMMA INTVAL RPAREN')
     def input_string_statement(self, p):
         # TODO : semntic check for the left value datatype -> only string
@@ -996,11 +996,17 @@ class Parser(SlyParser):
 
         # print("LOOK HERE : ", parameters)
 
+        # Semantic check for function calls
         self.check_function_signature(p.VARNAME, args_types)
 
+        matched = list(filter(lambda e: e["function_name"] == "@"+p.VARNAME and
+                              e["parameters_types"] == args_types,
+                              self.function_symbol_table))
+
+        print("matched : ", matched)
         # -----------------------
         head = AstNode(Operator.A_FUNCCALL, left=p.VARNAME,
-                       right=p.argument_list)
+                       right=p.argument_list, data_type=matched[0]["return_type"])
         return head
 
     # argument_list -> argument_list_rec | e

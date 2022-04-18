@@ -2,4 +2,8 @@ void @start() {
     int a = 5;
     int b = 10;
     int c = 11;
+    int d = 12;
+    int e = 13;
+    b = a;
+    c = d;
 }
