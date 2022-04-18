@@ -51,3 +51,13 @@ Corresponding TAC:
 a = (int)0;
 b = (bool)false;
 
+-------------------------------------------------------------------------------------------------------
+Typecasting in code generation
+
+1. assignment statement
+  a = b
+  a - float, b - float ()
+  a - int/char/bool, b - int/char/bool
+  a - float, b - int/char/bool
+  a - int/char/bool, b - float 
+
