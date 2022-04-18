@@ -651,7 +651,15 @@ class RegisterAllocation:
                             self.update_descriptors('nospill', [reg1, operand])
 
                             # check here if the register has nothing
-                            # if it has nothing, load the variable into the register
+                            # if it has nothing, load the variable from
+                            # the memory into the register
+
+                            if self.register_descriptor[reg1] == None:
+                                offset = self.address_descriptor[operand]['offset']
+                                self.text_segment += f"lw {reg1}, {offset}($s8)\n"
+                                self.update_descriptors(
+                                    "load", [reg1, operand])
+                                # load the variable into the register
 
                             # Get reg from subject ================================================
 
