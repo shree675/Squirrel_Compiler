@@ -29,33 +29,33 @@ default_reg_des = {
 
 class RegisterAllocation:
 
-    # registers_map = {
-    #     '$t0': 'r0',
-    #     '$t1': 'r1',
-    #     '$t2': 'r2',
-    #     '$t3': 'r3',
-    #     '$t4': 'r4',
-    #     '$t5': 'r5',
-    #     '$t6': 'r6',
-    #     '$t7': 'r7',
-    #     '$s0': 'r8',
-    #     '$s1': 'r9',
-    #     '$s2': 'r10',
-    #     '$s3': 'r11',
-    #     '$s4': 'r12',
-    #     '$s5': 'r13',
-    #     '$s6': 'r14',
-    #     '$s7': 'r15',
-    #     '$t8': 'r16',
-    #     '$t9': 'r17',
-    # }
-
     registers_map = {
         '$t0': 'r0',
         '$t1': 'r1',
         '$t2': 'r2',
-        '$t3': 'r3'
+        '$t3': 'r3',
+        '$t4': 'r4',
+        '$t5': 'r5',
+        '$t6': 'r6',
+        '$t7': 'r7',
+        '$s0': 'r8',
+        '$s1': 'r9',
+        '$s2': 'r10',
+        '$s3': 'r11',
+        '$s4': 'r12',
+        '$s5': 'r13',
+        '$s6': 'r14',
+        '$s7': 'r15',
+        '$t8': 'r16',
+        '$t9': 'r17',
     }
+
+    # registers_map = {
+    #     '$t0': 'r0',
+    #     '$t1': 'r1',
+    #     '$t2': 'r2',
+    #     '$t3': 'r3'
+    # }
 
     reserved_registers = {'$ra', '$s8', '$v0'}
 
@@ -749,7 +749,7 @@ class RegisterAllocation:
 
                 elif self.is_return_statement(line):
                     num_words = len(line.split())
-                    var_name = line.split()[-1]
+                    return_var = line.split()[-1]
 
                     # reg: [set of variables]
                     # var: [list of reigsters]
@@ -758,7 +758,22 @@ class RegisterAllocation:
                         # return with value
                         # TODO : get the register from the variable descriptor
                         # for reg in self.register_descriptor
-                        self.text_segment += f"lw $v0, {line.split()[1]}\n"
+                        reg0, spill0, update0 = self.get_reg(
+                            False, live_and_next_use_blocks, blocks.index(block), return_var)
+
+                        if spill0 == 1:
+                            # load from memory to $v0
+                            offset = self.address_descriptor[return_var]['offset']
+                            self.text_segment += f"lw $v0, {offset}($s8)\n"
+                            self.update_descriptors('load', [reg0, return_var])
+                        else:
+                            self.text_segment += f"move $v0, {reg0}\n"
+                            self.update_descriptors(
+                                'nospill', [reg0, return_var])
+
+                        self.text_segment += f"jr $ra\n"
+
+                        # self.text_segment += f"lw $v0, {line.split()[1]}\n"
 
                     self.text_segment += f"jr $ra\n"
 
@@ -801,7 +816,7 @@ class RegisterAllocation:
                         index -= 1
 
                     # code for function call
-                    function_name = words[3][:-2]
+                    function_name = words[3][:-1]
                     self.text_segment += f"jal {function_name}\n"
 
                     # get_reg for the subject
@@ -832,8 +847,9 @@ class RegisterAllocation:
                         var = self.register_descriptor[reg]
                         if var != None:
                             offset = self.address_descriptor[var]['offset']
-                            self.text_segment += f"lw {reg}, {offset}($s8)\n"
-                            self.update_descriptors('load', [reg, var])
+                            if offset != None:
+                                self.text_segment += f"lw {reg}, {offset}($s8)\n"
+                                self.update_descriptors('load', [reg, var])
 
                     # ---------------------------------------
 
@@ -891,8 +907,9 @@ class RegisterAllocation:
                         var = self.register_descriptor[reg]
                         if var != None:
                             offset = self.address_descriptor[var]['offset']
-                            self.text_segment += f"lw {reg}, {offset}($s8)\n"
-                            self.update_descriptors('load', [reg, var])
+                            if offset != None:
+                                self.text_segment += f"lw {reg}, {offset}($s8)\n"
+                                self.update_descriptors('load', [reg, var])
 
                     # ---------------------------------------
 
