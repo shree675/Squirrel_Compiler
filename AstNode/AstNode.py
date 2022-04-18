@@ -81,7 +81,7 @@ class Operator(Enum):
     A_START = "init"
 
 
-#typeChecker = TypeChecker.TypeChecker()
+# typeChecker = TypeChecker.TypeChecker()
 
 default_values = {
     "int": "0",
@@ -113,7 +113,7 @@ class AstNode:
         self.code = None
         self.next = next_label
 
-        #print("Value", self.value, "Datatype", self.data_type)
+        # print("Value", self.value, "Datatype", self.data_type)
         # self.parent = parent
     @staticmethod
     def raise_error(message=None):
@@ -144,7 +144,7 @@ class AstNode:
         if head.operator == Operator.A_ROOT:
 
             left, mid, right = head.left, head.mid,  head.right
-            #typeChecker.check(head, parser.symbol_table)
+            # typeChecker.check(head, parser.symbol_table)
             AstNode.generateCode(left, parser)
             # head.code = left.code + '\n' + left.next + ':\n'
             head.code = left.code
@@ -729,7 +729,7 @@ class AstNode:
             # head.code = expr0.code + "\n" + expr1.code + "\n" + \
             # head.value + " = " + expr0.value + " / " + expr1.value
 
-            #print('1', expr0.code, '2', expr1.code)
+            # print('1', expr0.code, '2', expr1.code)
             head.code = expr0.code + "\n" + expr1.code + "\n"
 
             if head.data_type != expr0.data_type:
@@ -1106,7 +1106,12 @@ class AstNode:
             function_name = head.left
             argument_list = head.right
 
-            head.value = parser.get_new_temp(head.data_type)
+            if head.data_type == "void":
+                head.code = ""
+            else:
+                print("HHHEEE : ", head.data_type)
+                head.value = parser.get_new_temp(head.data_type)
+                head.code = f"{head.value} = "
 
             if argument_list:
                 AstNode.generateCode(argument_list, parser)
@@ -1121,10 +1126,21 @@ class AstNode:
                 head.code = argument_list.code + '\n'
                 for arg in args:
                     head.code += f"param {arg}\n"
-                head.code += f"{head.value} = call {function_name}, {len(args)}\n"
+
+                if head.data_type == "void":
+                    head.code += f"call {function_name}, {len(args)}\n"
+                else:
+                    head.code += f"{head.value} = call {function_name}, {len(args)}\n"
 
             else:
-                head.code = f"{head.value} = call {function_name}, 0\n"
+                if head.data_type == "void":
+                    head.code += f"call {function_name}, 0\n"
+                else:
+                    head.code += f"{head.value} = call {function_name}, 0\n"
+                # head.code += f"call {function_name}, 0\n"
+
+            print("CODEEEE : ", head.code)
+            print("end -----------------")
 
         elif head.operator == Operator.A_TYPECAST:
 
@@ -1155,25 +1171,24 @@ class AstNode:
 
                 head.code = left_value.code
                 head.code += f"input {cur.data_type}, {left_value.value}\n"
-        
+
         elif head.operator == Operator.A_INPUT_STRING:
 
             left_value = head.left
             length = head.right
 
             if left_value.operator != Operator.A_VARIABLE:
-                AstNode.raise_error("Semantic Error : \"input_string\" can only be used with a variable.\n")
-                
+                AstNode.raise_error(
+                    "Semantic Error : \"input_string\" can only be used with a variable.\n")
+
             # check if the variable is of type string
 
             if left_value.data_type != "string":
                 AstNode.raise_error(
                     f'Semantic Error: variable \"{left_value.value}\" is not of type \"string\"\n')
-                
 
             head.code = f"input_string {left_value.value}, {length}\n"
-            return 
-
+            return
 
         elif head.operator == Operator.A_OUTPUT:
 

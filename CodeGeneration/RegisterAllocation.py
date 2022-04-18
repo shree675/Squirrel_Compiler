@@ -54,6 +54,7 @@ class RegisterAllocation:
         '$t0': 'r0',
         '$t1': 'r1',
         '$t2': 'r2',
+        '$t3': 'r3'
     }
 
     reserved_registers = {'$ra', '$s8', '$v0'}
@@ -97,7 +98,7 @@ class RegisterAllocation:
     def __init__(self):
         # TODO: change the structure of register_descriptor
         # We should add float registers as well
-        self.register_descriptor = default_reg_des
+        self.register_descriptor = default_reg_des.copy()
         self.address_descriptor = {}
         self.offset = 4
         self.text_segment = ''
@@ -139,11 +140,13 @@ class RegisterAllocation:
             return True
         return False
 
-    # def is_function_call_without_return(self, instruction):
-    #     words = instruction.split()
-    #     if words == "call":
-    #         return True
-    #     return False
+    def is_function_call_without_return(self, instruction):
+        words = instruction.split()
+        if len(words) < 3:
+            return False
+        if words[0] == "call":
+            return True
+        return False
 
     # started
     def is_assignment_instruction(self, instruction):
@@ -207,7 +210,7 @@ class RegisterAllocation:
     def free_all(self):
         # Reinitialize the register_descriptor and address_descriptor
         # We should add float registers as well
-        self.register_descriptor = default_reg_des
+        self.register_descriptor = default_reg_des.copy()
         self.address_descriptor = {}
         self.offset = 4
 
@@ -525,6 +528,8 @@ class RegisterAllocation:
                         line += f"\nmove $s8, $sp\n"
 
                     self.text_segment += line+'\n'
+
+                    print("FUNCTION STARTED ", line+'\n')
 # --------------------------------------------------------------------------------------------------
                 elif line.startswith('goto'):
                     self.text_segment += f'j {line.split()[1]}\n'
@@ -567,7 +572,7 @@ class RegisterAllocation:
                             print(521)
                             self.update_descriptors('spill', [reg0])
                             # create the address descriptor entry for subject
-                            # TODO : what are we doing here?
+                            # loading an immediate into a register -> nospill protocol
                             self.update_descriptors('nospill', [reg0, subject])
                         else:
                             print(524)
@@ -636,7 +641,10 @@ class RegisterAllocation:
                             self.spill_reg(reg1)
                             print(538)
                             self.update_descriptors('spill', [reg1])
-
+                            offset = self.address_descriptor[operand]['offset']
+                            # TODO : Test this!
+                            self.text_segment += f"lw {reg1}, {offset}($s8)\n"
+                            self.update_descriptors("load", [reg1, operand])
                             # load the variable into the register
                         else:
                             print(543)
@@ -656,13 +664,6 @@ class RegisterAllocation:
                             self.spill_reg(reg0)
                             print(521)
                             self.update_descriptors('spill', [reg0])
-                            # create the address descriptor entry for subject
-                            self.update_descriptors(
-                                'nospill', [reg0, subject])
-                        else:
-                            print(524)
-                            self.update_descriptors(
-                                'nospill', [reg0, subject])
 
                         # ===========================================================================
 
@@ -670,8 +671,11 @@ class RegisterAllocation:
 
                         if var == None:
                             self.text_segment += f"lw {reg0}, {self.address_descriptor[operand]['offset']}($s8)\n"
+                            self.update_descriptors("load", [reg0, operand])
+                        else:
+                            self.text_segment += f"addi {reg0}, {reg1}, 0\n"
+                            self.update_descriptors('nospill', [reg0, subject])
 
-                        self.text_segment += f"addi {reg0}, {reg1}, 0\n"
                     # if self.isfloat(operand):
                     #     # the operand is a float constant
                     #     freg0, spill0, update0 = self.get_reg(
@@ -779,6 +783,7 @@ class RegisterAllocation:
                     index = number_of_params - 1
                     current_index = lines.index(line)
 
+                    # Code for loading the parameters
                     for i in range(number_of_params):
                         j = current_index - i - 1
                         print(lines[j])
@@ -794,14 +799,34 @@ class RegisterAllocation:
                             self.text_segment += f"lw $a{index}, {offset}($s8)\n"
 
                         index -= 1
+
+                    # code for function call
                     function_name = words[3][:-2]
                     self.text_segment += f"jal {function_name}\n"
+
+                    # get_reg for the subject
+                    subject = words[0]
+                    reg0, spill0, update0 = self.get_reg(
+                        False, live_and_next_use_blocks, blocks.index(block), subject)
+
+                    print("subject reg : ", subject, reg0)
+
+                    if spill0 == 1:
+                        self.spill_reg(reg0)
+                        self.update_descriptors('spill', [reg0])
+
+                    # move the value from $v0 to reg0
+
+                    self.text_segment += f"move {reg0}, $v0\n"
+                    self.update_descriptors("nospill", [reg0, subject])
 
                     # ---------------------------------
                     # Load $fp and $ra
                     # Load $fp from the top of the stack
                     self.text_segment += f"lw $s8, 4($sp)\n"
                     self.text_segment += f"lw $ra, 8($sp)\n"
+
+                    # Load all spilled registers
 
                     for reg in self.register_descriptor:
                         var = self.register_descriptor[reg]
@@ -811,7 +836,65 @@ class RegisterAllocation:
                             self.update_descriptors('load', [reg, var])
 
                     # ---------------------------------------
+
+                elif self.is_function_call_without_return(line):
+
+                    self.text_segment += "\n# -------------------------------- \n"
+                    # SPILL all the registers including a0, a1, a2, a3
+                    for reg in self.register_descriptor:
+                        if self.register_descriptor[reg] != None:
+                            # spill
+                            self.spill_reg(reg)
+                            self.update_descriptors('spill', [reg])
+                    # Spill $ra and $fp
+                    self.spill_reg("$ra")
+                    self.spill_reg("$s8")
+
+                    # ------------------------------------------------------------
+                    # Generate the code for function call
+                    print(line)
+                    words = line.split()
+                    number_of_params = int(words[-1])
+                    index = number_of_params - 1
+                    current_index = lines.index(line)
+
+                    # Code for loading the parameters
+                    for i in range(number_of_params):
+                        j = current_index - i - 1
+                        print(lines[j])
+
+                        param_var = lines[j].split()[1]
+
+                        for reg in self.register_descriptor:
+                            if self.register_descriptor[reg] == param_var:
+                                self.text_segment += f"move $a{index}, {reg}\n"
+                                break
+                        else:
+                            offset = self.address_descriptor[param_var]['offset']
+                            self.text_segment += f"lw $a{index}, {offset}($s8)\n"
+
+                        index -= 1
+
+                    # code for function call
+                    function_name = words[1][:-2]
+                    self.text_segment += f"jal {function_name}\n"
+
+                    # ---------------------------------
+                    # Load $fp and $ra
+                    # Load $fp from the top of the stack
+                    self.text_segment += f"lw $s8, 4($sp)\n"
+                    self.text_segment += f"lw $ra, 8($sp)\n"
+
                     # Load all spilled registers
+
+                    for reg in self.register_descriptor:
+                        var = self.register_descriptor[reg]
+                        if var != None:
+                            offset = self.address_descriptor[var]['offset']
+                            self.text_segment += f"lw {reg}, {offset}($s8)\n"
+                            self.update_descriptors('load', [reg, var])
+
+                    # ---------------------------------------
 
                 elif self.is_input(line):
                     syscall_number = {
