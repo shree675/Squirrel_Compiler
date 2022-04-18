@@ -80,7 +80,7 @@ class CodeGen:
 
         return assembly_code
 
-    def generate_target_code(self, intermediate_code, optimization_level):
+    def generate_target_code(self, intermediate_code, symbol_table, optimization_level):
 
         if not intermediate_code:
             return
@@ -306,7 +306,7 @@ class CodeGen:
         data_segment = self.preamble(intermediate_code_final)
 
         code_segment = RegisterAllocation.RegisterAllocation().allocate_registers(
-            blocks, live_and_next_use_blocks, data_segment, self.array_addresses)
+            blocks, live_and_next_use_blocks, data_segment, self.array_addresses, symbol_table)
         f = open("Output/test.asm", "w")
         f.write(data_segment+code_segment)
         f.close()

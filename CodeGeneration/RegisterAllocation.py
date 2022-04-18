@@ -29,33 +29,33 @@ default_reg_des = {
 
 class RegisterAllocation:
 
-    # registers_map = {
-    #     '$t0': 'r0',
-    #     '$t1': 'r1',
-    #     '$t2': 'r2',
-    #     '$t3': 'r3',
-    #     '$t4': 'r4',
-    #     '$t5': 'r5',
-    #     '$t6': 'r6',
-    #     '$t7': 'r7',
-    #     '$s0': 'r8',
-    #     '$s1': 'r9',
-    #     '$s2': 'r10',
-    #     '$s3': 'r11',
-    #     '$s4': 'r12',
-    #     '$s5': 'r13',
-    #     '$s6': 'r14',
-    #     '$s7': 'r15',
-    #     '$t8': 'r16',
-    #     '$t9': 'r17',
-    # }
-
     registers_map = {
         '$t0': 'r0',
         '$t1': 'r1',
         '$t2': 'r2',
-        '$t3': 'r3'
+        '$t3': 'r3',
+        '$t4': 'r4',
+        '$t5': 'r5',
+        '$t6': 'r6',
+        '$t7': 'r7',
+        '$s0': 'r8',
+        '$s1': 'r9',
+        '$s2': 'r10',
+        '$s3': 'r11',
+        '$s4': 'r12',
+        '$s5': 'r13',
+        '$s6': 'r14',
+        '$s7': 'r15',
+        '$t8': 'r16',
+        '$t9': 'r17',
     }
+
+    # registers_map = {
+    #     '$t0': 'r0',
+    #     '$t1': 'r1',
+    #     '$t2': 'r2',
+    #     '$t3': 'r3'
+    # }
 
     reserved_registers = {'$ra', '$s8', '$v0'}
 
@@ -487,7 +487,7 @@ class RegisterAllocation:
         print('end of update : ', protocol)
         self.print_descriptors()
 
-    def allocate_registers(self, blocks, live_and_next_use_blocks, data_segment, array_addresses):
+    def allocate_registers(self, blocks, live_and_next_use_blocks, data_segment, array_addresses, symbol_table):
         """
         allocate_registers function allocates registers and generates the MIPS code that is stored in the text_segment
         Note: The cases, i.e., the different types of statements are identified as using elifs in this function, 
@@ -535,146 +535,190 @@ class RegisterAllocation:
                     self.text_segment += f'j {line.split()[1]}\n'
 # -------------------------------------------------------------------------------------------------
                 elif self.is_assignment_instruction(line):
-                    subject, operand = 0, 0
+                    subject, operand, cast_type = [None]*3
                     # TODO: Check and handle typecasting
+                    subject_type = 0
+                    operand_type = 0
+                    # If typecasting
                     if '(' in line:
                         subject, operand, cast_type = line.split()[0], line.split()[
                             3], line.split()[2]
+                    else:
+                        subject, operand = line.split()[0], line.split()[2]
 
-                        if cast_type == 'int':
+                    subject_name = subject.split('__')[0]
+                    subject_scope = int(subject.split('__')[1])
+                    subject_data_type = list(filter(
+                        lambda var: var["identifier_name"] == subject_name +
+                        "`"+subject_scope,
+                        symbol_table
+                    ))[0]["data_type"]
+
+                    operand_name = operand.split('__')[0]
+                    operand_scope = int(operand.split('__')[1])
+                    operand_data_type = list(filter(
+                        lambda var: var["identifier_name"] == operand_name +
+                        "`"+operand_scope, symbol_table
+                    ))[0]["data_type"]
+                    # ----------------------------------------------------------------------------------------
+                    if '(' in line:
+
+                        if cast_type == 'int' or cast_type == 'char' or cast_type == 'bool':
                             # if operand is char and cast type is int, do nohting because mips will take care of it
                             # here, we just need to check if the operand is a float or not
                             # if the operand is not float, do nothing
+
                             pass
 
                         elif cast_type == 'float':
                             pass
-                    # Typecaseting end -----------------------------------------
+                    # Typecasting end -----------------------------------------
                     else:
-                        subject, operand = line.split()[0], line.split()[2]
-                    # TODO: Change this block and index passing
 
-                    # Temporarily assuming it is a variable or number
+                        # Temporarily assuming it is a variable or number
 
-                    if operand.isnumeric():
-                        print("NUMEBR")
-                        # the operand is an integer
-                        operand = int(operand)
-
-                        # Get reg from subject ================================================
-                        reg0, spill0, update0 = self.get_reg(False,
-                                                             live_and_next_use_blocks, blocks.index(block), subject)
-
-                        print("subject reg : ", subject, reg0)
-
-                        if spill0 == 1:
-                            self.spill_reg(reg0)
-                            print(521)
-                            self.update_descriptors('spill', [reg0])
-                            # create the address descriptor entry for subject
-                            # loading an immediate into a register -> nospill protocol
-                            self.update_descriptors('nospill', [reg0, subject])
-                        else:
-                            print(524)
-                            self.update_descriptors('nospill', [reg0, subject])
-
-                        # ===========================================================================
-
-                        self.text_segment += f"li {reg0}, {operand}\n"
-
-                    elif operand[0] == '\'':
-                        # the operand is a character
-                        operand = operand[1]
-
-                        # Get reg from subject ================================================
-                        reg0, spill0, update0 = self.get_reg(False,
-                                                             live_and_next_use_blocks, blocks.index(block), subject)
-
-                        print("subject reg : ", subject, reg0)
-
-                        if spill0 == 1:
-                            self.spill_reg(reg0)
-                            self.update_descriptors('spill', [reg0])
-                            # create the address descriptor entry for subject
-                            # TODO : what are we doing here?
-                            self.update_descriptors('nospill', [reg0, subject])
-                        else:
-                            print(524)
-                            self.update_descriptors('nospill', [reg0, subject])
-
-                        # ===========================================================================
-
-                        self.text_segment += f"li {reg0}, {ord(operand)}\n"
-
-                    elif self.isfloat(operand):
-                        # the operand is a float
-                        operand = float(operand)
-
-                        print("FLOAT")
-
-                        # Get reg from subject ================================================
-                        # TODO : here get_reg is returning "int" register instead of "float"
-                        reg0, spill0, update0 = self.get_reg(True,
-                                                             live_and_next_use_blocks, blocks.index(block), subject)
-
-                        print("subject reg : ", subject, reg0)
-
-                        if spill0 == 1:
-                            self.spill_reg(reg0)
-                            self.update_descriptors('spill', [reg0])
-                            # create the address descriptor entry for subject
-                            # TODO : what are we doing here?
-                            self.update_descriptors('nospill', [reg0, subject])
-                        else:
-                            print(524)
-                            self.update_descriptors('nospill', [reg0, subject])
-
-                        # ===========================================================================
-
-                        self.text_segment += f"li.s {reg0}, {operand}\n"
-
-                    else:
-                        # if it is a variable
-                        reg1, spill1, update1 = self.get_reg(False,
-                                                             live_and_next_use_blocks, blocks.index(block), operand)
-                        if spill1 == 1:
-                            self.spill_reg(reg1)
-                            print(538)
-                            self.update_descriptors('spill', [reg1])
-                            offset = self.address_descriptor[operand]['offset']
-                            # TODO : Test this!
-                            self.text_segment += f"lw {reg1}, {offset}($s8)\n"
-                            self.update_descriptors("load", [reg1, operand])
-                            # load the variable into the register
-                        else:
-                            print(543)
-                            self.update_descriptors('nospill', [reg1, operand])
-
-                            # check here if the register has nothing
-                            # if it has nothing, load the variable into the register
+                        if operand.isnumeric():
+                            # the operand is an integer
+                            operand = int(operand)
 
                             # Get reg from subject ================================================
+                            reg0, spill0, update0 = self.get_reg(subject_type == 'float',
+                                                                 live_and_next_use_blocks, blocks.index(block), subject)
 
-                        reg0, spill0, update0 = self.get_reg(False,
-                                                             live_and_next_use_blocks, blocks.index(block), subject)
+                            print("subject reg : ", subject, reg0)
 
-                        print("subject reg : ", subject, reg0)
+                            if spill0 == 1:
+                                self.spill_reg(reg0)
+                                print(521)
+                                self.update_descriptors('spill', [reg0])
+                                # create the address descriptor entry for subject
+                                # loading an immediate into a register -> nospill protocol
+                                self.update_descriptors(
+                                    'nospill', [reg0, subject])
+                            else:
+                                print(524)
+                                self.update_descriptors(
+                                    'nospill', [reg0, subject])
 
-                        if spill0 == 1:
-                            self.spill_reg(reg0)
-                            print(521)
-                            self.update_descriptors('spill', [reg0])
+                            # ===========================================================================
 
-                        # ===========================================================================
+                            self.text_segment += f"li {reg0}, {operand}\n"
 
-                        var = self.register_descriptor[reg1]
+                        elif operand[0] == '\'':
+                            # the operand is a character
+                            operand = operand[1]
 
-                        if var == None:
-                            self.text_segment += f"lw {reg0}, {self.address_descriptor[operand]['offset']}($s8)\n"
-                            self.update_descriptors("load", [reg0, operand])
+                            # Get reg from subject ================================================
+                            reg0, spill0, update0 = self.get_reg(subject_type == 'float',
+                                                                 live_and_next_use_blocks, blocks.index(block), subject)
+
+                            print("subject reg : ", subject, reg0)
+
+                            if spill0 == 1:
+                                self.spill_reg(reg0)
+                                self.update_descriptors('spill', [reg0])
+                                # create the address descriptor entry for subject
+                                # TODO : what are we doing here?
+                                self.update_descriptors(
+                                    'nospill', [reg0, subject])
+                            else:
+                                print(524)
+                                self.update_descriptors(
+                                    'nospill', [reg0, subject])
+
+                            # ===========================================================================
+
+                            self.text_segment += f"li {reg0}, {ord(operand)}\n"
+
+                        elif self.isfloat(operand):
+                            # the operand is a float
+                            operand = float(operand)
+
+                            print("FLOAT")
+
+                            # Get reg from subject ================================================
+                            # TODO : here get_reg is returning "int" register instead of "float"
+                            reg0, spill0, update0 = self.get_reg(subject_type == 'float',
+                                                                 live_and_next_use_blocks, blocks.index(block), subject)
+
+                            print("subject reg : ", subject, reg0)
+
+                            if spill0 == 1:
+                                self.spill_reg(reg0)
+                                self.update_descriptors('spill', [reg0])
+                                # create the address descriptor entry for subject
+                                # TODO : what are we doing here?
+                                self.update_descriptors(
+                                    'nospill', [reg0, subject])
+                            else:
+                                print(524)
+                                self.update_descriptors(
+                                    'nospill', [reg0, subject])
+
+                            # ===========================================================================
+
+                            self.text_segment += f"li.s {reg0}, {operand}\n"
+
                         else:
-                            self.text_segment += f"addi {reg0}, {reg1}, 0\n"
-                            self.update_descriptors('nospill', [reg0, subject])
+                            # if it is a variable
+                            reg1, spill1, update1 = self.get_reg(operand_type == 'float',
+                                                                 live_and_next_use_blocks, blocks.index(block), operand)
+                            if spill1 == 1:
+                                self.spill_reg(reg1)
+                                print(538)
+                                self.update_descriptors('spill', [reg1])
+                                offset = self.address_descriptor[operand]['offset']
+                                # TODO : Test this!
+                                self.text_segment += f"lw {reg1}, {offset}($s8)\n"
+                                self.update_descriptors(
+                                    "load", [reg1, operand])
+                                # load the variable into the register
+                            else:
+                                print(543)
+                                self.update_descriptors(
+                                    'nospill', [reg1, operand])
+
+                                # check here if the register has nothing
+                                # if it has nothing, load the variable from
+                                # the memory into the register
+
+                                if self.register_descriptor[reg1] == None:
+                                    offset = self.address_descriptor[operand]['offset']
+                                    self.text_segment += f"lw {reg1}, {offset}($s8)\n"
+                                    self.update_descriptors(
+                                        "load", [reg1, operand])
+                                    # load the variable into the register
+
+                                # Get reg from subject ================================================
+
+                            reg0, spill0, update0 = self.get_reg(subject_type == 'float',
+                                                                 live_and_next_use_blocks, blocks.index(block), subject)
+
+                            print("subject reg : ", subject, reg0)
+
+                            if spill0 == 1:
+                                self.spill_reg(reg0)
+                                print(521)
+                                self.update_descriptors('spill', [reg0])
+
+                            # ===========================================================================
+
+                            var = self.register_descriptor[reg1]
+
+                            if var == None:
+                                self.text_segment += f"lw {reg0}, {self.address_descriptor[operand]['offset']}($s8)\n"
+                                self.update_descriptors(
+                                    "load", [reg0, operand])
+                            else:
+                                if reg0 in self.floating_point_registers_map and reg1 in self.registers_map:
+                                    self.text_segment += f"cvt.s.w {reg0}, {reg1}, 0\n"
+                                elif reg0 in self.registers_map and reg1 in self.floating_point_registers_map:
+                                    self.text_segment += f"cvt.w.s {reg0}, {reg1}, 0\n"
+                                else:
+                                    self.text_segment += f"addi {reg0}, {reg1}, 0\n"
+
+                                self.update_descriptors(
+                                    'nospill', [reg0, subject])
 
                     # if self.isfloat(operand):
                     #     # the operand is a float constant
@@ -749,7 +793,7 @@ class RegisterAllocation:
 
                 elif self.is_return_statement(line):
                     num_words = len(line.split())
-                    var_name = line.split()[-1]
+                    return_var = line.split()[-1]
 
                     # reg: [set of variables]
                     # var: [list of reigsters]
@@ -758,7 +802,22 @@ class RegisterAllocation:
                         # return with value
                         # TODO : get the register from the variable descriptor
                         # for reg in self.register_descriptor
-                        self.text_segment += f"lw $v0, {line.split()[1]}\n"
+                        reg0, spill0, update0 = self.get_reg(
+                            False, live_and_next_use_blocks, blocks.index(block), return_var)
+
+                        if spill0 == 1:
+                            # load from memory to $v0
+                            offset = self.address_descriptor[return_var]['offset']
+                            self.text_segment += f"lw $v0, {offset}($s8)\n"
+                            self.update_descriptors('load', [reg0, return_var])
+                        else:
+                            self.text_segment += f"move $v0, {reg0}\n"
+                            self.update_descriptors(
+                                'nospill', [reg0, return_var])
+
+                        self.text_segment += f"jr $ra\n"
+
+                        # self.text_segment += f"lw $v0, {line.split()[1]}\n"
 
                     self.text_segment += f"jr $ra\n"
 
@@ -801,7 +860,7 @@ class RegisterAllocation:
                         index -= 1
 
                     # code for function call
-                    function_name = words[3][:-2]
+                    function_name = words[3][:-1]
                     self.text_segment += f"jal {function_name}\n"
 
                     # get_reg for the subject
@@ -832,8 +891,9 @@ class RegisterAllocation:
                         var = self.register_descriptor[reg]
                         if var != None:
                             offset = self.address_descriptor[var]['offset']
-                            self.text_segment += f"lw {reg}, {offset}($s8)\n"
-                            self.update_descriptors('load', [reg, var])
+                            if offset != None:
+                                self.text_segment += f"lw {reg}, {offset}($s8)\n"
+                                self.update_descriptors('load', [reg, var])
 
                     # ---------------------------------------
 
@@ -891,8 +951,9 @@ class RegisterAllocation:
                         var = self.register_descriptor[reg]
                         if var != None:
                             offset = self.address_descriptor[var]['offset']
-                            self.text_segment += f"lw {reg}, {offset}($s8)\n"
-                            self.update_descriptors('load', [reg, var])
+                            if offset != None:
+                                self.text_segment += f"lw {reg}, {offset}($s8)\n"
+                                self.update_descriptors('load', [reg, var])
 
                     # ---------------------------------------
 

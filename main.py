@@ -25,7 +25,6 @@ from Preprocessing import preprocessor
 from LexicalAnalysis import lexer
 from SyntaxAnalysis import parser as Parser
 from CodeGeneration import CodeGen
-
 def compile(filename, optimization_level, save_preprocessed_file, save_intermediate_code):
     print(
         f"Compiling {filename} (with optimization level: {optimization_level})")
@@ -45,12 +44,14 @@ def compile(filename, optimization_level, save_preprocessed_file, save_intermedi
     # code_generator = CodeGeneration.CodeGeneration()
     # target_code = code_generator.generate_target_code(parser.parse(tokens), optimization_level)
 
+    intermediate_code = parser.parse(tokens)
+    symbol_table = parser.symbol_table
     code_generator = CodeGen.CodeGen()
     target_code = code_generator.generate_target_code(
-        parser.parse(tokens), optimization_level)
+        intermediate_code, symbol_table, optimization_level)
 
     output_file_path = "./Output/" + \
-            filename.split("/")[-1].replace(".sq", ".asm")
+        filename.split("/")[-1].replace(".sq", ".asm")
 
     f = open(output_file_path, "w")
     f.write(target_code)
