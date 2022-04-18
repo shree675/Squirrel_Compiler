@@ -25,19 +25,16 @@ Done :
 
 List of Statement types----------------------------
 
-1. is_arithmetic_instruction_binary
-2. is_arithmetic_instruction_unary
-3. is_function_call_with_return (Done, bug in TAC)
-4. is_function_call_without_return
-5. is_assignment_instruction - Done
-6. is_if_statement
-7. is_return_statement - Done
-8. is_param_instruction - ??? (we are not using it anywhere)
-9. is_input
-10. is_output
-11. is_array_initialization
-12. is_array_assignment
-
-TODO statements :
-
-13. is_input_string
+1. is_arithmetic_instruction_binary - Shreetesh and Kranthi
+2. is_arithmetic_instruction_unary - Shreetesh and Kranthi
+3. is_function_call_with_return (Done, bug in TAC) = Aashrith and Debeshee
+4. is_function_call_without_return Aashrith and Debeshee
+5. is_assignment_instruction - Typecasting Aashrith and Debeshee
+6. is_if_statement - Shreetesh and Kranthi
+7. is_return_statement - Test it
+8. is_param_instruction - ??? (we are not using it anywhere) - remove it
+9. is_input - Aashrith and Kranthi
+10. is_output - Aashrith and Kranthi
+11. is_array_initialization - Shreetesh and Kranthi
+12. is_array_assignment - Shreetesh and Kranthi
+13. input_string - Kranthi and Aashrith
