@@ -19,6 +19,7 @@ python3 main.py [-flags] <filename1>.sq <filename2>.sq ... <filenameN>.sq """
 
 
 
+
 import sys
 import os
 import subprocess
@@ -47,17 +48,17 @@ def compile(filename, optimization_level, save_preprocessed_file, save_intermedi
     # target_code = code_generator.generate_target_code(parser.parse(tokens), optimization_level)
 
     intermediate_code = parser.parse(tokens)
-    
+
     if not intermediate_code:
         return
 
     if save_intermediate_code:
         parser.output_file = "./Output/" + \
             filename.split("/")[-1].replace(".sq", ".tac")
-        
+
         with open(parser.output_file, "w") as f:
             f.write(intermediate_code)
-            
+
     symbol_table = parser.symbol_table
     code_generator = CodeGen.CodeGen()
     target_code = code_generator.generate_target_code(
@@ -69,8 +70,8 @@ def compile(filename, optimization_level, save_preprocessed_file, save_intermedi
     with open(output_file_path, "w") as f:
         f.write(target_code)
 
-    subprocess.run(["echo", "Running SPIM assembler"])
-    subprocess.run(["spim", "run", output_file_path])
+    # subprocess.run(["echo", "Running SPIM assembler"])
+    # subprocess.run(["spim", "run", output_file_path])
 
 
 def main(*argv):

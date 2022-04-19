@@ -14,9 +14,10 @@ z`2 = (int) 0
 #L4:
 
 ~tf2 = 3.4
+~t0 = (int) ~tf2
 
-
-
+~t1 = (int) ~t0
+z`2 = ~t1
 
 #L2:
 return 
