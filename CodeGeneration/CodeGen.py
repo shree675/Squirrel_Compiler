@@ -9,6 +9,13 @@ class CodeGen:
 
     arithmetic_operators = set("+ - * / % && || > < >= <= ! != = ==".split())
 
+    datatype_sizes = {
+        'int': 4,
+        'float': 4,
+        'char': 1,
+        'bool': 1,
+    }
+
     def __init__(self):
         self.register_descriptor = defaultdict(list)
         self.address_descriptor = defaultdict(list)
@@ -23,6 +30,8 @@ class CodeGen:
 
     def preamble(self, intermediate_code_final):
 
+        self.data_segment_dict = {}
+
         array_initializations = ''
         string_constants = ''
         data_types = "int float char bool string"
@@ -36,12 +45,13 @@ class CodeGen:
                 string_const = ""
                 string_var = ""
                 if '=' in tokens:
-                    string_const = tokens[-1]
+                    string_const = re.match(r".*(\".*\")", line).group(1)
                     string_var = tokens[tokens.index('=') - 1]
+                    self.data_segment_dict[string_var] = string_const
                 else:
                     string_var = 'return'+str(self.return_string_count)
                     self.return_string_count += 1
-                    string_const = tokens[-1]
+                    string_const = re.match(r".*(\".*\")", line).group(1)
                 string_constants += f'{string_var}:\n\t.asciiz {string_const}\n'
                 self.string_addresses[string_var] = self.memory_pointer
                 self.memory_pointer += len(string_const) + 1
@@ -306,8 +316,5 @@ class CodeGen:
         data_segment = self.preamble(intermediate_code_final)
 
         code_segment = RegisterAllocation.RegisterAllocation().allocate_registers(
-            blocks, live_and_next_use_blocks, data_segment, self.array_addresses, symbol_table)
-        f = open("Output/test.asm", "w")
-        f.write(data_segment+code_segment)
-        f.close()
+            blocks, live_and_next_use_blocks, data_segment, self.array_addresses, symbol_table, self.data_segment_dict)
         return code_segment

@@ -229,7 +229,8 @@ class Parser(SlyParser):
     @_('program')
     def init(self, p):
         root = AstNode(Operator.A_START, left=p.program)
-        root.output_file = self.output_file
+        # TODO: Handle the case when we don't have an output file path
+        root.output_file = self.output_file if self.output_file else ""
         p.program.parent = root
 
         code = AstNode.generateCode(root, self)
