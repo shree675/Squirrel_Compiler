@@ -25,22 +25,9 @@ goto #L11
 
 #L14:
 
-~t5 = i`3 * 1
+~t5 = sum`2 * i`3
 
-~t6 = ~t5 * 4
-
-~t7 = 1
-
-~t8 = i`3 + ~t7
-
-~t9 = (int) ~t8
-arr`2[~t6] = ~t9
-
-#L19:
-
-~t10 = sum`2 * i`3
-
-sum`2 = ~t10
+sum`2 = ~t5
 
 #L17:
 output int, i`3
