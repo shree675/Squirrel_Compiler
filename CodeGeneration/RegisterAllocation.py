@@ -144,7 +144,7 @@ class RegisterAllocation:
     def get_data_type(self, variable, symbol_table):
         # In case of temporary variable, we directly use the naming convention to infer type
         # In case of user defined variable, we use the symbol table passed form the parser to infer the datatype
-        print('VARIABLE: ' + variable)
+        print('VARIABLE in get_DT: ' + variable)
         variable_type = None
         if variable.startswith("__"):
             # temp variable
@@ -322,7 +322,7 @@ class RegisterAllocation:
         # No need to spill. Just return that register
         if is_float:
             for reg in register_descriptor:
-                if 'f' in reg and reg in self.address_descriptor[variable]['registers']:
+                if 'f' in reg and self.address_descriptor.get(variable) != None and reg in self.address_descriptor[variable]['registers']:
                     return (reg, 0, 0)
         else:
             for reg in register_descriptor:
@@ -687,9 +687,9 @@ class RegisterAllocation:
                             operand = ord(operand)
                         # Get reg for subject ================================================
                         # reg0, spill0, update0 = self.get_reg(subject_type == 'float', live_and_next_use_blocks, blocks.index(block), subject)
-                        reg0, spill0, update0 = self.get_reg(cast_type=='float',
+                        reg0, spill0, update0 = self.get_reg(cast_type == 'float',
                                                              live_and_next_use_blocks, blocks.index(block), subject)
-                                                             
+
                         # print("subject reg : ", subject, reg0)
 
                         if spill0 == 1:
@@ -719,7 +719,7 @@ class RegisterAllocation:
                         # TODO : Check the above comment, it should be fine now
                         # reg0, spill0, update0 = self.get_reg(subject_type == 'float',
                         #                                      live_and_next_use_blocks, blocks.index(block), subject)
-                        reg0, spill0, update0 = self.get_reg(cast_type=='float',
+                        reg0, spill0, update0 = self.get_reg(cast_type == 'float',
                                                              live_and_next_use_blocks, blocks.index(block), subject)
 
                         # print("subject reg : ", subject, reg0)
@@ -732,18 +732,81 @@ class RegisterAllocation:
                         if cast_type == 'float':
                             # Case 2: Subject: float type, Operand: float type
                             self.text_segment += f"li.s {reg0}, {operand}"
-                        else: 
+                        else:
                             # Case 3: Subject: int type, Operand: float type
-                            self.text_segment += f"li {reg0}, {operand}\n"  
+                            self.text_segment += f"li {reg0}, {operand}\n"
                             self.text_segment += f"cvt.w.s {reg0}, {reg0}\n"
-                            
+
                         # loading an immediate into a register -> nospill protocol
                         self.update_descriptors(
                             'nospill', [reg0, subject])
 
-                    else :
-                        # Variable
-                        pass
+                    else:
+                        # if it is a variable
+                        operand_type = self.get_data_type(
+                            operand, symbol_table)
+
+                        register_descriptor = None
+                        if operand_type == 'float':
+                            register_descriptor = self.float_register_descriptor
+                        else:
+                            register_descriptor = self.register_descriptor
+
+                        # First get the register for the operand
+
+                        reg1, spill1, update1 = self.get_reg(operand_type == 'float',
+                                                             live_and_next_use_blocks, blocks.index(block), operand)
+
+                        # get register for subject
+                        reg0, spill0, update0 = self.get_reg(subject_type == 'float',
+                                                             live_and_next_use_blocks, blocks.index(block), subject)
+
+                        if spill0 == 1:
+                            self.spill_reg(reg0)
+                            self.update_descriptors('spill', [reg0])
+
+                        if spill1 == 1:
+                            self.spill_reg(reg1)
+                            self.update_descriptors('spill', [reg1])
+
+                            offset = self.address_descriptor[operand]['offset']
+
+                            if operand_type == "float":
+                                self.text_segment += f"l.s {reg0}, {offset}($s8)\n"
+                            else:
+                                self.text_segment += f"lw {reg0}, {offset}($s8)\n"
+                            self.update_descriptors(
+                                "load", [reg0, operand])
+
+                        else:
+                            # if the register in not empty (it already has the value)
+                            # then use the register
+                            # else load the value into reg0 directly from the
+                            # memory (handled below)
+
+                            if register_descriptor[reg1] == None:
+                                # if the reg1 is empty
+                                # load the value into reg0 directly from the memory
+                                offset = self.address_descriptor[operand]['offset']
+                                if operand_type == "float":
+                                    self.text_segment += f"l.s {reg0}, {offset}($s8)\n"
+                                else:
+                                    self.text_segment += f"lw {reg0}, {offset}($s8)\n"
+                                self.update_descriptors(
+                                    "load", [reg0, operand])
+                            else:
+                                # reg1 already has the value of operand
+                                if reg0 in default_float_reg_des and reg1 in default_reg_des:
+                                    self.text_segment += f"cvt.s.w {reg0}, {reg1}, 0\n"
+                                elif reg0 in default_reg_des and reg1 in default_float_reg_des:
+                                    self.text_segment += f"cvt.w.s {reg0}, {reg1}, 0\n"
+                                elif reg0 in default_float_reg_des and reg1 in default_float_reg_des:
+                                    self.text_segment += f"mov.s {reg0}, {reg1}\n"
+                                else:
+                                    self.text_segment += f"addi {reg0}, {reg1}, 0\n"
+
+                                self.update_descriptors(
+                                    'nospill', [reg0, subject])
 
 
 # -------------------------------------------------------------------------------------------------
@@ -755,6 +818,8 @@ class RegisterAllocation:
                     subject, operand = line.split()[0], line.split()[2]
                     # Extracting subject_type
                     subject_type = self.get_data_type(subject, symbol_table)
+
+                    print("Subject TYPE assignment : ", subject,  subject_type)
 
                     # ---------------------------------------------------------------------------------------
                     # The operand could be a literal or a variable
@@ -784,7 +849,7 @@ class RegisterAllocation:
                             # create the address descriptor entry for subject
 
                         self.text_segment += f"li {reg0}, {operand}\n"
-                        
+
                         # loading an immediate into a register -> nospill protocol
                         self.update_descriptors(
                             'nospill', [reg0, subject])
@@ -876,7 +941,7 @@ class RegisterAllocation:
 
                             self.update_descriptors(
                                 'nospill', [reg0, subject])
-                
+
 # -------------------------------------------------------------------------------------------------
                 elif self.is_arithmetic_instruction_binary(line):
                     # Same as reg = [0,1,2] -> We just need to initialize the list with 3 elements

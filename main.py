@@ -19,6 +19,7 @@ python3 main.py [-flags] <filename1>.sq <filename2>.sq ... <filenameN>.sq """
 
 
 
+
 import subprocess
 import sys
 from Preprocessing import preprocessor
@@ -57,8 +58,8 @@ def compile(filename, optimization_level, save_preprocessed_file, save_intermedi
     f.write(target_code)
     f.close()
 
-    subprocess.run(["echo", "Running SPIM assembler"])
-    subprocess.run(["spim", "run", output_file_path])
+    # subprocess.run(["echo", "Running SPIM assembler"])
+    # subprocess.run(["spim", "run", output_file_path])
 
 
 def main(*argv):
