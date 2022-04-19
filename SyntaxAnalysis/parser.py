@@ -25,6 +25,7 @@ class Parser(SlyParser):
         self.num_ftemp = 0
         self.type_checker = TypeChecker.TypeChecker(self.symbol_table)
         self.function_symbol_table = []
+        self.output_file = None
 
         '''
             function_symbol_table = [
@@ -229,18 +230,17 @@ class Parser(SlyParser):
     @_('program')
     def init(self, p):
         root = AstNode(Operator.A_START, left=p.program)
-        # TODO: Handle the case when we don't have an output file path
         root.output_file = self.output_file if self.output_file else ""
         p.program.parent = root
 
         code = AstNode.generateCode(root, self)
 
-        output_path = self.output_file if os.getcwd().endswith(
-            "Squirrel_Compiler") else "../" + self.output_file
+        # output_path = self.output_file if os.getcwd().endswith(
+        #     "Squirrel_Compiler") else "../" + self.output_file
 
-        with open(output_path, "w") as f:
-            output = re.sub(r"\n{3,}", "\n\n", code, flags=re.DOTALL)
-            f.write(output)
+        # with open(output_path, "w") as f:
+        #     output = re.sub(r"\n{3,}", "\n\n", code, flags=re.DOTALL)
+        #     f.write(output)
 
         return code
 
