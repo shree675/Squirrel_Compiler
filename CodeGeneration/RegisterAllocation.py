@@ -157,6 +157,7 @@ class RegisterAllocation:
         else:
             # user variable
             variable_name = variable.split('__')[0]
+            print("foooo", variable_name)
             variable_scope = variable.split('__')[1]
             variable_type = list(filter(
                 lambda var: var["identifier_name"] == variable_name +
@@ -1320,10 +1321,11 @@ class RegisterAllocation:
                 elif self.is_input_string(line, data_segment):
                     syscall_number = 8
                     _, variable, length = line.split()
-                    data_segment += f"__input_string_{self.num_input_strings}:\n\t.space {(length + 1)}\n"
+                    variable = variable[:-1]
+                    data_segment_dict[variable] = (".space", int(length) + 1, "")
 
                     self.text_segment += f"li $v0, {syscall_number}\n"
-                    self.text_segment += f"la $a0, __input_string_{self.num_input_strings}\n"
+                    self.text_segment += f"la $a0, {variable}\n"
                     self.text_segment += f"syscall\n"
 
                     self.num_input_strings += 1
@@ -1417,6 +1419,12 @@ class RegisterAllocation:
                         self.text_segment += f"s.s {reg1}, {array_name}({reg0})\n"
                     else:
                         self.text_segment += f"sw {reg1}, {array_name}({reg0})\n"
+
+        for var, (type, space, value) in data_segment_dict.items():
+            if space:
+                data_segment += f"{var}:\n\t{type} {space}\n"
+            else:
+                data_segment += f"{var}:\n\t{type} {value}\n"
                     
         assembly_code = f"{data_segment}.text\n.globl main\n\n{self.text_segment}\n"
         assembly_code = re.sub('start:', 'main:\n', assembly_code)
