@@ -93,7 +93,8 @@ class CodeGen:
     def generate_target_code(self, intermediate_code, symbol_table, optimization_level):
 
         if not intermediate_code:
-            return
+            # handle it more elegantly
+            return ""
 
         intermediate_code = re.sub(r'\btrue\b', '1', intermediate_code)
         intermediate_code = re.sub(r'\bfalse\b', '0', intermediate_code)

@@ -1199,6 +1199,7 @@ class AstNode:
 
             left_value = head.left
 
+
             # TODO: convert all lists to node
             if type(left_value) == list:
                 head.code = f"output {left_value[0].value.split(' ')[0]}, {left_value[1]}\n"
@@ -1211,8 +1212,10 @@ class AstNode:
                 # head = left_value.code
                 AstNode.generateCode(left_value, parser)
                 cur = left_value
-                while cur.left:
-                    cur = cur.left
+                # while cur.left:
+                cur = cur.left
+                
+                print(cur.value, "BAR")
 
                 head.code = left_value.code
                 head.code += f"output {cur.data_type}, {left_value.value}\n"

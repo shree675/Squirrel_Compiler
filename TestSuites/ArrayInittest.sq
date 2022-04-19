@@ -1,18 +1,19 @@
 
 void @start(){
 
-    ``int arr[3][2] = {1,2,12,5,6,7};``
+    int arr[3][2] = {1,2,12,5,6,7};
 
     char charArray[5] = {'a', 'b', 'c', 'd', 'e'};
 
     bool boolArray[1][2] = {true, false};
 
-    float floatArray[3] = {1.1, 2.2, 3.3};
+    float floatArray[3][2][1] = {1.1, 2.2, 3.3, 1.1, 2.2, 3.3};
 
-    ``int specialArray[2][3][2] = {1,2,3,4,5,6,1,2,3,4,5,6};
+    int specialArray[2][3][2] = {1,2,3,4,5,6,1,2,3,4,5,6};
 
-    char specialArrayChar[1][2] = {'a', 'b'};``
+    char specialArrayChar[1][2] = {'a', 'b'};
 
-    charArray[2] = 'v' + 'd';
+    floatArray[2][0][0] = floatArray[1][0][0] + floatArray[0][0][0];
+    output(floatArray[2][0][0]);
 }
 
