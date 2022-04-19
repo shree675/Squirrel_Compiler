@@ -942,7 +942,7 @@ class Parser(SlyParser):
 
     @_('array_var_use')
     def left_value(self, p):
-        return AstNode(Operator.A_ARREXPR_VARIABLE, left=p.array_var_use)
+        return AstNode(Operator.A_ARREXPR_VARIABLE, left=p.array_var_use, mid=True)
 
     # constant -> INTVAL | FLOATVAL | CHARVAL | STRINGVAL | BOOLVAL
     @_('INTVAL')

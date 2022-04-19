@@ -817,6 +817,12 @@ class AstNode:
                 array_variable.value["val"] + " * " + \
                 str(size) + '\n'
 
+
+            if not head.mid:
+                temp2 = parser.get_new_temp("float" if data_type == FLOAT else "int")
+                head.code += temp2 + " = " + array_variable.value["varname"] + "[" + temp + "]" + '\n'
+                head.value = temp2
+            
         # --------------------------------------------------------------------
 
         # semantic analysis is required here
