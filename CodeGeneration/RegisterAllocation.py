@@ -232,11 +232,6 @@ class RegisterAllocation:
             return True
         return False
 
-    def is_param_instruction(self, instruction):
-        if instruction and instruction.split()[0] == 'param':
-            return True
-        return False
-
     def is_input(self, instruction):
         if instruction and instruction.split()[0] == 'input':
             return True
@@ -663,6 +658,94 @@ class RegisterAllocation:
                     elif cast_type == 'float':
                         pass
                     pass
+                    # ---------------------------------------------------------------------------------------
+                    """There are 4 cases possible where the subject and operand can be of different types
+                    int type: int, char, bool (no need to explicitly mention it)
+                    float type: float
+
+                    Case 1: Subject: int type, Operand: int type
+                            move $t0, $t1
+                    Case 2: Subject: float type, Operand: float type 
+                            move $f0, $f1
+                    Case 3: Subject: int type, Operand: float type
+                            cvt.w.s $f0, $f1
+                    Case 4: Subject: float type, Operand: int type
+                            cvt.s.w $f0, $f1
+                    """
+                    # ---------------------------------------------------------------------------------------
+                    if operand.isnumeric() or operand[0] == '\'':
+                        # Since operand is int type -> Only Case 1 and Case 4 are possible
+                        # the operand is an integer or char (bool need not be handled because it would
+                        # already have been converted to integer just before code generation)
+                        operand_type = None
+                        if operand.isnumeric():
+                            operand_type = 'int'
+                            # operand = int(operand)
+                        else:
+                            operand_type = 'char'
+                            operand = operand[1]
+                            operand = ord(operand)
+                        # Get reg for subject ================================================
+                        # reg0, spill0, update0 = self.get_reg(subject_type == 'float', live_and_next_use_blocks, blocks.index(block), subject)
+                        reg0, spill0, update0 = self.get_reg(cast_type=='float',
+                                                             live_and_next_use_blocks, blocks.index(block), subject)
+                                                             
+                        # print("subject reg : ", subject, reg0)
+
+                        if spill0 == 1:
+                            self.spill_reg(reg0)
+                            self.update_descriptors('spill', [reg0])
+                            # create the address descriptor entry for subject
+
+                        if cast_type == 'float':
+                            # Case 4: Subject: float type, Operand: int type
+                            self.text_segment += f"li.s {reg0}, {operand}\n"
+                        else:
+                            # Case 1: Subject: int type, Operand: int type
+                            self.text_segment += f"li {reg0}, {operand}\n"
+
+                        # loading an immediate into a register -> nospill protocol
+                        self.update_descriptors(
+                            'nospill', [reg0, subject])
+                    # ---------------------------------------------------------------------------------------
+                    elif self.isfloat(operand):
+                        # the operand is a float - although isfloat also returns true for int
+                        # we have already caught int in a previous elif so this will still be correct
+                        # Since operand is float type -> Only Case 2 and Case 3 are possible
+                        operand = float(operand)
+
+                        # Get reg for subject ================================================
+                        # TODO : here get_reg is returning "int" register instead of "float"
+                        # TODO : Check the above comment, it should be fine now
+                        # reg0, spill0, update0 = self.get_reg(subject_type == 'float',
+                        #                                      live_and_next_use_blocks, blocks.index(block), subject)
+                        reg0, spill0, update0 = self.get_reg(cast_type=='float',
+                                                             live_and_next_use_blocks, blocks.index(block), subject)
+
+                        # print("subject reg : ", subject, reg0)
+
+                        if spill0 == 1:
+                            self.spill_reg(reg0)
+                            self.update_descriptors('spill', [reg0])
+                        # ===========================================================================
+
+                        if cast_type == 'float':
+                            # Case 2: Subject: float type, Operand: float type
+                            self.text_segment += f"li.s {reg0}, {operand}"
+                        else: 
+                            # Case 3: Subject: int type, Operand: float type
+                            self.text_segment += f"li {reg0}, {operand}\n"  
+                            self.text_segment += f"cvt.w.s {reg0}, {reg0}\n"
+                            
+                        # loading an immediate into a register -> nospill protocol
+                        self.update_descriptors(
+                            'nospill', [reg0, subject])
+
+                    else :
+                        # Variable
+                        pass
+
+
 # -------------------------------------------------------------------------------------------------
                 elif self.is_assignment_instruction(line):
                     # Anything related to arrays are not handled in this case
@@ -681,12 +764,15 @@ class RegisterAllocation:
                     if operand.isnumeric() or operand[0] == '\'':
                         # the operand is an integer or char (bool need not be handled because it would
                         # already have been converted to integer just before code generation)
-                        operand_type = 'char'
+                        operand_type = None
                         if operand.isnumeric():
                             operand_type = 'int'
-                            operand = int(operand)
+                            # operand = int(operand)
                         else:
+                            operand_type = 'char'
                             operand = operand[1]
+                            operand = ord(operand)
+                            # In case of character we convert it to ascii value
                         # Get reg for subject ================================================
                         reg0, spill0, update0 = self.get_reg(subject_type == 'float',
                                                              live_and_next_use_blocks, blocks.index(block), subject)
@@ -697,12 +783,8 @@ class RegisterAllocation:
                             self.update_descriptors('spill', [reg0])
                             # create the address descriptor entry for subject
 
-                        if operand_type == 'int':
-                            self.text_segment += f"li {reg0}, {operand}\n"
-                        else:
-                            # In case of character, just convert to ascii notation
-                            self.text_segment += f"li {reg0}, {ord(operand)}\n"
-
+                        self.text_segment += f"li {reg0}, {operand}\n"
+                        
                         # loading an immediate into a register -> nospill protocol
                         self.update_descriptors(
                             'nospill', [reg0, subject])

@@ -25,16 +25,17 @@ Done :
 
 List of Statement types----------------------------
 
-1. is_arithmetic_instruction_binary - Shreetesh and Kranthi
+1. is_arithmetic_instruction_binary - Shreetesh and Kranthi - almost done
 2. is_arithmetic_instruction_unary - Shreetesh and Kranthi
-3. is_function_call_with_return (Done, bug in TAC) = Aashrith and Debeshee
-4. is_function_call_without_return Aashrith and Debeshee
-5. is_assignment_instruction - Typecasting Aashrith and Debeshee
+3. is_function_call_with_return (Done, bug in TAC - bug fixed) = Aashrith and Debeshee - need to test recursion
+4. is_function_call_without_return Aashrith and Debeshee - need to test recursion
+5. is_assignment_instruction - Aashrith and Debeshee - need to test little bit
 6. is_if_statement - Shreetesh and Kranthi
-7. is_return_statement - Test it
-8. is_param_instruction - ??? (we are not using it anywhere) - remove it
-9. is_input - Aashrith and Kranthi
-10. is_output - Aashrith and Kranthi
+7. is_return_statement - check and test it once Aashrith and Debeshee
+8. is_param_instruction - ??? (we are not using it anywhere) - removed - done
+9. is_input - Aashrith and Kranthi - test it
+10. is_output - Aashrith and Kranthi - test it
 11. is_array_initialization - Shreetesh and Kranthi
-12. is_array_assignment - Shreetesh and Kranthi
+12. is_array_assignment - Shreetesh and Kranthi - fix TAC bug
 13. input_string - Kranthi and Aashrith
+14. is_assignment_instruction_with_typecast - Typecasting Aashrith and Debeshee

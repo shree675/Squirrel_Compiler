@@ -1,3 +1,7 @@
 void @start() {
     float x = 0.2;
+    int y = 3.4;
+    int z;
+    z = (int) 3.4;
+
 }
