@@ -1,23 +1,21 @@
 start:
 
-~tf0 = 0.2
+~t0 = 'a'
+~t1 = (int) ~t0
 
-x`2 = (float) ~tf0
-
-#L8:
-~tf1 = 3.4
-
-y`2 = (int) ~tf1
+a`2 = (int) ~t1
 
 #L6:
-z`2 = (int) 0
+~t2 = 1
+~t3 = (char) ~t2
+
+b`2 = (char) ~t3
+
 #L4:
+~t4 = 'a'
+~tf0 = (float) ~t4
 
-~tf2 = 3.4
-~t0 = (int) ~tf2
-
-~t1 = (int) ~t0
-z`2 = ~t1
+f`2 = (float) ~tf0
 
 #L2:
 return 

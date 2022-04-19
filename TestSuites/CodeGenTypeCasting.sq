@@ -1,7 +1,8 @@
 void @start() {
-    float x = 0.2;
-    int y = 3.4;
-    int z;
-    z = (int) 3.4;
-
+    int a = (int)'a';
+    char b = (char)1;
+    float f = (float)'a';
+    float e = a + b;
+    output(e);
+    bool q = f - e;
 }
