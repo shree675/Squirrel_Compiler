@@ -770,6 +770,8 @@ class RegisterAllocation:
 
                             self.update_descriptors(
                                 'nospill', [reg0, subject])
+                
+# -------------------------------------------------------------------------------------------------
                 elif self.is_arithmetic_instruction_binary(line):
                     # Same as reg = [0,1,2] -> We just need to initialize the list with 3 elements
                     reg = [i for i in range(3)]
@@ -905,7 +907,7 @@ class RegisterAllocation:
                         self.update_descriptors("nospill", [reg[2], operand2])
 
                     self.update_descriptors("nospill", [reg[0], subject])
-
+# -------------------------------------------------------------------------------------------------
 # -------------------------------------------------------------------------------------------------
                 elif self.is_if_statement(line):
                     # TODO: check if left, right are floats
