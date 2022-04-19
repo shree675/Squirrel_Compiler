@@ -133,6 +133,7 @@ class RegisterAllocation:
         # }
         self.offset = 4
         self.text_segment = ''
+        self.num_input_strings = 0
 
     def isfloat(self, num):
         try:
@@ -236,6 +237,9 @@ class RegisterAllocation:
         if instruction and instruction.split()[0] == 'input':
             return True
         return False
+
+    def is_input_string(self, instruction, data_segment):
+        return instruction.startswith('input_string')
 
     # started
     def is_output(self, instruction):
@@ -1247,6 +1251,17 @@ class RegisterAllocation:
                             'nospill', [reg0, variable])
 
                     self.text_segment += f"move {reg0}, $v0\n"
+
+                elif self.is_input_string(line, data_segment):
+                    syscall_number = 8
+                    _, variable, length = line.split()
+                    data_segment += f"__input_string_{self.num_input_strings}:\n\t.space {(length + 1)}\n"
+
+                    self.text_segment += f"li $v0, {syscall_number}\n"
+                    self.text_segment += f"la $a0, __input_string_{self.num_input_strings}\n"
+                    self.text_segment += f"syscall\n"
+
+                    self.num_input_strings += 1
 
                 elif self.is_output(line):
                     # TODO: Test Float, String

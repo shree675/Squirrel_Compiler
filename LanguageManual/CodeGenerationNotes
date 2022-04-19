@@ -27,15 +27,9 @@ List of Statement types----------------------------
 
 1. is_arithmetic_instruction_binary - Shreetesh and Kranthi - almost done
 2. is_arithmetic_instruction_unary - Shreetesh and Kranthi
-<<<<<<< HEAD
 3. is_function_call_with_return (Done, bug in TAC - bug fixed) = Aashrith and Debeshee - need to test recursion
 4. is_function_call_without_return Aashrith and Debeshee - need to test recursion
 5. is_assignment_instruction - Aashrith and Debeshee - need to test little bit
-=======
-3. is_function_call_with_return Done = Aashrith and Debeshee (Test this)
-4. is_function_call_without_return Aashrith and Debeshee
-5. is_assignment_instruction - Typecasting Aashrith and Debeshee
->>>>>>> 5a828f6 (fix array tac, code gen for statements)
 6. is_if_statement - Shreetesh and Kranthi
 7. is_return_statement - check and test it once Aashrith and Debeshee
 8. is_param_instruction - ??? (we are not using it anywhere) - removed - done

@@ -30,6 +30,7 @@ class CodeGen:
 
     def preamble(self, intermediate_code_final):
 
+        # storing all the string constants
         self.data_segment_dict = {}
 
         array_initializations = ''
