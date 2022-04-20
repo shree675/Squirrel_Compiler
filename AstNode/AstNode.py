@@ -817,12 +817,13 @@ class AstNode:
                 array_variable.value["val"] + " * " + \
                 str(size) + '\n'
 
-
             if not head.mid:
-                temp2 = parser.get_new_temp("float" if data_type == FLOAT else "int")
-                head.code += temp2 + " = " + array_variable.value["varname"] + "[" + temp + "]" + '\n'
+                temp2 = parser.get_new_temp(
+                    "float" if data_type == FLOAT else "int")
+                head.code += temp2 + " = " + \
+                    array_variable.value["varname"] + "[" + temp + "]" + '\n'
                 head.value = temp2
-            
+
         # --------------------------------------------------------------------
 
         # semantic analysis is required here
@@ -1043,8 +1044,8 @@ class AstNode:
 
                 # print("left.code", left.value is one)
                 t0 = parser.get_new_temp("int")
-                head.code += f"{t0} = 0\n"
-                head.code = left.code + "\n" + "if " + left.value + \
+                head.code = f"{t0} = 0\n"
+                head.code += left.code + "\n" + "if " + left.value + \
                     " " + "!= " + t0 + " goto " + head.true + temp_false
 
             else:
@@ -1205,23 +1206,38 @@ class AstNode:
 
             left_value = head.left
 
-
             # TODO: convert all lists to node
             if type(left_value) == list:
                 head.code = f"output {left_value[0].value.split(' ')[0]}, {left_value[1]}\n"
             elif left_value.operator == Operator.A_VARIABLE:
                 # print(left_value.value)
                 # data_type = parser.get_data_type(left_value.value)
-                head.code = f"output {left_value.data_type}, {left_value.value}\n"
+                if left_value.data_type != "bool":
+                    head.code = f"output {left_value.data_type}, {left_value.value}\n"
+                else:
+
+                    L1 = parser.get_new_label()
+                    L2 = parser.get_new_label()
+                    temp_var = parser.get_new_temp("int")
+                    temp_var1 = parser.get_new_temp("int")
+
+                    head.code = f"{temp_var} = 0\n"
+                    head.code += f"{temp_var1} = 1\n"
+                    head.code += f"if {left_value.value} == {temp_var} goto {L1}\n"
+                    head.code += f"output int, {temp_var1}\n"
+                    head.code += f"goto {L2}\n"
+                    head.code += f"{L1}:\n"
+                    head.code += f"output int, {temp_var}\n"
+                    head.code += f"{L2}:\n"
             else:
-                # data_type = parser.get_data_type(left_value.value.split('[')[0])
-                # head = left_value.code
+                # ARRAY VARIABLE
                 AstNode.generateCode(left_value, parser)
                 cur = left_value
                 # while cur.left:
                 cur = cur.left
-                
+
                 print(cur.value, "BAR")
 
                 head.code = left_value.code
+                # handle differently for BOOL !
                 head.code += f"output {cur.data_type}, {left_value.value}\n"

@@ -1,7 +1,14 @@
 void @start() {
-    float x = 0.2;
+    ``float x = 0.2;
     int y = 3.4;
     int z;
-    z = (int) 3.4;
+    z = (int) 3.4; ``
+
+    int a = 5;
+    bool b = (bool)a;
+
+    if(b){
+       output(b) ;
+    }
 
 }

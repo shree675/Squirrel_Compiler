@@ -424,7 +424,8 @@ class RegisterAllocation:
                         # register_descriptor[reg].remove(
                         #     temp_with_farthest_next_use)
                         return (reg, 1, 1)
-        # return ('$t9', 1, 1)
+
+        return ('$t0', 1, 1)
 
     def spill_reg(self,  register):
 
@@ -1035,7 +1036,7 @@ class RegisterAllocation:
                         self.spill_reg(reg[2])
                         self.update_descriptors('spill', [reg[2]])
 
-                    operand_type = self.get_data_type(left)
+                    operand_type = self.get_data_type(left, symbol_table)
 
                     # TODO !!!: Check nop for floats while testing
 
@@ -1347,6 +1348,10 @@ class RegisterAllocation:
 
                     else:
                         # For regular variables
+                        print("OUTPUT Variable", variable)
+                        print(self.address_descriptor)
+                        print(self.register_descriptor)
+
                         reg0, spill0, _ = self.get_reg(
                             data_type == 'float', live_and_next_use_blocks, blocks.index(block), variable)
                         if spill0 == 1:
@@ -1417,7 +1422,7 @@ class RegisterAllocation:
                         self.text_segment += f"s.s {reg1}, {array_name}({reg0})\n"
                     else:
                         self.text_segment += f"sw {reg1}, {array_name}({reg0})\n"
-                    
+
         assembly_code = f"{data_segment}.text\n.globl main\n\n{self.text_segment}\n"
         assembly_code = re.sub('start:', 'main:\n', assembly_code)
 
