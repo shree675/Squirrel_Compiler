@@ -1,0 +1,19 @@
+- [ ] Arrays on the left
+- [ ] Arrays on the right
+- [x] Simple Input - passed int char arrays | failed bool float
+- [ ] Simple Output - passed int char arrays | failed bool
+- [ ] Strings Input
+- [ ] Strings Output
+- [x] Binary Arithmetic Integers - passed
+- [ ] Binary Arithmetic Integers with arrays - fail
+- [ ] Binary Arithmetic Floats - fail
+- [ ] Binary Arithmetic Floats with arrays - fail
+- [ ] Type Casting Assignment - fail
+- [ ] Function calls
+- [ ] Recursion
+- [x] If statement
+- [ ] If statement with arrays
+- [ ] If statement with type casting - JumpTest.sq line 18: no semantic error raised
+- [ ] Switch statements
+- [ ] Boolean assignment statements
+- [ ] Check get_reg thoroughly in all cases

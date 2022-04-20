@@ -1,56 +1,74 @@
 start:
 
 x`2 = (int) 0
-#L8:
+#L12:
 y`2 = (int) 0
-#L6:
 #L10:
+j`2 = (int) 0
+#L8:
+#L14:
 
 ~t0 = 5
 
-if x`2 < ~t0 goto #L11
-goto #L4
+if x`2 < ~t0 goto #L15
+goto #L6
 
-#L11:
+#L15:
 
-j`3 = (int) 0
-#L14:
 
 ~t1 = 0
 
-if j`3 == ~t1 goto #L17
-goto #L18
+if j`2 == ~t1 goto #L19
+goto #L20
 
-#L17:
+#L19:
+
 
 ~t2 = 1
+~tf0 = (float) ~t2
 
-j`3 = ~t2
+~t3 = (int) ~tf0
+j`2 = ~t3
 
-#L21:
-goto #L10
-#L19:
-goto #L16
-#L18:
-
-goto #L4
 #L23:
+goto #L14
+#L21:
+goto #L18
+#L20:
 
-#L16:
-goto #L10
+
+
+~t4 = 1
+
+~t5 = x`2 + ~t4
+
+x`2 = ~t5
+
+#L25:
+
+#L18:
+goto #L14
+#L6:
+output int, x`2
+
 #L4:
 
-~t3 = x`2 * y`2
 
-~t4 = x`2 + ~t3
 
-~t6 = x`2 + y`2
+~t6 = x`2 * y`2
 
-~t5 = y`2 * ~t6
+~t7 = x`2 + ~t6
 
-~t7 = ~t4 + ~t5
 
-return ~t7
+
+
+~t9 = x`2 + y`2
+
+~t8 = y`2 * ~t9
+
+~t10 = ~t7 + ~t8
+
+return ~t10
 #L2:
 return 0
 

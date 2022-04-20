@@ -1,31 +1,49 @@
-var1`1 = (int) 0
+~t0 = 4
 
-myFloat`1 = (float) 1.2
+var1`1 = (int) ~t0
+
+~tf0 = 1.2
+
+myFloat`1 = (float) ~tf0
 
 start:
 
 var2`2 = (int) 0
 #L4:
-ifFalse var1`1 == 20 goto #L7
+~t1 = (int) 20
+output int, ~t1
+ifFalse var1`1 == ~t1 goto #L7
 
-myFloat`1 = 8.4
+
+~tf1 = 8.4
+
+myFloat`1 = ~tf1
 
 #L10:
 goto #L6
 #L8:
 #L7:
 
-ifFalse var1`1 == 4 goto #L12
+~t3 = (int) 4
+output int, ~t3
+ifFalse var1`1 == ~t3 goto #L12
 
-var2`2 = 82
+
+~t2 = 82
+
+var2`2 = ~t2
+
+#L17:
+output int, var2`2
 
 #L15:
 goto #L6
 #L13:
 #L12:
 
+
 b`6 = (bool) false
-#L17:
+#L19:
 goto #L6
 
 #L6:

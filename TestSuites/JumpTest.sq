@@ -12,15 +12,17 @@ int @start(int a){
         }
     }``
 
+    int j;
     while(x < 5){
-        int j;
         if(j == 0){
-            j = 1;
+            j = (float) 1;
             continue;
         }else{
-            break;
+            x = x + 1;
         }
     }
+
+    output(x);
 
     ``continue;``
     return x+x*y+y*(x+y);

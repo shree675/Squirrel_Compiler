@@ -22,7 +22,7 @@ class CodeGen:
         'int': 4,
         'float': 4,
         'char': 1,
-        'bool': 1,
+        'bool': 4,
     }
 
     def __init__(self):

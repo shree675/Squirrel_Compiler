@@ -1,7 +1,5 @@
 .data
 
-s__2:
-	.space 10
 .text
 .globl main
 
@@ -9,11 +7,13 @@ main:
 
 move $s8, $sp
 
-li $v0, 8
-la $a0, s__2
+li $t0, 0.0
+cvt.w.s $t0, $t0
+li $v0, 6
 syscall
-li $v0, 4
-la $a0, s__2
+move $f3, $v0
+mov.s $f12, $f3
+li $v0, 2
 syscall
 move $sp, $s8
 jr $ra

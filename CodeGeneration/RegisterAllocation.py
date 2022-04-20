@@ -110,12 +110,12 @@ class RegisterAllocation:
     #     '$f31': '$f31',
     # }
 
-    # datatype_sizes = {
-    #     'int': 4,
-    #     'float': 4,
-    #     'char': 1,
-    #     'bool': 1,
-    # }
+    datatype_sizes = {
+        'int': 4,
+        'float': 4,
+        'char': 1,
+        'bool': 1,
+    }
 
     # The set of all valid arithmetic operators
     arithmetic_operators = set("+ - * / % && || > < >= <= ! != = ==".split())
@@ -618,10 +618,12 @@ class RegisterAllocation:
                     data_type, size = line.split()[0], line.split()[
                         1].split('[')[1].split(']')[0]
                     num_of_elements = int(
-                        size)//4  # this was previously datatype_sizes[data_type] but in our case everything is size 4
+                        size)//self.datatype_sizes[data_type]
+                    # this was previously datatype_sizes[data_type] but in our case everything is size 4
                     # In our TAC for array initialization, after the declaration, there are num_of_elements lines of initialization
                     # These multiple lines have only constants which do not affect live analysis
                     # Hence we just skip these lines using the following for loop
+                    print(num_of_elements)
                     for _ in range(num_of_elements):
                         next(lines_generator)
 
@@ -1055,6 +1057,12 @@ class RegisterAllocation:
                                 self.text_segment += f"lw {reg[1]}, {offset}($s8)\n"
                         self.update_descriptors("load", [reg[1], operand1])
 
+                        if self.is_constant(operand1):
+                            if not self.isfloat(operand1):
+                                self.text_segment += f"li {reg[1]}, {operand1}\n"
+                            else:
+                                self.text_segment += f"li.s {reg[1]}, {operand1}\n"
+
                     operand2_type = self.get_data_type(operand2, symbol_table)
 
                     if reg[2] is None:
@@ -1072,6 +1080,12 @@ class RegisterAllocation:
                                 offset = self.address_descriptor[operand2]['offset']
                                 self.text_segment += f"lw {reg[2]}, {offset}($s8)\n"
                         self.update_descriptors("load", [reg[2], operand2])
+
+                        if self.is_constant(operand2):
+                            if not self.isfloat(operand2):
+                                self.text_segment += f"li {reg[2]}, {operand2}\n"
+                            else:
+                                self.text_segment += f"li.s {reg[2]}, {operand2}\n"
 
                     operand_type = self.get_data_type(
                         operand1, symbol_table)
@@ -1404,6 +1418,7 @@ class RegisterAllocation:
                         'char': 12,
                     }
                     _, data_type, variable = line.split()
+                    print("barman", data_type, variable)
                     # since it's a reserved register, we don't have to
                     # spill or update the descriptors
 
@@ -1420,6 +1435,25 @@ class RegisterAllocation:
                             'nospill', [reg0, variable])
 
                     self.text_segment += f"move {reg0}, $v0\n"
+                    self.update_descriptors("nospill", [reg0, variable])
+
+                    if '[' in variable:
+                        array_name = variable.split('[')[0]
+                        var_index = variable.split('[')[1].split(']')[0]
+                        reg_index, spill_index, _  = self.get_reg(
+                                False, live_and_next_use_blocks, blocks.index(block), var_index)
+                        if spill_index == 1:
+                                self.spill_reg(reg_index)
+                                self.update_descriptors('spill', [reg_index])
+                                offset = self.address_descriptor[var_index]['offset']
+                                self.text_segment += f"lw {reg_index}, {offset}($s8)\n"
+                                self.update_descriptors('load', [reg0, var_index])
+                        if data_type == "float":
+                            self.text_segment += f"s.s {reg0}, {array_name}({reg_index})\n"
+                        elif data_type == "char":
+                            self.text_segment += f"sb {reg0}, {array_name}({reg_index})\n"
+                        else:
+                            self.text_segment += f"sb {reg0}, {array_name}({reg_index})\n"
 
                 elif self.is_input_string(line, data_segment):
                     syscall_number = 8
@@ -1444,6 +1478,9 @@ class RegisterAllocation:
                     }
                     _, data_type, variable = line.split()
                     data_type = data_type[:-1]
+
+
+
                     if data_type == 'string':
                         self.text_segment += f"li $v0, {syscall_number[data_type]}\n"
                         self.text_segment += f"la $a0, {variable}\n"
@@ -1475,11 +1512,31 @@ class RegisterAllocation:
                                     self.text_segment += f"lw {reg0}, {offset}($s8)\n"
                             self.update_descriptors(
                                 'load', [reg0, variable])
-                        self.text_segment += f"li $v0, {syscall_number[data_type]}\n"
+                        
+
+                        if '[' in variable:
+                            array_name = variable.split('[')[0]
+                            var_index = variable.split('[')[1].split(']')[0]
+                            reg_index, spill_index, _  = self.get_reg(
+                                    False, live_and_next_use_blocks, blocks.index(block), var_index)
+                            if spill_index == 1:
+                                    self.spill_reg(reg_index)
+                                    self.update_descriptors('spill', [reg_index])
+                                    offset = self.address_descriptor[var_index]['offset']
+                                    self.text_segment += f"lw {reg_index}, {offset}($s8)\n"
+                                    self.update_descriptors('load', [reg0, var_index])
+                            if data_type == "float":
+                                self.text_segment += f"l.s {reg0}, {array_name}({reg_index})\n"
+                            elif data_type == "char":
+                                self.text_segment += f"lb {reg0}, {array_name}({reg_index})\n"
+                            else:
+                                self.text_segment += f"lw {reg0}, {array_name}({reg_index})\n"
+
                         if data_type == 'float':
                             self.text_segment += f"mov.s $f12, {reg0}\n"
                         else:
                             self.text_segment += f"move $a0, {reg0}\n"
+                        self.text_segment += f"li $v0, {syscall_number[data_type]}\n"
                         self.text_segment += f"syscall\n"
 
         for var, (type, space, value) in data_segment_dict.items():

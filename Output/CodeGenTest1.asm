@@ -27,26 +27,26 @@ addi $s5, $s4, 0
 div $t1, $t3
 mfhi $s6
 addi $s7, $s6, 0
-li $v0, 1
 move $a0, $t1
-syscall
 li $v0, 1
+syscall
 move $a0, $t3
-syscall
 li $v0, 1
+syscall
 move $a0, $t5
-syscall
 li $v0, 1
+syscall
 move $a0, $s1
-syscall
 li $v0, 1
+syscall
 move $a0, $s3
-syscall
 li $v0, 1
+syscall
 move $a0, $s5
-syscall
 li $v0, 1
+syscall
 move $a0, $s7
+li $v0, 1
 syscall
 move $sp, $s8
 jr $ra

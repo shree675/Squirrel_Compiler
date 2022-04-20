@@ -1,4 +1,4 @@
-int var1;
+int var1 = 4;
 float myFloat=1.2;
 
 void @start(){
@@ -10,8 +10,10 @@ void @start(){
     
     switch(var1){
         case (20): myFloat=8.4;
+                    ``output(myFloat);``
                    break;
         case (4): var2=82;
+                output(var2);
                   break;
         default: bool b;
     }

@@ -536,7 +536,16 @@ class AstNode:
 
             AstNode.generateCode(statements, parser)
 
-            head.code = "ifFalse " + head.value.value + " == " + constant[1] + " goto " + statements.next + '\n' + \
+            if constant[0] == Operator.A_FLOATCONST:
+                t0 = parser.get_new_temp("float")
+                
+            else:
+                t0 = parser.get_new_temp("int")
+            head.code = f"{t0} = ({constant[0].value.split()[0]}) {constant[1]}\n"
+            value = t0
+            head.code += f"output {constant[0].value.split(' ')[0]}, {value}\n"
+
+            head.code += "ifFalse " + head.value.value + " == " + t0 + " goto " + statements.next + '\n' + \
                 statements.code + "\n" + statements.next + ":\n"
 
         # ------------------------------------------------------------
@@ -1178,8 +1187,8 @@ class AstNode:
                 # head = left_value.code
                 AstNode.generateCode(left_value, parser)
                 cur = left_value
-                while cur.left:
-                    cur = cur.left
+                # while cur.left:
+                cur = cur.left
 
                 head.code = left_value.code
                 head.code += f"input {cur.data_type}, {left_value.value}\n"

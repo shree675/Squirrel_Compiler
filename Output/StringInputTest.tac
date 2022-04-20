@@ -1,11 +1,11 @@
 start:
 
-s`2 = (string) ""
+s3`2 = (float) 0.0
 #L6:
-input_string s`2, 10
+input float, s3`2
 
 #L4:
-output string, s`2
+output float, s3`2
 
 #L2:
 return 

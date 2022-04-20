@@ -2,8 +2,8 @@ void @start() {
     char a;
     float b;
 
-    if (a < b) {
+    if (a <= b) {
         int c = a+b;
+        output(c);
     }
-    
 }

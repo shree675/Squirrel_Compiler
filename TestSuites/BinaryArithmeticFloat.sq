@@ -1,0 +1,14 @@
+void @start() {
+    float a=2.7;
+    float b=3.9;
+    float c=a+b;
+    float d=a-b*2;
+    float e=a*b;
+    float f=a/b;
+    output(a);
+    output(b);
+    output(c);
+    output(d);
+    output(e);
+    output(f);
+}

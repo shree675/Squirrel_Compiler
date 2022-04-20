@@ -1,5 +1,21 @@
 void @start() {
-    string s;
-    input_string(s, 10);
-    output(s);
-}
+``    char s[2] = {'a', 'b'};
+    input(s[1]);
+    output(s[1]);``
+
+   `` char s1;
+    input(s1);
+    output(s1);
+``
+``    bool s2;
+    input(s2);
+    output(s2);``
+
+   float s3;
+    input(s3);
+    output(s3);
+
+``    float s4[10] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
+    input(s4[1]);
+    output(s4[1]);
+``}
