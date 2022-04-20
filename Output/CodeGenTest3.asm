@@ -26,16 +26,16 @@ mflo $t6
 li $t7, 1
 add $s0, $t3, $t7
 addi $s1, $s0, 0
-addi $s2, $s1, 0
+sw $s1, arr__2($t6)
 mult $t1, $t3
-mflo $s3
-addi $t1, $s3, 0
+mflo $s2
+addi $t1, $s2, 0
 li $v0, 1
 move $a0, $t3
 syscall
-li $s4, 1
-add $s5, $t3, $s4
-addi $t3, $s5, 0
+li $s3, 1
+add $s4, $t3, $s3
+addi $t3, $s4, 0
 j _L13
 _L11:
 li $v0, 1

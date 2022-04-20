@@ -100,6 +100,7 @@ class CodeGen:
 
     def preamble(self, intermediate_code_final):
 
+        # storing all the string constants
         self.data_segment_dict = {}
 
         array_initializations = ''
@@ -117,7 +118,7 @@ class CodeGen:
                 if '=' in tokens:
                     string_const = re.match(r".*(\".*\")", line).group(1)
                     string_var = tokens[tokens.index('=') - 1]
-                    self.data_segment_dict[string_var] = string_const
+                    self.data_segment_dict[string_var] = (".asciiz", 0, string_const)
                 else:
                     string_var = 'return'+str(self.return_string_count)
                     self.return_string_count += 1
@@ -156,7 +157,7 @@ class CodeGen:
                     array_initializations += f'{self.array_addresses[array_var][0][i].strip()}, '
             array_initializations = array_initializations[:-2] + '\n'
 
-        assembly_code = f".data\n{array_initializations}{string_constants}\n"
+        assembly_code = f".data\n{array_initializations}\n"
 
         return assembly_code
 
@@ -170,6 +171,9 @@ class CodeGen:
         intermediate_code = re.sub(r'\bfalse\b', '0', intermediate_code)
         intermediate_code = re.sub(r'`', '__', intermediate_code)
         intermediate_code = re.sub(r'~', '__', intermediate_code)
+        intermediate_code = re.sub(r'\bbool\b', 'int', intermediate_code)
+
+        print("intermediate code : ", intermediate_code)
 
         goto_labels = set()
         for lines in intermediate_code.splitlines():
