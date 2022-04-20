@@ -721,7 +721,7 @@ class RegisterAllocation:
 
                     Case 1: Subject: int type, Operand: int type
                             move $t0, $t1
-                    Case 2: Subject: float type, Operand: float type 
+                    Case 2: Subject: float type, Operand: float type
                             move $f0, $f1
                     Case 3: Subject: int type, Operand: float type
                             cvt.w.s $f0, $f1
@@ -939,6 +939,20 @@ class RegisterAllocation:
                         # loading an immediate into a register -> nospill protocol
                         self.update_descriptors(
                             'nospill', [reg0, subject])
+
+                    elif operand[0] == '\"':
+                        print("STRING OPERAND", operand)
+                        reg0, spill0, _ = self.get_reg(
+                            subject_type == 'float', live_and_next_use_blocks, blocks.index(block), subject)
+
+                        if spill0:
+                            self.spill_reg(reg0)
+                            self.update_descriptors('spill', [reg0])
+
+                        self.text_segment += f"la {reg0}, {subject}\n"
+                        # TODO : Update descriptors for load from data segment
+                        self.update_descriptors("load", [reg0, subject])
+                        print("STRING", self.register_descriptor)
 
                     else:
                         # if it is a variable
