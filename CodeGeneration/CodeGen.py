@@ -4,6 +4,15 @@ from collections import defaultdict
 import os
 from CodeGeneration import RegisterAllocation
 
+class Node:
+    def __init__(self,index,code_block):
+        self.index = index
+        self.code_block = code_block
+        self.next = set()
+        self.leading_label = None
+        if ':' in code_block.split('\n')[0]:
+            self.leading_label = code_block.split('\n')[0].split(':')[0]
+        
 
 class CodeGen:
 
@@ -27,6 +36,67 @@ class CodeGen:
         self.string_addresses = defaultdict()
         # This is the fixed starting address of data segment on QTSPIM
         self.memory_pointer = 0x10010000
+
+    def eliminate_dead_code(self, blocks, symbol_table, optimization_level):
+        print("calling eliminate_dead_code")
+        print("================================================")
+        # print("Initial Block Structure")
+
+        CFG = []
+        blocks_current = []
+        for block in blocks:
+            block = block.strip('\n')
+            if block.isspace() or len(block) == 0:
+                continue
+            else:
+                # while len(block.split('\n')) > 2 and 'return' in block.split('\n')[-1] and 'return' in block.split('\n')[-2]:
+                #     block = '\n'.join(block.split('\n')[:-1])
+                blocks_current.append(block)
+        for block in blocks_current:   
+            #print(block)
+            print("----------------------------------------------")
+            new_node = Node(blocks_current.index(block), block)
+            CFG.append(new_node)
+            print("leading label: ", new_node.leading_label)
+            print(new_node.index, len(new_node.code_block), new_node.code_block)
+            print("********************************")
+
+        print("================================================")
+
+        # Start creating Control Flow Graph connections
+        for node in CFG:
+            print("block number:", node.index)
+            print(node.code_block)
+            last_line = node.code_block.split('\n')[-1]
+            # last_line = node.code_block.rstrip('\n').split('\n')[-1]
+            words = last_line.split(' ')
+            # print(last_line)
+            if len(words)> 1 and (words[0] == 'goto' or words[0] == 'return'):
+                # The direct goto statements (without condition)
+                print("goto found")
+                label = words[1]
+                print('index of this block: ', node.index)
+                for search_node in CFG:
+                    if search_node.leading_label is not None and search_node.leading_label == label:
+                        node.next.add(search_node.index)       
+            else:
+                print('no goto found, go to next block')
+                print('current block: ', node.index)
+                if node.index < (len(blocks_current)-1):
+                    node.next.add(node.index+1)
+
+            if len(words)> 2 and words[-2] == 'goto':
+                # For the gotos that accompany an if or ifFalse statement (with condition)
+                label = words[-1]
+                print('index of this block: ', node.index)
+                for search_node in CFG:
+                    if search_node.leading_label is not None and search_node.leading_label == label:
+                        node.next.add(search_node.index)
+
+            print('Next blocks', node.next)
+            print("$$$$$$$$$$$$$$$$$$$$")    
+
+        return blocks
 
     def preamble(self, intermediate_code_final):
 
@@ -109,7 +179,20 @@ class CodeGen:
         for lines in intermediate_code.splitlines():
             if 'goto' in lines:
                 goto_labels.add(lines.split(' ')[-1])
-
+        # #----------------------------------------------------------------
+        # print('intermediate code', intermediate_code)
+        # optimized_code0 = ""
+        # i = 1
+        # intermediate_code_list = intermediate_code.splitlines()
+        # while i < len(intermediate_code_list):
+        #     if 'return' in intermediate_code_list[i-1] and 'return' in intermediate_code_list[i]:
+        #         continue
+        #     else:
+        #         optimized_code0 += intermediate_code_list[i] + '\n'   
+        #     i += 1    
+        # print('optimized 0 code', optimized_code0)
+        # # ----------------------------------------------------------------
+        # # At the end of optimization level 0, redundant return statements are removed
         optimized_code1 = ""
         for lines in intermediate_code.splitlines():
             if lines.startswith('#L') and lines.split(':')[0] not in goto_labels:
@@ -190,6 +273,8 @@ class CodeGen:
         prev = False
         first_label_seen = False
         for lines in intermediate_code_final.splitlines():
+            # while len(block.split('\n')) > 2 and 'return' in block.split('\n')[-1] and 'return' in block.split('\n')[-2]:
+            #         block = '\n'.join(block.split('\n')[:-1])
             if not first_label_seen and lines.endswith(':'):
                 first_label_seen = True
                 blocks.append(block_line)
@@ -209,6 +294,9 @@ class CodeGen:
             elif 'goto' in lines:
                 block_line += lines+'\n'
                 prev = True
+            elif 'call' in lines:
+                block_line += lines+'\n'
+                prev = True
             else:
                 block_line += lines+'\n'
         if block_line != "":
@@ -220,6 +308,9 @@ class CodeGen:
         reserved_all_dead_keywords = "int float string bool char"
         reserved_words = set(reserved_operators.split())
         live_and_next_use_blocks = []
+
+        blocks = self.eliminate_dead_code(blocks, symbol_table, optimization_level)
+        print("Dead code elimination done")
 
         for block in blocks:
             num_lines = len(block.split('\n'))
