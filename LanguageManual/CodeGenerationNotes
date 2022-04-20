@@ -39,13 +39,3 @@ List of Statement types----------------------------
 12. is_array_assignment - Shreetesh and Kranthi - fix TAC bug
 13. input_string - Kranthi and Aashrith
 14. is_assignment_instruction_with_typecast - Typecasting Aashrith and Debeshee
-
----
-
-int a = 5;
-bool b = (bool)a;
-
-&&
-
-110 -> 001
-000 -> 000
