@@ -19,7 +19,8 @@ goto #L8
 
 #L9:
 
-output string, "a"
+~t2 = (string) "a"
+output string, ~t2
 
 #L10:
 

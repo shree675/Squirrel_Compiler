@@ -70,8 +70,8 @@ def compile(filename, optimization_level, save_preprocessed_file, save_intermedi
     with open(output_file_path, "w") as f:
         f.write(target_code)
 
-    # subprocess.run(["echo", "Running SPIM assembler"])
-    # subprocess.run(["spim", "run", output_file_path])
+    subprocess.run(["echo", "Running SPIM assembler"])
+    subprocess.run(["spim", "run", output_file_path])
 
 
 def main(*argv):

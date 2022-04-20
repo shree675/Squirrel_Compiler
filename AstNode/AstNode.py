@@ -1017,7 +1017,7 @@ class AstNode:
         # --------------------------------------------------------------------
 
         elif head.operator == Operator.A_INTCONST or head.operator == Operator.A_STRINGCONST or head.operator == Operator.A_CHARCONST:
-
+            print("helloworld", head.value)
             t0 = parser.get_new_temp("int")
             head.code = f"{t0} = {head.value}\n"
             head.value = t0
@@ -1208,7 +1208,14 @@ class AstNode:
 
             # TODO: convert all lists to node
             if type(left_value) == list:
-                head.code = f"output {left_value[0].value.split(' ')[0]}, {left_value[1]}\n"
+                if left_value[0] == Operator.A_FLOATCONST:
+                    t0 = parser.get_new_temp("float")
+                    
+                else:
+                    t0 = parser.get_new_temp("int")
+                head.code = f"{t0} = ({left_value[0].value.split()[0]}) {left_value[1]}\n"
+                head.value = t0
+                head.code += f"output {left_value[0].value.split(' ')[0]}, {head.value}\n"
             elif left_value.operator == Operator.A_VARIABLE:
                 # print(left_value.value)
                 # data_type = parser.get_data_type(left_value.value)
