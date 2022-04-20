@@ -31,7 +31,7 @@ goto #L20
 j`2 = ~t3
 
 #L23:
-goto #L14
+goto #L6
 #L21:
 goto #L18
 #L20:

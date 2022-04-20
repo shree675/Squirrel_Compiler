@@ -11,7 +11,6 @@ start:
 var2`2 = (int) 0
 #L4:
 ~t1 = (int) 20
-output int, ~t1
 ifFalse var1`1 == ~t1 goto #L7
 
 
@@ -25,7 +24,6 @@ goto #L6
 #L7:
 
 ~t3 = (int) 4
-output int, ~t3
 ifFalse var1`1 == ~t3 goto #L12
 
 

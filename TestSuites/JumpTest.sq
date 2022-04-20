@@ -16,7 +16,7 @@ int @start(int a){
     while(x < 5){
         if(j == 0){
             j = (float) 1;
-            continue;
+            break;
         }else{
             x = x + 1;
         }

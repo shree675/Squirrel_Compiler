@@ -543,7 +543,6 @@ class AstNode:
                 t0 = parser.get_new_temp("int")
             head.code = f"{t0} = ({constant[0].value.split()[0]}) {constant[1]}\n"
             value = t0
-            head.code += f"output {constant[0].value.split(' ')[0]}, {value}\n"
 
             head.code += "ifFalse " + head.value.value + " == " + t0 + " goto " + statements.next + '\n' + \
                 statements.code + "\n" + statements.next + ":\n"

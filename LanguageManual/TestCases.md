@@ -6,14 +6,15 @@
 - [ ] Strings Output
 - [x] Binary Arithmetic Integers - passed
 - [ ] Binary Arithmetic Integers with arrays - fail
-- [ ] Binary Arithmetic Floats - fail
+- [ ] Binary Arithmetic Floats - fail - Check BinaryArithmeticFloat.sq
 - [ ] Binary Arithmetic Floats with arrays - fail
 - [ ] Type Casting Assignment - fail
 - [ ] Function calls
+- [ ] Function calls without return
 - [ ] Recursion
 - [x] If statement
 - [ ] If statement with arrays
-- [ ] If statement with type casting - JumpTest.sq line 18: no semantic error raised
+- [ ] If statement with type casting
 - [ ] Switch statements
 - [ ] Boolean assignment statements
 - [ ] Check get_reg thoroughly in all cases

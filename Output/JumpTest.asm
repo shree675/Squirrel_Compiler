@@ -27,7 +27,7 @@ cvt.s.w $f3, $f1
 cvt.w.s $f1, $f3
 mfc1 $t6, $f1
 addi $t2, $t6, 0
-j _L14
+j _L6
 _L20:
 li $t7, 1
 add $s0, $t0, $t7
