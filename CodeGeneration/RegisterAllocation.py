@@ -437,7 +437,7 @@ class RegisterAllocation:
                     if temp_with_farthest_next_use == register_descriptor[reg]:
                         # register_descriptor[reg].remove(
                         #     temp_with_farthest_next_use)
-                        return (reg, 1, 1)            
+                        return (reg, 1, 1)
         return ('$t9', 1, 1) if not is_float else ('$f31', 1, 1)
 
     def spill_reg(self,  register):
@@ -1043,7 +1043,6 @@ class RegisterAllocation:
 
                     operand2_type = self.get_data_type(operand2, symbol_table)
 
-
                     if reg[2] is None:
                         reg[2], spill[2], _ = self.get_reg(operand2_type == 'float',
                                                            live_and_next_use_blocks, blocks.index(block), operand2)
@@ -1412,7 +1411,8 @@ class RegisterAllocation:
                     syscall_number = 8
                     _, variable, length = line.split()
                     variable = variable[:-1]
-                    data_segment_dict[variable] = (".space", int(length) + 1, "")
+                    data_segment_dict[variable] = (
+                        ".space", int(length) + 1, "")
 
                     self.text_segment += f"li $v0, {syscall_number}\n"
                     self.text_segment += f"la $a0, {variable}\n"
@@ -1439,6 +1439,10 @@ class RegisterAllocation:
 
                     else:
                         # For regular variables
+                        print("OUTPUT Variable", variable)
+                        print(self.address_descriptor)
+                        print(self.register_descriptor)
+
                         reg0, spill0, _ = self.get_reg(
                             data_type == 'float', live_and_next_use_blocks, blocks.index(block), variable)
                         if spill0 == 1:
@@ -1464,13 +1468,12 @@ class RegisterAllocation:
                             self.text_segment += f"move $a0, {reg0}\n"
                         self.text_segment += f"syscall\n"
 
-                
         for var, (type, space, value) in data_segment_dict.items():
             if space:
                 data_segment += f"{var}:\n\t{type} {space}\n"
             else:
                 data_segment += f"{var}:\n\t{type} {value}\n"
-                    
+
         assembly_code = f"{data_segment}.text\n.globl main\n\n{self.text_segment}\n"
         assembly_code = re.sub('start:', 'main:\n', assembly_code)
 

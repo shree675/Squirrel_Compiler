@@ -101,6 +101,9 @@ class CodeGen:
         intermediate_code = re.sub(r'\bfalse\b', '0', intermediate_code)
         intermediate_code = re.sub(r'`', '__', intermediate_code)
         intermediate_code = re.sub(r'~', '__', intermediate_code)
+        intermediate_code = re.sub(r'\bbool\b', 'int', intermediate_code)
+
+        print("intermediate code : ", intermediate_code)
 
         goto_labels = set()
         for lines in intermediate_code.splitlines():
