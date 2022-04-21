@@ -222,10 +222,9 @@ class RegisterAllocation:
         # In case the type casting is mentioned, replace it with '' using the following regex
         instruction = re.sub(r'\(.+\)', '', instruction)
 
-        if not self.is_if_statement(instruction) and '=' in instruction and not self.is_arithmetic_instruction_binary(instruction):
+        if not self.is_if_statement(instruction) and not self.is_function_call_with_return(instruction) and '=' in instruction and not self.is_arithmetic_instruction_binary(instruction):
             return True
         return False
-
 
     def is_assignment_instruction_with_typecast(self, instruction):
         # The case of a simple assignment statement with typecast like a=(int)b or f=(float)10
@@ -237,10 +236,10 @@ class RegisterAllocation:
         # if '=' in instruction and len(instruction.split("=")) == 3 and flag:
         #     return True
         # return False
-        
+
         # s`2 = (string) ""
         # s2`2 = (bool) false
-        print("instruction : " , instruction)
+        print("instruction : ", instruction)
         if not self.is_if_statement(instruction) and '=' in instruction and instruction.split("=")[1].strip()[0] == '(':
             return True
         return False
@@ -598,7 +597,6 @@ class RegisterAllocation:
                     'registers': [register]
                 }
 
-
         elif protocol == "load_ds":
             # Load a value from data segment into the register
             register = params[0]
@@ -621,7 +619,6 @@ class RegisterAllocation:
                     'registers': [register]
                 }
 
-
         print('end of update : ', protocol)
         self.print_descriptors()
 
@@ -643,7 +640,7 @@ class RegisterAllocation:
             for line in lines_generator:
                 line = re.sub(r'#', '_', line)
 
-                print("Line: ", line)
+                # print("Line: ", line)
 
                 if self.is_array_initialization(line):
                     # Extract the datatype of the initialized array: int arr`2[24]
@@ -726,7 +723,8 @@ class RegisterAllocation:
                     subject, operand, cast_type, subject_type, operand_type = [
                         None]*5
                     print("foo", line.split("="))
-                    subject, cast_type, operand = line.split("=")[0], line.split("=")[1].split()[0], line.split(")")[1]
+                    subject, cast_type, operand = line.split("=")[0], line.split("=")[
+                        1].split()[0], line.split(")")[1]
 
                     subject = subject.strip()
                     operand = operand.strip()
@@ -839,7 +837,7 @@ class RegisterAllocation:
                         # loading an immediate into a register -> nospill protocol
                         self.update_descriptors(
                             'nospill', [reg0, subject])
-                    
+
                     elif operand[0] == '\"':
                         print("STRING OPERAND", operand)
                         reg0, spill0, _ = self.get_reg(
@@ -934,7 +932,7 @@ class RegisterAllocation:
                     subject, operand, subject_type, operand_type = [
                         None]*4
 
-                    subject, operand = line.split("=") 
+                    subject, operand = line.split("=")
 
                     subject = subject.strip()
                     operand = operand.strip()
@@ -1023,21 +1021,22 @@ class RegisterAllocation:
                         print("STRING", self.register_descriptor)
                         print(self.address_descriptor)
 
-                    elif '[' in operand:  
+                    elif '[' in operand:
                         array_name = operand.split('[')[0]
                         var_index = operand.split('[')[1].split(']')[0]
 
-                        array_type = self.get_data_type(array_name, symbol_table)
+                        array_type = self.get_data_type(
+                            array_name, symbol_table)
 
                         reg0, spill0, _ = self.get_reg(
                             False, live_and_next_use_blocks, blocks.index(block), var_index)
-                        
+
                         if spill0:
                             self.spill_reg(reg0)
                             self.update_descriptors('spill', [reg0])
 
                             offset = self.address_descriptor[var_index]['offset']
-                            self.text_segment += f"lw {reg0}, {offset}($s8)\n" 
+                            self.text_segment += f"lw {reg0}, {offset}($s8)\n"
 
                         if array_type == 'float':
                             reg_temp, spill_temp, _ = self.get_reg(
@@ -1046,11 +1045,12 @@ class RegisterAllocation:
                                 self.spill_reg(reg_temp)
                                 self.update_descriptors('spill', [reg_temp])
                             self.text_segment += f"l.s {reg_temp}, {array_name}({reg0})\n"
-                            self.update_descriptors('load', [reg_temp, subject])
+                            self.update_descriptors(
+                                'load', [reg_temp, subject])
                         else:
                             self.text_segment += f"lw {reg0}, {array_name}({reg0})\n"
                             self.update_descriptors("load", [reg0, subject])
-                        
+
                         self.update_descriptors('load', [reg0, var_index])
 
                     else:
@@ -1381,8 +1381,11 @@ class RegisterAllocation:
                             self.spill_reg(reg)
                             self.update_descriptors('spill', [reg])
                     # Spill $ra and $fp
-                    self.spill_reg(False, "$ra")
-                    self.spill_reg(False, "$s8")
+                    # self.spill_reg(False, "$ra")
+                    # self.spill_reg(False, "$s8")
+
+                    self.spill_reg("$ra")
+                    self.spill_reg("$s8")
 
                     # ------------------------------------------------------------
                     # Generate the code for function call
@@ -1538,14 +1541,14 @@ class RegisterAllocation:
                     if '[' in variable:
                         array_name = variable.split('[')[0]
                         var_index = variable.split('[')[1].split(']')[0]
-                        reg_index, spill_index, _  = self.get_reg(
-                                False, live_and_next_use_blocks, blocks.index(block), var_index)
+                        reg_index, spill_index, _ = self.get_reg(
+                            False, live_and_next_use_blocks, blocks.index(block), var_index)
                         if spill_index == 1:
-                                self.spill_reg(reg_index)
-                                self.update_descriptors('spill', [reg_index])
-                                offset = self.address_descriptor[var_index]['offset']
-                                self.text_segment += f"lw {reg_index}, {offset}($s8)\n"
-                                self.update_descriptors('load', [reg0, var_index])
+                            self.spill_reg(reg_index)
+                            self.update_descriptors('spill', [reg_index])
+                            offset = self.address_descriptor[var_index]['offset']
+                            self.text_segment += f"lw {reg_index}, {offset}($s8)\n"
+                            self.update_descriptors('load', [reg0, var_index])
                         if data_type == "float":
                             self.text_segment += f"s.s {reg0}, {array_name}({reg_index})\n"
                         elif data_type == "char":
@@ -1577,8 +1580,6 @@ class RegisterAllocation:
                     _, data_type, variable = line.split()
                     data_type = data_type[:-1]
 
-
-
                     if data_type == 'string':
                         self.text_segment += f"li $v0, {syscall_number[data_type]}\n"
                         self.text_segment += f"la $a0, {variable}\n"
@@ -1597,14 +1598,15 @@ class RegisterAllocation:
                         if '[' in variable:
                             array_name = variable.split('[')[0]
                             var_index = variable.split('[')[1].split(']')[0]
-                            reg_index, spill_index, _  = self.get_reg(
-                                    False, live_and_next_use_blocks, blocks.index(block), var_index)
+                            reg_index, spill_index, _ = self.get_reg(
+                                False, live_and_next_use_blocks, blocks.index(block), var_index)
                             if spill_index == 1:
-                                    self.spill_reg(reg_index)
-                                    self.update_descriptors('spill', [reg_index])
-                                    offset = self.address_descriptor[var_index]['offset']
-                                    self.text_segment += f"lw {reg_index}, {offset}($s8)\n"
-                                    self.update_descriptors('load', [reg0, var_index])
+                                self.spill_reg(reg_index)
+                                self.update_descriptors('spill', [reg_index])
+                                offset = self.address_descriptor[var_index]['offset']
+                                self.text_segment += f"lw {reg_index}, {offset}($s8)\n"
+                                self.update_descriptors(
+                                    'load', [reg0, var_index])
                             if data_type == "float":
                                 self.text_segment += f"l.s {reg0}, {array_name}({reg_index})\n"
                             elif data_type == "char":
@@ -1612,7 +1614,6 @@ class RegisterAllocation:
                             else:
                                 self.text_segment += f"lw {reg0}, {array_name}({reg_index})\n"
 
-                        
                         elif spill0 == 1:
                             self.spill_reg(reg0)
                             self.update_descriptors('spill', [reg0])
@@ -1629,9 +1630,6 @@ class RegisterAllocation:
                                     self.text_segment += f"lw {reg0}, {offset}($s8)\n"
                             self.update_descriptors(
                                 'load', [reg0, variable])
-                        
-
-                        
 
                         if data_type == 'float':
                             self.text_segment += f"mov.s $f12, {reg0}\n"

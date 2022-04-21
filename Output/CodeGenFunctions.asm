@@ -1,16 +1,20 @@
+.data
+
 .text
 .globl main
 
 fun1:
 move $s8, $sp
 
-li $t0, 5
+add $t0, $t0, $t1
+addi $t2, $t0, 0
+li $t3, 5
 move $sp, $s8
-move $v0, $t0
+move $v0, $t3
 jr $ra
 jr $ra
 move $sp, $s8
-move $v0, $t1
+move $v0, $t4
 jr $ra
 jr $ra
 main:
