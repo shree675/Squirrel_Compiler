@@ -1,4 +1,7 @@
 void @start() {
-    string s = "Hello, world!";
+    string s;
+    s = "Hello, world!";
+    string s1 = s;
+    string s2 = s1;
     output(s);
 }

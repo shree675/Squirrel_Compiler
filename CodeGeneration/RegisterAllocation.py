@@ -221,20 +221,31 @@ class RegisterAllocation:
         # The case of a simple assignment statement like a=b or f=10
         # In case the type casting is mentioned, replace it with '' using the following regex
         instruction = re.sub(r'\(.+\)', '', instruction)
-        if '=' in instruction and len(instruction.split()) == 3:
+
+        if not self.is_if_statement(instruction) and '=' in instruction and not self.is_arithmetic_instruction_binary(instruction):
             return True
         return False
 
+
     def is_assignment_instruction_with_typecast(self, instruction):
         # The case of a simple assignment statement with typecast like a=(int)b or f=(float)10
-        flag = False
-        if '(' in instruction:
-            flag = True
-        # In case the type casting is mentioned, replace it with '' using the following regex
-        instruction = re.sub(r'\(.+\)', '', instruction)
-        if '=' in instruction and len(instruction.split()) == 3 and flag:
+        # flag = False
+        # if '(' in instruction:
+        #     flag = True
+        # # In case the type casting is mentioned, replace it with '' using the following regex
+        # instruction = re.sub(r'\(.+\)', '', instruction)
+        # if '=' in instruction and len(instruction.split("=")) == 3 and flag:
+        #     return True
+        # return False
+        
+        # s`2 = (string) ""
+        # s2`2 = (bool) false
+        print("instruction : " , instruction)
+        if not self.is_if_statement(instruction) and '=' in instruction and instruction.split("=")[1].strip()[0] == '(':
             return True
         return False
+
+        # subject, type_cast, operand = instruction.split("=")[0], instruction.split("=")[1].split()[0], instruction.split("=")[2]
 
     # started
     def is_if_statement(self, instruction):
@@ -587,8 +598,28 @@ class RegisterAllocation:
                     'registers': [register]
                 }
 
-        #     self.
-        # elif protocol == "new_var":
+        elif protocol == "load_ds":
+            # Load a value from data segment into the register
+            register = params[0]
+            variable = params[1]
+            register_descriptor[register] = variable
+
+            # Remove the register from the variable descriptor of variables
+            # which were using this register before is got overwritten
+            for var in self.address_descriptor:
+                if register in self.address_descriptor[var]['registers']:
+                    self.address_descriptor[var]['registers'].remove(register)
+
+            try:
+                self.address_descriptor[variable]['registers'].append(register)
+
+            except KeyError:
+                # This exception will never happen
+                self.address_descriptor[variable] = {
+                    'offset': None,
+                    'registers': [register]
+                }
+
 
         print('end of update : ', protocol)
         self.print_descriptors()
@@ -693,8 +724,14 @@ class RegisterAllocation:
                 elif self.is_assignment_instruction_with_typecast(line):
                     subject, operand, cast_type, subject_type, operand_type = [
                         None]*5
-                    subject, operand, cast_type = line.split()[0], line.split()[
-                        3], line.split()[2]
+                    print("foo", line.split("="))
+                    subject, cast_type, operand = line.split("=")[0], line.split("=")[1].split()[0], line.split(")")[1]
+
+                    subject = subject.strip()
+                    operand = operand.strip()
+
+                    cast_type = cast_type.strip()[1:-1]
+                    print("bar,", subject, cast_type, operand)
 
                     # Extracting subject_type
                     if '[' in subject:
@@ -712,6 +749,10 @@ class RegisterAllocation:
                         # if the operand is not float, do nothing
 
                         pass
+                    if cast_type == "string":
+                        if not self.is_constant(operand):
+                            data_segment_dict[subject] = data_segment_dict[operand]
+                            # data_segment_dict.pop(operand)
 
                     elif cast_type == 'float':
                         pass
@@ -789,7 +830,7 @@ class RegisterAllocation:
 
                         if cast_type == 'float':
                             # Case 2: Subject: float type, Operand: float type
-                            self.text_segment += f"li.s {reg0}, {operand}"
+                            self.text_segment += f"li.s {reg0}, {operand}\n"
                         else:
                             # Case 3: Subject: int type, Operand: float type
                             self.text_segment += f"li {reg0}, {operand}\n"
@@ -798,6 +839,22 @@ class RegisterAllocation:
                         # loading an immediate into a register -> nospill protocol
                         self.update_descriptors(
                             'nospill', [reg0, subject])
+                    
+                    elif operand[0] == '\"':
+                        print("STRING OPERAND", operand)
+                        reg0, spill0, _ = self.get_reg(
+                            subject_type == 'float', live_and_next_use_blocks, blocks.index(block), subject)
+
+                        if spill0:
+                            self.spill_reg(reg0)
+                            self.update_descriptors('spill', [reg0])
+
+                        self.text_segment += f"la {reg0}, {subject}\n"
+                        # TODO : Update descriptors for load from data segment
+                        print("subject reg : ", subject, reg0)
+                        print("STRING", self.register_descriptor)
+                        print(self.address_descriptor)
+                        self.update_descriptors("nospill", [reg0, subject])
 
                     else:
                         # if it is a variable
@@ -876,14 +933,23 @@ class RegisterAllocation:
                     subject, operand, subject_type, operand_type = [
                         None]*4
 
-                    subject, operand = line.split()[0], line.split()[2]
+                    subject, operand = line.split("=") 
+
+                    subject = subject.strip()
+                    operand = operand.strip()
+
+                    print("barman", subject, operand)
+
                     # Extracting subject_type
                     if '[' in subject:
                         subject = subject.split('[')[0]
 
                     subject_type = self.get_data_type(subject, symbol_table)
 
-                    print("Subject TYPE assignment : ", subject,  subject_type)
+                    if subject_type == "string":
+                        if not self.is_constant(operand):
+                            data_segment_dict[subject] = data_segment_dict[operand]
+                            # data_segment_dict.pop(operand)
 
                     # ---------------------------------------------------------------------------------------
                     # The operand could be a literal or a variable
@@ -953,8 +1019,10 @@ class RegisterAllocation:
 
                         self.text_segment += f"la {reg0}, {subject}\n"
                         # TODO : Update descriptors for load from data segment
-                        self.update_descriptors("load", [reg0, subject])
+                        self.update_descriptors("nospill", [reg0, subject])
+                        print("subject reg1", subject, reg0)
                         print("STRING", self.register_descriptor)
+                        print(self.address_descriptor)
 
                     else:
                         # if it is a variable
@@ -1004,6 +1072,7 @@ class RegisterAllocation:
                             if register_descriptor[reg1] == None:
                                 # if the reg1 is empty
                                 # load the value into reg0 directly from the memory
+                                print("OPERAND", operand)
                                 offset = self.address_descriptor[operand]['offset']
                                 if operand_type == "float":
                                     self.text_segment += f"l.s {reg0}, {offset}($s8)\n"
@@ -1418,7 +1487,6 @@ class RegisterAllocation:
                         'char': 12,
                     }
                     _, data_type, variable = line.split()
-                    print("barman", data_type, variable)
                     # since it's a reserved register, we don't have to
                     # spill or update the descriptors
 
@@ -1434,7 +1502,10 @@ class RegisterAllocation:
                         self.update_descriptors(
                             'nospill', [reg0, variable])
 
-                    self.text_segment += f"move {reg0}, $v0\n"
+                    if data_type == 'float':
+                        self.text_segment += f"mov.s {reg0}, $f0\n"
+                    else:
+                        self.text_segment += f"move {reg0}, $v0\n"
                     self.update_descriptors("nospill", [reg0, variable])
 
                     if '[' in variable:
@@ -1496,24 +1567,6 @@ class RegisterAllocation:
 
                         reg0, spill0, _ = self.get_reg(
                             data_type == 'float', live_and_next_use_blocks, blocks.index(block), variable)
-                        if spill0 == 1:
-                            self.spill_reg(reg0)
-                            self.update_descriptors('spill', [reg0])
-                            if self.is_constant(variable):
-                                if not self.isfloat(variable):
-                                    self.text_segment += f"li {reg0}, {variable}\n"
-                                else:
-                                    self.text_segment += f"li.s {reg0}, {variable}\n"
-                            else:
-                                offset = self.address_descriptor[variable]['offset']
-                                if data_type == 'float':
-                                    self.text_segment += f"l.s {reg0}, {offset}($s8)\n"
-                                else:
-                                    self.text_segment += f"lw {reg0}, {offset}($s8)\n"
-                            self.update_descriptors(
-                                'load', [reg0, variable])
-                        
-
                         if '[' in variable:
                             array_name = variable.split('[')[0]
                             var_index = variable.split('[')[1].split(']')[0]
@@ -1531,6 +1584,27 @@ class RegisterAllocation:
                                 self.text_segment += f"lb {reg0}, {array_name}({reg_index})\n"
                             else:
                                 self.text_segment += f"lw {reg0}, {array_name}({reg_index})\n"
+
+                        
+                        elif spill0 == 1:
+                            self.spill_reg(reg0)
+                            self.update_descriptors('spill', [reg0])
+                            if self.is_constant(variable):
+                                if not self.isfloat(variable):
+                                    self.text_segment += f"li {reg0}, {variable}\n"
+                                else:
+                                    self.text_segment += f"li.s {reg0}, {variable}\n"
+                            else:
+                                offset = self.address_descriptor[variable]['offset']
+                                if data_type == 'float':
+                                    self.text_segment += f"l.s {reg0}, {offset}($s8)\n"
+                                else:
+                                    self.text_segment += f"lw {reg0}, {offset}($s8)\n"
+                            self.update_descriptors(
+                                'load', [reg0, variable])
+                        
+
+                        
 
                         if data_type == 'float':
                             self.text_segment += f"mov.s $f12, {reg0}\n"
