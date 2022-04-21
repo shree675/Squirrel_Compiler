@@ -598,6 +598,7 @@ class RegisterAllocation:
                     'registers': [register]
                 }
 
+
         elif protocol == "load_ds":
             # Load a value from data segment into the register
             register = params[0]
@@ -756,7 +757,6 @@ class RegisterAllocation:
 
                     elif cast_type == 'float':
                         pass
-                    pass
                     # ---------------------------------------------------------------------------------------
                     """There are 4 cases possible where the subject and operand can be of different types
                     int type: int, char, bool (no need to explicitly mention it)
@@ -898,12 +898,11 @@ class RegisterAllocation:
                             # then use the register
                             # else load the value into reg0 directly from the
                             # memory (handled below)
-
                             if register_descriptor[reg1] == None:
                                 # if the reg1 is empty
                                 # load the value into reg0 directly from the memory
                                 offset = self.address_descriptor[operand]['offset']
-                                if operand_type == "float":
+                                if subject_type == "float":
                                     self.text_segment += f"l.s {reg0}, {offset}($s8)\n"
                                 else:
                                     self.text_segment += f"lw {reg0}, {offset}($s8)\n"
@@ -923,8 +922,10 @@ class RegisterAllocation:
                                 else:
                                     self.text_segment += f"addi {reg0}, {reg1}, 0\n"
 
-                                self.update_descriptors(
-                                    'nospill', [reg0, subject])
+                        self.update_descriptors(
+                            'nospill', [reg1, operand])
+                        self.update_descriptors(
+                            'nospill', [reg0, subject])
 
 
 # -------------------------------------------------------------------------------------------------
@@ -937,8 +938,6 @@ class RegisterAllocation:
 
                     subject = subject.strip()
                     operand = operand.strip()
-
-                    print("barman", subject, operand)
 
                     # Extracting subject_type
                     if '[' in subject:
@@ -1024,11 +1023,38 @@ class RegisterAllocation:
                         print("STRING", self.register_descriptor)
                         print(self.address_descriptor)
 
+                    elif '[' in operand:  
+                        array_name = operand.split('[')[0]
+                        var_index = operand.split('[')[1].split(']')[0]
+
+                        array_type = self.get_data_type(array_name, symbol_table)
+
+                        reg0, spill0, _ = self.get_reg(
+                            False, live_and_next_use_blocks, blocks.index(block), var_index)
+                        
+                        if spill0:
+                            self.spill_reg(reg0)
+                            self.update_descriptors('spill', [reg0])
+
+                            offset = self.address_descriptor[var_index]['offset']
+                            self.text_segment += f"lw {reg0}, {offset}($s8)\n" 
+
+                        if array_type == 'float':
+                            reg_temp, spill_temp, _ = self.get_reg(
+                                True, live_and_next_use_blocks, blocks.index(block), operand)
+                            if spill_temp == 1:
+                                self.spill_reg(reg_temp)
+                                self.update_descriptors('spill', [reg_temp])
+                            self.text_segment += f"l.s {reg_temp}, {array_name}({reg0})\n"
+                            self.update_descriptors('load', [reg_temp, subject])
+                        else:
+                            self.text_segment += f"lw {reg0}, {array_name}({reg0})\n"
+                            self.update_descriptors("load", [reg0, subject])
+                        
+                        self.update_descriptors('load', [reg0, var_index])
+
                     else:
                         # if it is a variable
-                        if '[' in operand:
-                            operand = operand.split('[')[0]
-
                         operand_type = self.get_data_type(
                             operand, symbol_table)
 
@@ -1169,6 +1195,7 @@ class RegisterAllocation:
                         elif operator == '/':
                             self.text_segment += f"div.s {reg[0]}, {reg[1]}, {reg[2]}\n"
 
+                        self.update_descriptors("nospill", [reg[0], subject])
                         continue
 
                     if operator == '+':

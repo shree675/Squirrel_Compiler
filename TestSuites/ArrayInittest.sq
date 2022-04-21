@@ -7,13 +7,14 @@ void @start(){
 
     bool boolArray[1][2] = {true, false};
 ``
-    float floatArray[3] = {1.1, 2.2, 3.3};
+    float floatArray[3] = {1.1, 5.0, 3.3};
 
     ``int specialArray[2][3][2] = {1,2,3,4,5,6,1,2,3,4,5,6};
 
     char specialArrayChar[1][2] = {'a', 'b'};``
 
     floatArray[2] = floatArray[1] + floatArray[0];
-``    output(floatArray[2][0][0]);
-``}
+    output(floatArray[2]);
+
+}
 
