@@ -19,30 +19,30 @@ start:
 
 n`3 = (int) ~t2
 
-#L17:
+#L19:
 ~t3 = 1
 
 a`3 = (int) ~t3
 
-#L15:
+#L17:
 ~t4 = 2
 
 b`3 = (int) ~t4
 
-#L13:
+#L15:
 ~t5 = 3
 
 c`3 = (int) ~t5
 
-#L11:
+#L13:
 
 
 
 
 
+#L25:
 #L23:
 #L21:
-#L19:
 param n`3
 param a`3
 param b`3
@@ -50,6 +50,9 @@ param c`3
 ~t6 = call fun1, 4
 
 n`3 = ~t6
+
+#L11:
+output int, n`3
 
 #L9:
 return 

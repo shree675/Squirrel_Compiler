@@ -1,43 +1,58 @@
 start:
 
-float floatArray`2[12]
-floatArray`2[0] = 1.1
-floatArray`2[4] = 5.0
-floatArray`2[8] = 3.3
+int arr`2[24]
+arr`2[0] = 1
+arr`2[4] = 2
+arr`2[8] = 12
+arr`2[12] = 5
+arr`2[16] = 6
+arr`2[20] = 7
 
 #L6:
-~t0 = 2
+~t0 = 0
 
-~t1 = ~t0 * 1
-
-~t2 = ~t1 * 4
-
-~t3 = 1
-
-~t4 = ~t3 * 1
+~t1 = ~t0 * 2
+~t2 = 1
+~t3 = ~t2 * 1
+~t4 = ~t1 + ~t3
 
 ~t5 = ~t4 * 4
-~tf0 = floatArray`2[~t5]
 
-~t6 = 0
+~t6 = 2
 
-~t7 = ~t6 * 1
-
-~t8 = ~t7 * 4
-~tf1 = floatArray`2[~t8]
-
-~tf2 = ~tf0 + ~tf1
-
-~tf3 = (float) ~tf2
-floatArray`2[~t2] = ~tf3
-
-#L4:
-~t9 = 2
-
-~t10 = ~t9 * 1
+~t7 = ~t6 * 2
+~t8 = 1
+~t9 = ~t8 * 1
+~t10 = ~t7 + ~t9
 
 ~t11 = ~t10 * 4
-output float, floatArray`2[~t11]
+~t12 = arr`2[~t11]
+
+~t13 = 0
+
+~t14 = ~t13 * 2
+~t15 = 0
+~t16 = ~t15 * 1
+~t17 = ~t14 + ~t16
+
+~t18 = ~t17 * 4
+~t19 = arr`2[~t18]
+
+~t20 = ~t12 + ~t19
+
+~t21 = (int) ~t20
+arr`2[~t5] = ~t21
+
+#L4:
+~t22 = 0
+
+~t23 = ~t22 * 2
+~t24 = 1
+~t25 = ~t24 * 1
+~t26 = ~t23 + ~t25
+
+~t27 = ~t26 * 4
+output int, arr`2[~t27]
 
 #L2:
 return 

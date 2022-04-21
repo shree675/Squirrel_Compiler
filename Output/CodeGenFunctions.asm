@@ -68,6 +68,9 @@ lw $t5, -20($s8)
 lw $t6, -24($s8)
 lw $t7, -28($s8)
 addi $t1, $s0, 0
+move $a0, $t1
+li $v0, 1
+syscall
 move $sp, $s8
 jr $ra
 

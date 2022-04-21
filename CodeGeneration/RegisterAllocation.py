@@ -431,6 +431,7 @@ class RegisterAllocation:
         # spill the register
         temp_with_farthest_next_use = ''
         farthest_next_use = -1
+        float_temp_with_farthest_next_use = ''
         for record in live_and_next_use_blocks[index]:
             for var in record:
                 if record[var]['next_use'] > farthest_next_use:
@@ -448,6 +449,21 @@ class RegisterAllocation:
                         # register_descriptor[reg].remove(
                         #     temp_with_farthest_next_use)
                         return (reg, 1, 1)
+        else:
+            for record in live_and_next_use_blocks[index]:
+                for var in record:
+                    if record[var]['next_use'] == -1 and not (var[0] == '~' or var[0] == '_'):
+                        temp_var = var
+                        for reg in register_descriptor:
+                            if is_float and 'f' in reg:
+                                if temp_var == register_descriptor[reg]:
+                                    # register_descriptor[reg].remove(temp_var)
+                                    return (reg, 1, 1)
+                            else:
+                                if temp_var == register_descriptor[reg]:
+                                    # register_descriptor[reg].remove(temp_var)
+                                    return (reg, 1, 1)
+
         return ('$t9', 1, 1) if not is_float else ('$f31', 1, 1)
 
     def spill_reg(self,  register):
@@ -1052,6 +1068,7 @@ class RegisterAllocation:
                             self.update_descriptors("load", [reg0, subject])
 
                         self.update_descriptors('load', [reg0, var_index])
+                        self.update_descriptors('load', [reg0, subject])
 
                     else:
                         # if it is a variable
