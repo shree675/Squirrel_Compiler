@@ -1,13 +1,38 @@
 void @start(){
-    int var1;
-    int var2;
+    ``int var1=20;
+    int var2=0;
     switch(var1){
         case (20): switch(var2){
-                        case (50): int n;
-                        default: int a;
+                        case (50): int n=2;
+                                    output(n);
+                                    break;
+                        default: int a=4;
+                                output(a);
                     }
-        case (4): int j;
-                     int q;
-        default: int k;
+                    break;
+        case (4): int j=1;
+                int q=3;
+                int k = j+q;
+                output(k);
+        default: int k=12;
+                output(k);
+    }``
+    char var1='b';
+    int var2=0;
+    switch(var1){
+        case ('b'): switch(var2){
+                        case (50): int n=2;
+                                    output(n);
+                                    break;
+                        default: int a=4;
+                                output(a);
+                    }
+                    break;
+        case ('a'): int j=1;
+                int q=3;
+                int k = j+q;
+                output(k);
+        default: int k=12;
+                output(k);
     }
 }
