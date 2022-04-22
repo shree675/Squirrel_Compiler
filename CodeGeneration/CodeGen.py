@@ -146,7 +146,7 @@ class CodeGen:
 
                     if not word.startswith('#L') and word.endswith(':'):
                         word = word.split(':')[0]
-                        print("Function label found", word)
+                        # print("Function label found", word)
                         for search_node in CFG:
                             if search_node.function_next is not None and search_node.function_next == word:
                                 node.next.add(search_node.index)
@@ -154,11 +154,11 @@ class CodeGen:
                     index -=1
 
                 return_pointer += 1
-            print('current line', words)
+            # print('current line', words)
             if (len(words) > 2 and words[0] == 'call') or (len(words) > 4 and words[2] == 'call'):
-                print("call found")
+                # print("call found")
                 funct= words[-2].split(',')[0]
-                print('index of this block: ', node.index)
+                # print('index of this block: ', node.index)
                 for search_node in CFG:
                     if search_node.leading_label is not None and search_node.leading_label == funct:
                         node.next.add(search_node.index)
