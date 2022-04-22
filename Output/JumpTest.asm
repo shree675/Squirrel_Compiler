@@ -49,8 +49,4 @@ move $sp, $s8
 move $v0, $s5
 jr $ra
 jr $ra
-move $sp, $s8
-move $v0, $s6
-jr $ra
-jr $ra
 

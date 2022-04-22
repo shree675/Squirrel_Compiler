@@ -1025,7 +1025,7 @@ class AstNode:
         # --------------------------------------------------------------------
 
         elif head.operator == Operator.A_INTCONST or head.operator == Operator.A_STRINGCONST or head.operator == Operator.A_CHARCONST:
-            print("helloworld", head.value)
+            # print("helloworld", head.value)
             t0 = parser.get_new_temp("int")
             head.code = f"{t0} = {head.value}\n"
             head.value = t0
@@ -1129,7 +1129,7 @@ class AstNode:
             if head.data_type == "void":
                 head.code = ""
             else:
-                print("HHHEEE : ", head.data_type)
+                # print("HHHEEE : ", head.data_type)
                 head.value = parser.get_new_temp(head.data_type)
                 head.code = f"{head.value} = "
 
@@ -1159,8 +1159,8 @@ class AstNode:
                     head.code += f"{head.value} = call {function_name}, 0\n"
                 # head.code += f"call {function_name}, 0\n"
 
-            print("CODEEEE : ", head.code)
-            print("end -----------------")
+            # print("CODEEEE : ", head.code)
+            # print("end -----------------")
 
         elif head.operator == Operator.A_TYPECAST:
 
@@ -1251,7 +1251,7 @@ class AstNode:
                 # while cur.left:
                 cur = cur.left
 
-                print(cur.value, "BAR")
+                # print(cur.value, "BAR")
 
                 head.code = left_value.code
                 # handle differently for BOOL !
