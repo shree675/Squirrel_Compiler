@@ -257,7 +257,7 @@ class Parser(SlyParser):
 
     @_('simple_init SEMICOL main')
     def main(self, p):
-        return AstNode(Operator.A_ROOT, left=p.simple_init, right=p.main)
+        return AstNode(Operator.A_ROOT, left=p.simple_init, right=p.main, value="global_variable")
 
     # methods -> methods method
     @_('method main')
