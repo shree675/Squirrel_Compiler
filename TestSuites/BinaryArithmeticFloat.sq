@@ -6,9 +6,14 @@ void @start() {
     float e=a*b;
     float f=a/b;
     output(a);
+    output("\n");
     output(b);
+    output("\n");
     output(c);
+    output("\n");
     output(d);
+    output("\n");
     output(e);
+    output("\n");
     output(f);
 }

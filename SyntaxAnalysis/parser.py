@@ -1,5 +1,6 @@
 from cmath import log
 import warnings
+from defer import return_value
 from sly import Parser as SlyParser
 from AstNode.AstNode import Operator, AstNode
 from SemanticAnalysis import TypeChecker
@@ -138,8 +139,14 @@ class Parser(SlyParser):
 
     def check_function_signature(self, function_name, args_types):
 
+        # print("------------------------------\n\n")
+        # e = self.function_symbol_table[0]
+        # print(list(list(zip(*e["parameters_types"]))[0]))
+        # print("GGGG", args_types)
+
         matched = list(filter(lambda e: e["function_name"] == "@"+function_name and
-                              e["parameters_types"] == args_types,
+                              list(list(zip(*e["parameters_types"])
+                                        )[0]) == args_types,
                               self.function_symbol_table))
 
         if len(matched) == 0:
@@ -305,14 +312,14 @@ class Parser(SlyParser):
         scope = self.scope_id_stack[-1]
         varname = p.VARNAME + '`' + str(scope)
         self.push_to_ST(p.DATATYPE, varname, [])
-        return [p.DATATYPE, *p.params_rec]
+        return [(p.DATATYPE, varname), *p.params_rec]
 
     @_('DATATYPE VARNAME')
     def params_rec(self, p):
         scope = self.scope_id_stack[-1]
         varname = p.VARNAME + '`' + str(scope)
         self.push_to_ST(p.DATATYPE, varname, [])
-        return [p.DATATYPE]
+        return [(p.DATATYPE, varname)]
 
     # statements -> statements statement
     @_("statements statement")
@@ -1000,14 +1007,18 @@ class Parser(SlyParser):
         # Semantic check for function calls
         self.check_function_signature(p.VARNAME, args_types)
 
+        # Get the return type
+
         matched = list(filter(lambda e: e["function_name"] == "@"+p.VARNAME and
-                              e["parameters_types"] == args_types,
+                              list(list(zip(*e["parameters_types"])
+                                        )[0]) == args_types,
                               self.function_symbol_table))
 
+        return_type = matched[0]["return_type"]
         print("matched : ", matched)
         # -----------------------
         head = AstNode(Operator.A_FUNCCALL, left=p.VARNAME,
-                       right=p.argument_list, data_type=matched[0]["return_type"])
+                       right=p.argument_list, data_type=return_type)
         return head
 
     # argument_list -> argument_list_rec | e

@@ -193,8 +193,12 @@ class AstNode:
             AstNode.generateCode(statements, parser)
 
             # head.code = statements.code + "\n" + head.next + ":\n" + "return\n"
+            params_code = f"params {len(params)}\n"
+            for param in params:
+                data_type, varname = param
+                params_code += f"param {data_type} {varname}\n"
 
-            head.code = function_name + ":\n" + statements.code + "\n" + \
+            head.code = function_name + ":\n" + params_code + statements.code + "\n" + \
                 f'return {default_values[head.value["return_type"]]}' + "\n"
 
         # ------------------------------------------------------------
@@ -538,7 +542,7 @@ class AstNode:
 
             if constant[0] == Operator.A_FLOATCONST:
                 t0 = parser.get_new_temp("float")
-                
+
             else:
                 t0 = parser.get_new_temp("int")
             head.code = f"{t0} = ({constant[0].value.split()[0]}) {constant[1]}\n"
@@ -1218,7 +1222,7 @@ class AstNode:
             if type(left_value) == list:
                 if left_value[0] == Operator.A_FLOATCONST:
                     t0 = parser.get_new_temp("float")
-                    
+
                 else:
                     t0 = parser.get_new_temp("int")
                 head.code = f"{t0} = ({left_value[0].value.split()[0]}) {left_value[1]}\n"

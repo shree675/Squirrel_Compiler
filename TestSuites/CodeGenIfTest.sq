@@ -1,0 +1,22 @@
+void @start(){
+    ``int arr[4]={1,2,3,4};
+    if(arr[2]==3){
+        output(6);
+    }
+    elif(arr[2]==4){
+        output(7);
+    }
+    else{
+        output(8);
+    }``
+    float abc[4]={1.1,2.2,3.3,4.4};
+    if(abc[2]==3.3){
+        output(9);
+    }
+    elif(abc[2]==4.4){
+        output(10);
+    }
+    else{
+        output(11);
+    }
+}

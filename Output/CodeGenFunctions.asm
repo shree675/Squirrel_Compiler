@@ -1,16 +1,25 @@
+.data
+
 .text
 .globl main
 
 fun1:
 move $s8, $sp
 
-li $t0, 5
+addi $t0, $a0, 0
+addi $t1, $a1, 0
+addi $t2, $a2, 0
+addi $t3, $a3, 0
+add $t4, $t0, $t1
+add $t5, $t4, $t2
+add $t6, $t5, $t3
+addi $t7, $t6, 0
 move $sp, $s8
-move $v0, $t0
+move $v0, $t7
 jr $ra
 jr $ra
 move $sp, $s8
-move $v0, $t1
+move $v0, $s0
 jr $ra
 jr $ra
 main:
@@ -64,6 +73,9 @@ lw $t5, -20($s8)
 lw $t6, -24($s8)
 lw $t7, -28($s8)
 addi $t1, $s0, 0
+move $a0, $t1
+li $v0, 1
+syscall
 move $sp, $s8
 jr $ra
 
