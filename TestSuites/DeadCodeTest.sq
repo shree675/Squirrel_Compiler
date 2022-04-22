@@ -1,0 +1,11 @@
+int @foo(int x) {
+    output(8);
+    return 3;
+    output(2); `` this is dead code``
+
+}
+
+void @start () {
+    float f = foo(4);
+    output(f);
+}

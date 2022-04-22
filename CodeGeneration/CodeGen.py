@@ -51,8 +51,8 @@ class CodeGen:
                 self.DFS(visited, graph, neighbour)
 
     def eliminate_dead_code(self, blocks, symbol_table, optimization_level):
-        print("calling eliminate_dead_code")
-        print("================================================")
+        # print("calling eliminate_dead_code")
+        # print("================================================")
         # print("Initial Block Structure")
         full_code = '\n'.join(blocks)
         all_lines = full_code.split('\n')
@@ -75,11 +75,11 @@ class CodeGen:
                 blocks_current.append(block)
         for block in blocks_current:   
             #print(block)
-            print("----------------------------------------------")
+            # print("----------------------------------------------")
             new_node = Node(blocks_current.index(block), block)
             CFG.append(new_node)
             # print("leading label: ", new_node.leading_label)
-            print(new_node.index, len(new_node.code_block), new_node.code_block)
+            # print(new_node.index, len(new_node.code_block), new_node.code_block)
             
 
         for i in range(1, len(CFG)):
@@ -89,7 +89,7 @@ class CodeGen:
                 funct = last_line.split(' ')[3].split(',')[0]
                 CFG[i].function_next = funct
 
-        print("================================================")
+        # print("================================================")
 
         # Start creating Control Flow Graph connections
         for node in CFG:
@@ -166,7 +166,7 @@ class CodeGen:
         blocks = []
         for node in list_of_visited_blocks:
             blocks.append(node.code_block)
-            print(node.index)
+            # print(node.index)
 
         # print(*blocks, sep = '\n%%%%%%%%%%%%%%%%%%%%%%%%%%%%\n')
         
@@ -236,7 +236,11 @@ class CodeGen:
         return assembly_code
 
     def generate_target_code(self, intermediate_code, symbol_table, optimization_level):
-
+        
+        # print("Generate target code starts here...")
+        # print('initial intermediate code--------------------------------------------------')
+        # print(intermediate_code)
+        # print("------------------------------------------------------------------------------")
         if not intermediate_code:
             # handle it more elegantly
             return ""
@@ -269,8 +273,9 @@ class CodeGen:
                     optimized_code0 += lines + '\n'
             # optimized_codde0 contains all the intermediate code except for labels that have no goto statements pointing to them
             #----------------------------------------------------------------
+            
             intermediate_code_list = optimized_code0.splitlines()
-            optimized_code1 = intermediate_code_list[0]
+            optimized_code1 = intermediate_code_list[0] + '\n'
             i = 1
             while i < len(intermediate_code_list):
                 if 'return' in intermediate_code_list[i-1] and 'return' in intermediate_code_list[i]:
@@ -284,10 +289,9 @@ class CodeGen:
         
             # print("**********************************************************") 
             # print("optimized code 1", optimized_code1)
-            print("HHhhhHHHHHHHHHHHHHHHHHHHH    HHhhhHHHHHHHHHHHHHHHHHHHH")
-            print('optimized code 1', optimized_code1)
+            intermediate_code_final = optimized_code1
         
-        if optimization_level >=2:
+        if optimization_level >= 2:
             # O2 Optimization level starts here ----------------------------------------------------------------   
             # ----------------------------------------------------------------
             # Optimization Level 2 remives labels in consecutive lines and replaces all the occurences of the label with the first one
@@ -347,8 +351,8 @@ class CodeGen:
                 else:
                     optimized_code3 += lines+'\n'
                     i += 1
+            intermediate_code_final = optimized_code3
 
-        
         if optimization_level >= 3:   
             # ------------------------------- 
             # O3 Optimization level starts here ----------------------------------------------------------------   
@@ -424,10 +428,11 @@ class CodeGen:
         live_and_next_use_blocks = []
 
         # print("Printing all the blocks")
-        # print(*blocks, sep = '%%\n')
+        
         if optimization_level >= 3:
             blocks = self.eliminate_dead_code(blocks, symbol_table, optimization_level)
-            print("Dead code elimination done --------------------------------------------------------------------------")
+            # print("Dead code elimination done --------------------------------------------------------------------------")
+        # print(*blocks, sep = '\n%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%\n')
         # All optimizations are completed and Live Analysis of the blocks starts here
 
         for block in blocks:
