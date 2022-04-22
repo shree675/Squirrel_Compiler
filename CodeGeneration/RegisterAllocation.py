@@ -678,13 +678,24 @@ class RegisterAllocation:
                     if line[0] == '_':
                         pass
                     else:
-                        # self.offset = 0
+                        # Function call
                         self.free_all()
                         line += f"\nmove $s8, $sp\n"
 
                     self.text_segment += line+'\n'
 
                     print("FUNCTION STARTED ", line+'\n')
+
+                elif line.startswith("params"):
+                    # Function parameter
+
+                    num_params = int(line.split()[1])
+
+                    for i in range(num_params):
+                        param_line = next(lines_generator)
+                        varname = param_line.split()[2]
+                        self.text_segment += f"addi $t{i}, $a{i}, 0\n"
+                        self.update_descriptors("nospill", [f"$t{i}", varname])
 # --------------------------------------------------------------------------------------------------
                 elif line.startswith('goto'):
                     self.text_segment += f'j {line.split()[1]}\n'

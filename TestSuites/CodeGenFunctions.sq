@@ -1,13 +1,26 @@
-int @fun1(int n, int a, int b, int c){
-    int r = n+b;
-    return 5;
+``int @fun1(int n, int a, int b, int c){
+    int r = 
+    return r;
+}``
+
+void fun2(int n){
+    output(n);
+    if(n==0){
+        return;
+    }
+    fun2(n-1);
 }
 
 void @start(){
-    int n=10;
+    ``int n=10;
     int a=1;
     int b=2;
     int c=3;
 
     n = fun1(n, a, b, c);
+    
+    output(n);``
+
+    int n = 10;
+    fun2(n);
 }
