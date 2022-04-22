@@ -1,4 +1,6 @@
 start:
+params 1
+param int a`2
 
 x`2 = (int) 0
 #L12:

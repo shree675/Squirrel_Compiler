@@ -5,17 +5,9 @@ param int a`2
 param int b`2
 param int c`2
 
+~t0 = 3
 
-
-~t0 = n`2 + a`2
-
-
-~t1 = ~t0 + b`2
-
-
-~t2 = ~t1 + c`2
-
-r`2 = (int) ~t2
+r`2 = (int) ~t0
 
 #L6:
 
@@ -26,24 +18,24 @@ return 0
 start:
 params 0
 
-~t3 = 10
+~t1 = 10
 
-n`3 = (int) ~t3
+n`3 = (int) ~t1
 
 #L19:
-~t4 = 1
+~t2 = 1
 
-a`3 = (int) ~t4
+a`3 = (int) ~t2
 
 #L17:
-~t5 = 2
+~t3 = 2
 
-b`3 = (int) ~t5
+b`3 = (int) ~t3
 
 #L15:
-~t6 = 3
+~t4 = 3
 
-c`3 = (int) ~t6
+c`3 = (int) ~t4
 
 #L13:
 
@@ -58,9 +50,9 @@ param n`3
 param a`3
 param b`3
 param c`3
-~t7 = call fun1, 4
+~t5 = call fun1, 4
 
-n`3 = ~t7
+n`3 = ~t5
 
 #L11:
 output int, n`3

@@ -7,46 +7,47 @@ main:
 
 move $s8, $sp
 
-li $t0, 0
+addi $t0, $a0, 0
 li $t1, 0
 li $t2, 0
+li $t3, 0
 _L14:
-li $t3, 5
-sub $t4, $t0, $t3
-blt $t4, $zero, _L15
+li $t4, 5
+sub $t5, $t1, $t4
+blt $t5, $zero, _L15
 j _L6
 _L15:
-li $t4, 0
-sub $t5, $t2, $t4
-beq $t5, $zero, _L19
+li $t5, 0
+sub $t6, $t3, $t5
+beq $t6, $zero, _L19
 j _L20
 _L19:
-li $t5, 1
-mtc1 $t5, $f1
+li $t6, 1
+mtc1 $t6, $f1
 cvt.s.w $f3, $f1
 cvt.w.s $f1, $f3
-mfc1 $t6, $f1
-addi $t2, $t6, 0
+mfc1 $t7, $f1
+addi $t3, $t7, 0
 j _L6
 _L20:
-li $t7, 1
-add $s0, $t0, $t7
-addi $t0, $s0, 0
+li $s0, 1
+add $s1, $t1, $s0
+addi $t1, $s1, 0
 _L18:
 j _L14
 _L6:
-move $a0, $t0
+move $a0, $t1
 li $v0, 1
 syscall
-mult $t0, $t1
-mflo $s1
-add $s2, $t0, $s1
-add $s3, $t0, $t1
-mult $t1, $s3
-mflo $s4
-add $s5, $s2, $s4
+mult $t1, $t2
+mflo $s2
+add $s3, $t1, $s2
+add $s4, $t1, $t2
+mult $t2, $s4
+mflo $s5
+add $s6, $s3, $s5
 move $sp, $s8
-move $v0, $s5
+move $v0, $s6
 jr $ra
 jr $ra
 

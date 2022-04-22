@@ -45,35 +45,24 @@ class CodeGen:
                 return node
 
     def DFS(self, visited=None, graph=[], node=None):  # function for dfs
-        print('node inside dfs: ', node, type(node))
         if node not in visited:
-            print(node.index)
             visited.add(node)
             for neighbour_index in node.next:
                 neighbour = self.get_node(graph, neighbour_index)
                 self.DFS(visited, graph, neighbour)
 
     def eliminate_dead_code(self, blocks, symbol_table, optimization_level):
-        print("calling eliminate_dead_code")
-        print("================================================")
+        # print("calling eliminate_dead_code")
+        # print("================================================")
         # print("Initial Block Structure")
         full_code = '\n'.join(blocks)
-        print('fill code')
-        print(full_code)
         all_lines = full_code.split('\n')
-        print('all lines')
-        print(all_lines)
 
         return_map = []
         return_pointer = 0
         for index, line in enumerate(all_lines):
             if 'return' in line:
                 return_map.append(index)
-
-        print("Printing all the returns")
-        print(return_map)
-
-        print('@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@')
 
         CFG = []
         blocks_current = []
@@ -87,12 +76,11 @@ class CodeGen:
                 blocks_current.append(block)
         for block in blocks_current:
             # print(block)
-            print("----------------------------------------------")
+            # print("----------------------------------------------")
             new_node = Node(blocks_current.index(block), block)
             CFG.append(new_node)
-            print("leading label: ", new_node.leading_label)
-            print(new_node.index, len(new_node.code_block), new_node.code_block)
-            print("********************************")
+            # print("leading label: ", new_node.leading_label)
+            # print(new_node.index, len(new_node.code_block), new_node.code_block)
 
         for i in range(1, len(CFG)):
             block = CFG[i-1].code_block
@@ -101,40 +89,32 @@ class CodeGen:
                 funct = last_line.split(' ')[3].split(',')[0]
                 CFG[i].function_next = funct
 
-        print("================================================")
+        # print("================================================")
 
         # Start creating Control Flow Graph connections
         for node in CFG:
-            print("block number:", node.index)
-            print(node.code_block)
             last_line = node.code_block.split('\n')[-1]
             # last_line = node.code_block.rstrip('\n').split('\n')[-1]
             words = last_line.split(' ')
             # print(last_line)
             if len(words) > 1 and (words[0] == 'goto' or words[0] == 'return'):
                 # The direct goto statements (without condition)
-                print("goto found")
                 label = words[1]
-                print('index of this block: ', node.index)
                 for search_node in CFG:
                     if search_node.leading_label is not None and search_node.leading_label == label:
                         node.next.add(search_node.index)
             else:
-                print('no goto found, go to next block')
-                print('current block: ', node.index)
                 if node.index < (len(blocks_current)-1):
                     node.next.add(node.index+1)
 
             if len(words) > 2 and words[-2] == 'goto':
                 # For the gotos that accompany an if or ifFalse statement (with condition)
                 label = words[-1]
-                print('index of this block: ', node.index)
                 for search_node in CFG:
                     if search_node.leading_label is not None and search_node.leading_label == label:
                         node.next.add(search_node.index)
             # Identify the return statements and connect them to the points where they are called
             if len(words) > 1 and words[0] == 'return':
-                print("return found")
                 index = return_map[return_pointer]
                 while index >= 0:
                     words = all_lines[index].split(' ')
@@ -164,10 +144,8 @@ class CodeGen:
                     if search_node.leading_label is not None and search_node.leading_label == funct:
                         node.next.add(search_node.index)
 
-            # if (len(words[0]) >4 and words[2] == 'call'):
-
-            print('Next blocks', node.next)
-            print("$$$$$$$$$$$$$$$$$$$$")
+            # print('Next blocks', node.next)
+            # print("$$$$$$$$$$$$$$$$$$$$")
 
         # The CFG is now completed - we now perform a depth first search to identify the dead code blocks
         # And block unfreachable from the start block is dead code
@@ -178,21 +156,19 @@ class CodeGen:
             if node.leading_label == 'start':
                 start_block = node
                 break
-        print('start_block', start_block, type(start_block))
+        # print('start_block', start_block, type(start_block))
         visited = set()
         # Call DFS and obtin the visited blocks
         self.DFS(visited=visited, graph=CFG, node=start_block)
-        print("visited blocks:")
-
         list_of_visited_blocks = list(visited)
         list_of_visited_blocks.sort(key=lambda x: x.index)
         # COnvert the visited set to a list and append only the code blocks to blocks and then return it
         blocks = []
         for node in list_of_visited_blocks:
             blocks.append(node.code_block)
-            print(node.index)
+            # print(node.index)
 
-        print(*blocks, sep='\n%%%%%%%%%%%%%%%%%%%%%%%%%%%%\n')
+        # print(*blocks, sep = '\n%%%%%%%%%%%%%%%%%%%%%%%%%%%%\n')
 
         return blocks
 
@@ -271,6 +247,10 @@ class CodeGen:
 
     def generate_target_code(self, intermediate_code, symbol_table, optimization_level):
 
+        # print("Generate target code starts here...")
+        # print('initial intermediate code--------------------------------------------------')
+        # print(intermediate_code)
+        # print("------------------------------------------------------------------------------")
         if not intermediate_code:
             # handle it more elegantly
             return ""
@@ -294,119 +274,132 @@ class CodeGen:
 
         print("intermediate code : ", intermediate_code)
 
+        """ The compiler allows 3 levels of optimization. O1, O2 and O3
+        We associate 2 kinds of optimization with each level. """
+        intermediate_code_final = ''  # initialise it with the original code
+
+        # O1 level optimization starts here----------------------------------------------------------------
         # Create a set of labels that are used as targets of goto statements
-        goto_labels = set()
-        for lines in intermediate_code.splitlines():
-            if 'goto' in lines:
-                goto_labels.add(lines.split(' ')[-1])
+        if optimization_level >= 1:
+            goto_labels = set()
+            for lines in intermediate_code.splitlines():
+                if 'goto' in lines:
+                    goto_labels.add(lines.split(' ')[-1])
 
-        optimized_code0 = ""
-        for lines in intermediate_code.splitlines():
-            if lines.startswith('#L') and lines.split(':')[0] not in goto_labels:
-                pass
-            else:
-                optimized_code0 += lines + '\n'
-         # optimized_codde0 contains all the intermediate code except for labels that have no goto statements pointing to them
-        # ----------------------------------------------------------------
-        intermediate_code_list = optimized_code0.splitlines()
-        optimized_code1 = intermediate_code_list[0]
-        i = 1
-        while i < len(intermediate_code_list):
-            if 'return' in intermediate_code_list[i-1] and 'return' in intermediate_code_list[i]:
-                pass
-            else:
-                optimized_code1 += intermediate_code_list[i] + '\n'
-            i += 1
-        # print('optimized 0 code', optimized_code0)
-        # ----------------------------------------------------------------
-        # At the end of optimization level 1, redundant return statements are removed
+            optimized_code0 = ""
+            for lines in intermediate_code.splitlines():
+                if lines.startswith('#L') and lines.split(':')[0] not in goto_labels:
+                    pass
+                else:
+                    optimized_code0 += lines + '\n'
+            # optimized_codde0 contains all the intermediate code except for labels that have no goto statements pointing to them
+            # ----------------------------------------------------------------
 
-        # print("**********************************************************")
-        # print("optimized code 1", optimized_code1)
-        # ----------------------------------------------------------------
-        # Optimization Level 2 remives labels in consecutive lines and replaces all the occurences of the label with the first one
-        optimized_code2 = ""
-        redundant_labels = {}
-        optimized_code_list = optimized_code1.splitlines()
-        i = 0
-        while i < len(optimized_code_list):
-            lines = optimized_code_list[i]
-            if lines.startswith('#L'):
-                optimized_code2 += lines + '\n'
-                k = i
-                for j in range(i+1, len(optimized_code_list)):
-                    if optimized_code_list[j].startswith('#L'):
-                        try:
-                            redundant_labels[optimized_code_list[i].split(
-                                ':')[0]].append(optimized_code_list[j].split(':')[0])
-                        except KeyError:
-                            redundant_labels[optimized_code_list[i].split(
-                                ':')[0]] = [optimized_code_list[j].split(':')[0]]
-                        k = j
-                    else:
-                        k += 1
-                        break
-                i = k
-            else:
-                optimized_code2 += lines + '\n'
+            intermediate_code_list = optimized_code0.splitlines()
+            optimized_code1 = intermediate_code_list[0] + '\n'
+            i = 1
+            while i < len(intermediate_code_list):
+                if 'return' in intermediate_code_list[i-1] and 'return' in intermediate_code_list[i]:
+                    pass
+                else:
+                    optimized_code1 += intermediate_code_list[i] + '\n'
                 i += 1
+            # print('optimized 0 code', optimized_code0)
+            # ----------------------------------------------------------------
+            # At the end of optimization level 1, redundant return statements are removed
 
-        for label in redundant_labels.keys():
-            for l in redundant_labels[label]:
-                optimized_code2 = optimized_code2.replace(l+':', '')
-                optimized_code2 = optimized_code2.replace(l, label)
+            # print("**********************************************************")
+            # print("optimized code 1", optimized_code1)
+            intermediate_code_final = optimized_code1
 
-        # print(optimized_code2)
-        # print("**********************************************************")
-        # print("optimized code 2", optimized_code2)
-        # ----------------------------------------------------------------
-        # Optimization Level 3 removes all the goto statements that occur in consecutive statements,
-        # retains only the first one
-        optimized_code3 = ""
-        optimized_code_list = optimized_code2.splitlines()
-        i = 0
-        while i < len(optimized_code_list):
-            lines = optimized_code_list[i]
-            if lines.startswith('goto'):
-                optimized_code3 += lines+'\n'
-                k = i
-                for j in range(i+1, len(optimized_code_list)):
-                    if optimized_code_list[j].startswith('goto'):
-                        k = j
-                    else:
-                        k += 1
-                        break
-                i = k
-            else:
-                optimized_code3 += lines+'\n'
-                i += 1
-
-        # -------------------------------
-        # Optimization Level 4 removes goto X and label X statements if they occur in consecutive lines
-        # We remove the label only if no other goto points to it
-        optimized_code4 = ""
-        optimized_code_list = optimized_code3.splitlines()
-        i = 0
-        # TODO: Check this case again-> what if someone else uses that label
-        while i < len(optimized_code_list):
-            lines = optimized_code_list[i]
-            if lines.startswith('goto'):
-                label = lines.split(' ')[-1]
-                k = 0
-                flag = True
-                for k in range(len(optimized_code_list)):
-                    if k != i and optimized_code_list[k].startswith('goto') and optimized_code_list[k].split(' ')[-1] == label:
-                        flag = False
-                        break
-                if optimized_code_list[i+1].startswith('#L') and optimized_code_list[i+1].split(':')[0] == label and flag:
+        if optimization_level >= 2:
+            # O2 Optimization level starts here ----------------------------------------------------------------
+            # ----------------------------------------------------------------
+            # Optimization Level 2 remives labels in consecutive lines and replaces all the occurences of the label with the first one
+            optimized_code2 = ""
+            redundant_labels = {}
+            optimized_code_list = optimized_code1.splitlines()
+            i = 0
+            while i < len(optimized_code_list):
+                lines = optimized_code_list[i]
+                if lines.startswith('#L'):
+                    optimized_code2 += lines + '\n'
+                    k = i
+                    for j in range(i+1, len(optimized_code_list)):
+                        if optimized_code_list[j].startswith('#L'):
+                            try:
+                                redundant_labels[optimized_code_list[i].split(
+                                    ':')[0]].append(optimized_code_list[j].split(':')[0])
+                            except KeyError:
+                                redundant_labels[optimized_code_list[i].split(
+                                    ':')[0]] = [optimized_code_list[j].split(':')[0]]
+                            k = j
+                        else:
+                            k += 1
+                            break
+                    i = k
+                else:
+                    optimized_code2 += lines + '\n'
                     i += 1
+
+            for label in redundant_labels.keys():
+                for l in redundant_labels[label]:
+                    optimized_code2 = optimized_code2.replace(l+':', '')
+                    optimized_code2 = optimized_code2.replace(l, label)
+
+            # print(optimized_code2)
+            # print("**********************************************************")
+            # print("optimized code 2", optimized_code2)
+            # ----------------------------------------------------------------
+            # Optimization Level 3 removes all the goto statements that occur in consecutive statements,
+            # retains only the first one
+            optimized_code3 = ""
+            optimized_code_list = optimized_code2.splitlines()
+            i = 0
+            while i < len(optimized_code_list):
+                lines = optimized_code_list[i]
+                if lines.startswith('goto'):
+                    optimized_code3 += lines+'\n'
+                    k = i
+                    for j in range(i+1, len(optimized_code_list)):
+                        if optimized_code_list[j].startswith('goto'):
+                            k = j
+                        else:
+                            k += 1
+                            break
+                    i = k
+                else:
+                    optimized_code3 += lines+'\n'
+                    i += 1
+            intermediate_code_final = optimized_code3
+
+        if optimization_level >= 3:
+            # -------------------------------
+            # O3 Optimization level starts here ----------------------------------------------------------------
+            # Optimization Level 4 removes goto X and label X statements if they occur in consecutive lines
+            # We remove the label only if no other goto points to it
+            optimized_code4 = ""
+            optimized_code_list = optimized_code3.splitlines()
+            i = 0
+            while i < len(optimized_code_list):
+                lines = optimized_code_list[i]
+                if lines.startswith('goto'):
+                    label = lines.split(' ')[-1]
+                    k = 0
+                    flag = True
+                    for k in range(len(optimized_code_list)):
+                        if k != i and optimized_code_list[k].startswith('goto') and optimized_code_list[k].split(' ')[-1] == label:
+                            flag = False
+                            break
+                    if optimized_code_list[i+1].startswith('#L') and optimized_code_list[i+1].split(':')[0] == label and flag:
+                        i += 1
+                    else:
+                        optimized_code4 += lines+'\n'
                 else:
                     optimized_code4 += lines+'\n'
-            else:
-                optimized_code4 += lines+'\n'
-            i += 1
+                i += 1
 
-        intermediate_code_final = optimized_code4
+            intermediate_code_final = optimized_code4
 
         # print(intermediate_code_final)
 
@@ -455,10 +448,13 @@ class CodeGen:
         live_and_next_use_blocks = []
 
         # print("Printing all the blocks")
-        # print(*blocks, sep = '%%\n')
-        blocks = self.eliminate_dead_code(
-            blocks, symbol_table, optimization_level)
-        print("Dead code elimination done --------------------------------------------------------------------------")
+
+        if optimization_level >= 3:
+            blocks = self.eliminate_dead_code(
+                blocks, symbol_table, optimization_level)
+            # print("Dead code elimination done --------------------------------------------------------------------------")
+        # print(*blocks, sep = '\n%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%\n')
+        # All optimizations are completed and Live Analysis of the blocks starts here
 
         for block in blocks:
             num_lines = len(block.split('\n'))
