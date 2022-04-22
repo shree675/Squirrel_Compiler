@@ -2,40 +2,41 @@ https://www2.engr.arizona.edu/~ece369/Resources/spim/QtSPIM_examples.pdf
 
 Phase 2 Todos :
 
-1. Making CFG from basic blocks - almost done Debeshee
-2. Deadcode elimination Debeshee
-3. Any other optimization ? - existing optimization Debeshee
+1. Making CFG from basic blocks - Debeshee -  Done
+2. Deadcode elimination Debeshee - Done
+3. Any other optimization ? - existing optimization Debeshee - Done
 4. Function calls - Done, Test recursion, Aashrith and Debeshee
 5. Binary multiplication not working - Done
-6. Input statements - Float is to be done, test bool - Kranthi and Shreetesh
+6. Input statements - Float is to be done, test bool - Kranthi and Shreetesh - Done
 7. Type casting - Done, test string assignment - Aashrith 
 8. Spilling the registers logic not correct - updating the register descriptor - Check again
-9. Check on .asciiz - Shreetesh and Kranthi - check if it's working
+9. Check on .asciiz - Shreetesh and Kranthi - check if it's working - Done
 10. Global variables - Shreetesh and Aashrith
+11. Fix code gen bugs Debeshee
 
 Done :
 
-1. Output statements - StringOutput.sq KeyError string constant dictionary - Kranthi and Shreetesh
-2. GOTO
+1. Output statements - StringOutput.sq KeyError string constant dictionary - Kranthi and Shreetesh - Fixed
+2. GOTO - Done
 3. If and IfFalse statements for integers
 4. assignment without explicit type casting
 5. bin. arithmetic statements for integers
-6. Array variable assignment for int - handle this case on the RHS - Kranthi and Aashrith
+6. Array variable assignment for int - handle this case on the RHS - Kranthi and Aashrith - Done
 7. Return without value - Test more
 
 List of Statement types----------------------------
 
-1. is_arithmetic_instruction_binary - Shreetesh and Kranthi - almost done
-2. is_arithmetic_instruction_unary - Shreetesh and Kranthi
+1. is_arithmetic_instruction_binary - Shreetesh and Kranthi - Done
+2. is_arithmetic_instruction_unary - Shreetesh and Kranthi - Done
 3. is_function_call_with_return (Done, bug in TAC - bug fixed) = Aashrith and Debeshee - need to test recursion
 4. is_function_call_without_return Aashrith and Debeshee - need to test recursion
-5. is_assignment_instruction - Aashrith and Debeshee - need to test little bit
-6. is_if_statement - Shreetesh and Kranthi
-7. is_return_statement - check and test it once Aashrith and Debeshee
+5. is_assignment_instruction - Aashrith and Debeshee - need to test little bit - Done
+6. is_if_statement - Shreetesh and Kranthi - Done
+7. is_return_statement - check and test it once Aashrith and Debeshee 
 8. is_param_instruction - ??? (we are not using it anywhere) - removed - done
-9. is_input - Aashrith and Kranthi - test it
-10. is_output - Aashrith and Kranthi - test it
-11. is_array_initialization - Shreetesh and Kranthi
-12. is_array_assignment - Shreetesh and Kranthi - fix TAC bug
-13. input_string - Kranthi and Aashrith
-14. is_assignment_instruction_with_typecast - Typecasting Aashrith and Debeshee
+9. is_input - Aashrith and Kranthi - test it - Done
+10. is_output - Aashrith and Kranthi - test it - Done
+11. is_array_initialization - Shreetesh and Kranthi - Done
+12. is_array_assignment - Shreetesh and Kranthi - fix TAC bug - Done
+13. input_string - Kranthi and Aashrith - Done
+14. is_assignment_instruction_with_typecast - Typecasting Aashrith and Debeshee - Done
