@@ -1,6 +1,5 @@
 from cmath import log
 import warnings
-from defer import return_value
 from sly import Parser as SlyParser
 from AstNode.AstNode import Operator, AstNode
 from SemanticAnalysis import TypeChecker
