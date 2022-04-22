@@ -6,15 +6,20 @@
 fun1:
 move $s8, $sp
 
-add $t0, $t0, $t1
-addi $t2, $t0, 0
-li $t3, 5
+addi $t0, $a0, 0
+addi $t1, $a1, 0
+addi $t2, $a2, 0
+addi $t3, $a3, 0
+add $t4, $t0, $t1
+add $t5, $t4, $t2
+add $t6, $t5, $t3
+addi $t7, $t6, 0
 move $sp, $s8
-move $v0, $t3
+move $v0, $t7
 jr $ra
 jr $ra
 move $sp, $s8
-move $v0, $t4
+move $v0, $s0
 jr $ra
 jr $ra
 main:
