@@ -676,7 +676,8 @@ class AstNode:
                     typecast_variable = parser.get_new_temp(head.data_type)
                     head.code += f"{typecast_variable} = ({head.data_type}) - {expr0.value}\n"
                 else:
-                    head.code += f"{head.value} = - {expr0.value}\n"
+                    float_suffix = ".0" if head.data_type == "float" else ""
+                    head.code += f"{head.value} = 0{float_suffix} -  {expr0.value}\n"
 
             else:
                 head.value = parser.get_new_temp(head.data_type)

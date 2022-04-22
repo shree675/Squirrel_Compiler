@@ -3,12 +3,13 @@
 
 .globl main
 main:
-    li.s $f0, 13.2
-    li.s $f1, 3.8
-    div.s $f2, $f0, $f1
+    li $t0, 'a'
+    # li $t1, 'b'
 
-    li $v0, 2
-    mov.d $f12, $f2
+    sub $t2, $zero, $t0
+    
+    li $v0, 1
+    move $a0, $t2
     syscall
-
+    
     jr $ra
