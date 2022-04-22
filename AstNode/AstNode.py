@@ -147,7 +147,10 @@ class AstNode:
             # typeChecker.check(head, parser.symbol_table)
             AstNode.generateCode(left, parser)
             # head.code = left.code + '\n' + left.next + ':\n'
-            head.code = left.code
+            if head.value == "global_variable":
+                head.code = "@\n" + left.code + "@\n"
+            else:
+                head.code = left.code
 
             if mid:
                 AstNode.generateCode(mid, parser)
