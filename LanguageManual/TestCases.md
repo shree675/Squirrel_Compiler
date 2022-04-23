@@ -9,9 +9,9 @@
 - [x] Binary Arithmetic Floats
 - [x] Binary Arithmetic Floats with arrays
 - [ ] Type Casting Assignment - fail - Aashrith
-- [ ] Function calls - Aashrith
+- [ ] Function calls - Aashrith - FAIL (for char)
 - [ ] Function calls without return - Aashrith
-- [ ] Recursion - Aashrith
+- [ ] Recursion - Aashrith - FAIL (Infinite loop)
 - [x] If statement
 - [ ] If statement with arrays - CodeGenIfTest.sq - Shreetesh
 - [ ] If statement with type casting - Shreetesh

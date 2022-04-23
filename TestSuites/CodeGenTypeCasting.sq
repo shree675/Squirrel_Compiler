@@ -4,13 +4,24 @@ void @start() {
     int z;
     z = (int) 3.4; ``
 
-    int a = 25;
-    bool b = false;
+    int a = 2.5;
+    output(a);
+    output("\n");
+
+    char c = 110.345;
+    output(c);
+    output("\n");
+
+    bool b = 32.21;
+    output(b);
+    output("\n");
 
     if(b){
-       output(a);
+        char c = 1+c;
+        output(c);
     }else{
         output(b);
     }
+    output("\n");
 
 }

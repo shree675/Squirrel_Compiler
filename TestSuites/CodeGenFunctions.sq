@@ -1,26 +1,42 @@
-``int @fun1(int n, int a, int b, int c){
-    int r = n+a+b+c;
-    return r;
-}``
+int @sum2(int a, int b){
+    return a+b;
+}
 
-void @fun2(int n){
+int @fun1(int n, int a, int b, int c){
+    return sum2(sum2(n, a), sum2(b, c));
+}
+
+void @pp(char c1,char c2,char c3){
+    output(c1);
+    output(c2);
+    output(c3);
+}
+
+``void @fun2(int n){
     output(n);
     if(n==0){
         return;
     }
     fun2(n-1);
-}
+}``
 
 void @start(){
-    ``int n=10;
-    int a=1;
-    int b=2;
-    int c=3;
-
-    n = fun1(n, a, b, c);
     
-    output(n);``
+    ``int n=1;
+    int a=2;
+    int b=3;
+    int c=4;``
 
-    int n = 10;
-    fun2(n);
+    char cc[3] = {'a', 'b', 'c'};
+
+    pp(cc[0], cc[1], cc[2]);
+
+    ``int r = fun1(n, a, b, c);
+    output(r);``
+
+    
+    ``output(n);``
+
+    ``int n = 10;
+    fun2(n);``
 }
