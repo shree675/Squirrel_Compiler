@@ -4,6 +4,10 @@ param int a`2
 param int b`2
 
 
+<<<<<<< HEAD
+=======
+#L10:
+>>>>>>> 6cf31541f72570c341fa57b9778dd8fdbbb9bbc8
 
 ~t0 = a`2 + b`2
 
@@ -18,6 +22,7 @@ param int a`3
 param int b`3
 param int c`3
 
+<<<<<<< HEAD
 
 
 #L14:
@@ -46,6 +51,17 @@ params 3
 param char c1`4
 param char c2`4
 param char c3`4
+=======
+if n`2 == ~t0 goto #L13
+goto #L12
+
+#L13:
+
+return
+#L14:
+
+#L12:
+>>>>>>> 6cf31541f72570c341fa57b9778dd8fdbbb9bbc8
 
 output char, c1`4
 
@@ -55,7 +71,13 @@ output char, c2`4
 #L22:
 output char, c3`4
 
+<<<<<<< HEAD
 #L20:
+=======
+#L6:
+return
+#L4:
+>>>>>>> 6cf31541f72570c341fa57b9778dd8fdbbb9bbc8
 return 
 
 start:
@@ -69,11 +91,16 @@ cc`5[2] = 'c'
 #L29:
 ~t4 = 0
 
+<<<<<<< HEAD
 ~t5 = ~t4 * 1
+=======
+#L19:
+>>>>>>> 6cf31541f72570c341fa57b9778dd8fdbbb9bbc8
 
 ~t6 = ~t5 * 1
 ~t7 = cc`5[~t6]
 
+<<<<<<< HEAD
 ~t8 = 1
 
 ~t9 = ~t8 * 1
@@ -99,6 +126,12 @@ call pp, 3
 return 
 
 #L26:
+=======
+#L17:
+return 
+
+#L16:
+>>>>>>> 6cf31541f72570c341fa57b9778dd8fdbbb9bbc8
 
 #L18:
 #L8:
