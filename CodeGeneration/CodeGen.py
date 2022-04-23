@@ -144,8 +144,10 @@ class CodeGen:
                     if search_node.leading_label is not None and search_node.leading_label == funct:
                         node.next.add(search_node.index)
 
-            # print('Next blocks', node.next)
-            # print("$$$$$$$$$$$$$$$$$$$$")
+            print("Current node index", node.index)
+            print('Current node code', node.code_block)
+            print('Next blocks', node.next)
+            print("$$$$$$$$$$$$$$$$$$$$")
 
         # The CFG is now completed - we now perform a depth first search to identify the dead code blocks
         # And block unfreachable from the start block is dead code
@@ -182,13 +184,13 @@ class CodeGen:
         string_constants = ''
         data_types = "int float char bool string"
 
-        for line in intermediate_code_final:
-            if ":" in line:
-                break
-            line = line.split('=')
-            if line.indexOf('=') == 2:
-                data_type = line[0]
-                variable = line[1]
+        # for line in intermediate_code_final:
+        # if ":" in line:
+        # break
+        # line = line.split('=')
+        # if line.index('=') == 2:
+        # data_type = line[0]
+        # variable = line[1]
 
         intermediate_code_generator = (
             i for i in intermediate_code_final.splitlines())
@@ -447,7 +449,10 @@ class CodeGen:
         reserved_words = set(reserved_operators.split())
         live_and_next_use_blocks = []
 
-        # print("Printing all the blocks")
+        print("Printing all the blocks")
+        for block in blocks:
+            print(block)
+            print('-----------------------------------------------------------------')
 
         if optimization_level >= 3:
             blocks = self.eliminate_dead_code(

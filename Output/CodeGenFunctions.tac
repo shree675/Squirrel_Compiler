@@ -1,65 +1,48 @@
-fun1:
-params 4
+fun2:
+params 1
 param int n`2
-param int a`2
-param int b`2
-param int c`2
 
-~t0 = 3
+output int, n`2
 
-r`2 = (int) ~t0
+#L8:
 
-#L6:
+~t0 = 0
 
-return r`2
+if n`2 == ~t0 goto #L11
+goto #L10
+
+#L11:
+
+return
+#L12:
+
+#L10:
+
+~t2 = 1
+
+~t1 = n`2 - ~t2
+
+param ~t1
+call fun2, 1
+
 #L4:
-return 0
+return 
 
 start:
 params 0
 
-~t1 = 10
+~t3 = 10
 
-n`3 = (int) ~t1
-
-#L19:
-~t2 = 1
-
-a`3 = (int) ~t2
+n`4 = (int) ~t3
 
 #L17:
-~t3 = 2
 
-b`3 = (int) ~t3
+param n`4
+call fun2, 1
 
 #L15:
-~t4 = 3
-
-c`3 = (int) ~t4
-
-#L13:
-
-
-
-
-
-#L25:
-#L23:
-#L21:
-param n`3
-param a`3
-param b`3
-param c`3
-~t5 = call fun1, 4
-
-n`3 = ~t5
-
-#L11:
-output int, n`3
-
-#L9:
 return 
 
-#L8:
+#L14:
 
 #L2:
