@@ -12,13 +12,15 @@ void @pp(char c1,char c2,char c3){
     output(c3);
 }
 
-``void @fun2(int n){
+void @fun2(int n){
     output(n);
+    output("\n");
+
     if(n==0){
         return;
     }
     fun2(n-1);
-}``
+}
 
 void @start(){
     
@@ -27,9 +29,9 @@ void @start(){
     int b=3;
     int c=4;``
 
-    char cc[3] = {'a', 'b', 'c'};
+    ``char cc[3] = {'a', 'b', 'c'};``
 
-    pp(cc[0], cc[1], cc[2]);
+    ``pp(cc[0], cc[1], cc[2]);``
 
     ``int r = fun1(n, a, b, c);
     output(r);``
@@ -37,6 +39,6 @@ void @start(){
     
     ``output(n);``
 
-    ``int n = 10;
-    fun2(n);``
+    int n = 24;
+    fun2(n);
 }

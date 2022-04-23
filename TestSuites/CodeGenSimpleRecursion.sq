@@ -1,4 +1,4 @@
-int fibonacci (int n)
+int @fibonacci (int n)
 {
     if (n == 0)
     {
@@ -7,16 +7,17 @@ int fibonacci (int n)
     elif (n == 1)
     {
         return 1;
-    }    
-    else
-    {
-        return fibonacci(n-1) + fibonacci(n-2);
-    }
+    } 
+    else{
+        int r = fibonacci(n-1) + fibonacci(n-2); 
+        return r;
+    }   
         
 }
 void @start() {
-	int n = 4;
+	int n = 3;
 	int a = fibonacci(n);
     output(a);
-    `expected output = 4`
+    output("\n");
+
 }
