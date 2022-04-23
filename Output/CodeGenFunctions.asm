@@ -75,5 +75,6 @@ lw $s8, 4($sp)
 lw $ra, 8($sp)
 lw $t0, 0($s8)
 lw $t1, -4($s8)
+move $sp, $s8
 jr $ra
 

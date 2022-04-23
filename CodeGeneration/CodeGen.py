@@ -74,10 +74,10 @@ class CodeGen:
                 # while len(block.split('\n')) > 2 and 'return' in block.split('\n')[-1] and 'return' in block.split('\n')[-2]:
                 #     block = '\n'.join(block.split('\n')[:-1])
                 blocks_current.append(block)
-        for block in blocks_current:
+        for index, block in enumerate(blocks_current):
             # print(block)
             # print("----------------------------------------------")
-            new_node = Node(blocks_current.index(block), block)
+            new_node = Node(index, block)
             CFG.append(new_node)
             # print("leading label: ", new_node.leading_label)
             # print(new_node.index, len(new_node.code_block), new_node.code_block)
@@ -153,11 +153,11 @@ class CodeGen:
                     if search_node.leading_label is not None and search_node.leading_label == funct:
                         node.next.add(search_node.index)
 
-            """ print("Current node index", node.index)
+            print("Current node index", node.index)
             print('Current node code\n', node.code_block)
             print('in case of a call -> Function next stores: ', node.function_next)
             print('Next blocks', node.next)
-            print("================================================") """
+            print("================================================")
 
         # The CFG is now completed - we now perform a depth first search to identify the dead code blocks
         # And block unfreachable from the start block is dead code
