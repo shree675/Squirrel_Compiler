@@ -616,7 +616,10 @@ class Parser(SlyParser):
     def elif_statement(self, p):
         self.type_checker.check_datatype(
             expr_type=p.expr.data_type, operator=Operator.A_ELIFMULTIPLE)
-        return AstNode(Operator.A_ELIFMULTIPLE, left=p.expr, mid=p.statements, right=p.elif_statement)
+        head = AstNode(Operator.A_ELIFMULTIPLE, left=p.expr,
+                       mid=p.statements, right=p.elif_statement)
+        p.statements.parent = head
+        return head
 
     @_("ELIF LPAREN expr RPAREN LBRACE scope_open statements RBRACE scope_close")
     def elif_statement(self, p):
@@ -628,7 +631,11 @@ class Parser(SlyParser):
     def elif_statement(self, p):
         self.type_checker.check_datatype(
             expr_type=p.expr.data_type, operator=Operator.A_IFELIFELSE)
-        return AstNode(Operator.A_IFELIFELSE, left=p.expr, mid=p.statements0, right=p.statements1)
+        head = AstNode(Operator.A_IFELIFELSE, left=p.expr,
+                       mid=p.statements0, right=p.statements1)
+        p.statements0.parent = head
+        p.statements1.parent = head
+        return head
 
     # switch_statement -> SWITCH ( left_value ) { case_statements }
     @_('SWITCH LPAREN left_value RPAREN LBRACE scope_open case_statements RBRACE scope_close')

@@ -13,7 +13,7 @@ class Node:
         self.leading_label = None
         if ':' in code_block.split('\n')[0]:
             self.leading_label = code_block.split('\n')[0].split(':')[0]
-        self.function_next = None # In case the block contains a 
+        self.function_next = None  # In case the block contains a
 
 
 class CodeGen:
@@ -82,7 +82,7 @@ class CodeGen:
             # print("leading label: ", new_node.leading_label)
             # print(new_node.index, len(new_node.code_block), new_node.code_block)
 
-        # Find all the function calls and 
+        # Find all the function calls and
         for i in range(1, len(CFG)):
             block = CFG[i-1].code_block
             # print('before call check')
@@ -412,8 +412,9 @@ class CodeGen:
                 i += 1
 
             intermediate_code_final = optimized_code4
-
-        # print(intermediate_code_final)
+        print('*******************************************************************')
+        print(intermediate_code_final)
+        print('*******************************************************************')
 
         blocks = []
         block_line = ""
@@ -460,15 +461,15 @@ class CodeGen:
         live_and_next_use_blocks = []
 
         print("Printing all the blocks")
-        for block in blocks:
-            print(block)
-            print('-----------------------------------------------------------------')
+        # for block in blocks:
+        #     print(block)
+        print('-----------------------------------------------------------------')
 
         if optimization_level >= 3:
             blocks = self.eliminate_dead_code(
                 blocks, symbol_table, optimization_level)
-            # print("Dead code elimination done --------------------------------------------------------------------------")
-        # print(*blocks, sep = '\n%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%\n')
+            print("Dead code elimination done --------------------------------------------------------------------------")
+        print(*blocks, sep='\n%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%\n')
         # All optimizations are completed and Live Analysis of the blocks starts here
 
         for block in blocks:
