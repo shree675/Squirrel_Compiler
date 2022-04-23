@@ -1,14 +1,14 @@
 void @start() {
-    int i=0;
+    ``int i=0;
     int j=0;
     int k=0;
-    int l=0;
+    int l=0;``
 
-    int arr[3][2][2][3] = {1,2,3,4,5,6,1,2,3,4,5,6,1,2,3,4,5,6,1,2,3,4,5,6,1,2,3,4,5,6,1,2,3,4,5,6};
-    arr[i][j][k][l]=10;
+    ``int arr[3][2][2][3] = {1,2,3,4,5,6,1,2,3,4,5,6,1,2,3,4,5,6,1,2,3,4,5,6,1,2,3,4,5,6,1,2,3,4,5,6};
+    arr[i][j][k][l]=10;``
 
     int arrx[4][3][2] = {1,2,3,4,5,6,1,2,3,4,5,6,1,2,3,4,5,6,1,2,3,4,5,6};
-    arrx[i][j][k]=12;
+    ``arrx[i][j][k]=12;
 
     char charArray[5] = {'a', 'b', 'c', 'd', 'e'};
     charArray[i] = 'f';
@@ -17,19 +17,38 @@ void @start() {
     int b;
     int c=18;
 
-    float floatArray[2][3] = {1.1, 2.2, 3.3, 4.4, 5.5, 6.6};
-    ``floatArray = 7.7;``
+    ``float floatArray[2][3] = {1.1, 2.2, 3.3, 4.4, 5.5, 6.6};
 
-    for(int i = 0; i < 3; i=i+1) {
+    ``for(int i = 0; i < 3; i=i+1) {
         for(int j = 0; j < 2; j=j+1) {
             for(int k = 0; k < 2; k=k+1) {
                 for(int l = 0; l < 3; l=l+1) {
-                    ``arr[i][j][k][l] = arr[i][j][k][l] + 1;``
                     output(arr[i][j][k][l]);
                 }
             }
         }
-    }
+    }``
 
-    ``a=floatArray[i][j];``
+    ``for(int i=0;i<2;i=i+1){
+        for(int j=0;j<3;j=j+1){
+            output(floatArray[i][j]);
+            output("\n");
+        }
+    }``
+
+    ``int i;
+    int j;
+    int k;
+    output(arrx[i][j][k]);``
+
+    ``int i;
+    output(charArray[i]);``
+
+    for(int i=0;i<4;i=i+1){
+        for(int j=0;j<3;j=j+1){
+            for(int k=0;k<2;k=k+1){
+                output(arrx[0][0][0]);
+            }
+        }
+    }
 }
