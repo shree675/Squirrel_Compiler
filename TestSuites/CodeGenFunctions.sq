@@ -9,6 +9,7 @@ void @fun2(int n){
         return;
     }
     fun2(n-1);
+    return; 
 }
 
 void @start(){
