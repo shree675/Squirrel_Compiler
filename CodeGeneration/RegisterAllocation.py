@@ -135,6 +135,7 @@ class RegisterAllocation:
         self.offset = 4
         self.text_segment = ''
         self.num_input_strings = 0
+        self.label_count = 0
 
     def isfloat(self, num):
         if num.isdigit():
@@ -307,6 +308,15 @@ class RegisterAllocation:
 
         # not a constant
         return False
+
+    def custom_label(self):
+        # this is a custom label genetator for handling bool typecast
+        # returns label with '___' prefix to distinguish between
+        # user generated labels and newly inserted labels
+        # the count starts from 0
+        label = "___L"+str(self.label_count)
+        self.label_count += 1
+        return label
 
     def free_all(self):
         # Reinitialize the register_descriptor and address_descriptor
@@ -910,11 +920,13 @@ class RegisterAllocation:
                     # Literal -> int, char, float, bool, string
                     # Variable -> temporary or user defined (should not make a difference to code generation)
 
-                    if cast_type == 'int' or cast_type == 'char' or cast_type == 'bool':
+                    if cast_type == 'int' or cast_type == 'char':
                         # if operand is char and cast type is int, do nohting because mips will take care of it
                         # here, we just need to check if the operand is a float or not
                         # if the operand is not float, do nothing
 
+                        pass
+                    elif cast_type == "bool":
                         pass
                     if cast_type == "string":
                         if not self.is_constant(operand):
@@ -1087,6 +1099,21 @@ class RegisterAllocation:
                                     self.text_segment += f"mov.s {reg0}, {reg1}\n"
                                 else:
                                     self.text_segment += f"addi {reg0}, {reg1}, 0\n"
+                            
+                            # in case of bool typecast, we must not handle it like int
+                            # we must convert the RHS to either 0 or 1, not just any int
+                            # hence we are adding an additional if statement that checks
+                            # for the zeroness of the RHS. If the RHS is 0, the LHS is
+                            # assigned 0, 1 otherwise
+                            if cast_type == 'bool':
+                                l0 = self.custom_label()
+                                l1 = self.custom_label()
+                                self.text_segment += f"bne {reg0}, $zero, {l0}\n"
+                                self.text_segment += f"addi {reg0}, $zero, 0\n"
+                                self.text_segment += f"j {l1}\n"
+                                self.text_segment += f"{l0}:\n"
+                                self.text_segment += f"addi {reg0}, $zero, 1\n"
+                                self.text_segment += f"{l1}:\n"
 
                         self.update_descriptors(
                             'nospill', [reg1, operand])
@@ -1388,11 +1415,13 @@ class RegisterAllocation:
                     reg = [i for i in range(3)]
                     spill = [0, 0, 0]
 
-                    reg[0], spill[0], _ = self.get_reg(False,
+                    operand_type = self.get_data_type(left, symbol_table)
+
+                    reg[0], spill[0], _ = self.get_reg(operand_type=='float',
                                                        live_and_next_use_blocks, blocks.index(block), left)
-                    reg[1], spill[1], _ = self.get_reg(False,
+                    reg[1], spill[1], _ = self.get_reg(operand_type=='float',
                                                        live_and_next_use_blocks, blocks.index(block), right)
-                    reg[2], spill[2], _ = self.get_reg(False,
+                    reg[2], spill[2], _ = self.get_reg(operand_type=='float',
                                                        live_and_next_use_blocks, blocks.index(block), "~")
 
                     if spill[0] == 1:
@@ -1414,8 +1443,6 @@ class RegisterAllocation:
                     if spill[2] == 1:
                         self.spill_reg(reg[2])
                         self.update_descriptors('spill', [reg[2]])
-
-                    operand_type = self.get_data_type(left, symbol_table)
 
                     # TODO !!!: Check nop for floats while testing
 

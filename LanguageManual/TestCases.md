@@ -1,11 +1,11 @@
 - [x] Arrays on the left
-- [ ] Arrays on the right - Shreetesh
+- [x] Arrays on the right - Shreetesh
 - [x] Simple Input - passed
 - [x] Simple Output - passed
 - [x] Strings Input
 - [x] Strings Output
 - [x] Binary Arithmetic Integers - passed
-- [ ] Binary Arithmetic Integers with arrays - Check ArrayInittest.sq - Shreetesh
+- [x] Binary Arithmetic Integers with arrays - Shreetesh
 - [x] Binary Arithmetic Floats
 - [x] Binary Arithmetic Floats with arrays
 - [ ] Type Casting Assignment - fail - Aashrith
@@ -13,8 +13,8 @@
 - [ ] Function calls without return - Aashrith
 - [ ] Recursion - Aashrith
 - [x] If statement
-- [ ] If statement with arrays - CodeGenIfTest.sq - Shreetesh
-- [ ] If statement with type casting - Shreetesh
+- [x] If statement with arrays - Shreetesh
+- [x] If statement with type casting - Shreetesh
 - [x] Switch statements
 - [x] Boolean assignment statements
 - [ ] Check get_reg thoroughly in all cases - Aashrith
