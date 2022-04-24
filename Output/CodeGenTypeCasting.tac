@@ -1,38 +1,56 @@
 start:
+params 0
 
-~t0 = 25
+~t0 = 'a'
 
-a`2 = (int) ~t0
+f`2 = (float) ~t0
 
-#L6:
+#L18:
+output float, f`2
 
-b`2 = (bool) false
-
-#L4:
-~t1 = 0
-
-if b`2 != ~t1 goto #L9
-goto #L10
-#L9:
-
-output int, a`2
-
-#L11:
-goto #L8
-#L10:
-
-~t2 = 0
-~t3 = 1
-if b`2 == ~t2 goto #L15
-output int, ~t3
-goto #L16
-#L15:
-output int, ~t2
 #L16:
+~t1 = (string) "\n"
+output string, ~t1
 
-#L13:
+#L14:
+~t2 = 'a'
+
+b1`2 = (bool) ~t2
+
+#L12:
+~t3 = 0
+
+b2`2 = (bool) ~t3
+
+#L10:
+~t4 = 0
+~t5 = 1
+if b1`2 == ~t4 goto #L20
+output int, ~t5
+goto #L21
+#L20:
+output int, ~t4
+#L21:
 
 #L8:
+~t6 = (string) "\n"
+output string, ~t6
+
+#L6:
+~t7 = 0
+~t8 = 1
+if b2`2 == ~t7 goto #L22
+output int, ~t8
+goto #L23
+#L22:
+output int, ~t7
+#L23:
+
+#L4:
+~t9 = (string) "\n"
+output string, ~t9
+
+#L2:
 return 
 
 #L1:

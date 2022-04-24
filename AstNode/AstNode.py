@@ -1097,6 +1097,7 @@ class AstNode:
 
             cur = head
             while cur.operator != Operator.A_FUNC:
+                print(cur.operator)
                 cur = cur.parent
 
             if (left != None and left.data_type != cur.value["return_type"]):
