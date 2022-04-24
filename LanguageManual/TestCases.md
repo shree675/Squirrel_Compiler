@@ -8,7 +8,7 @@
 - [ ] Binary Arithmetic Integers with arrays - Check ArrayInittest.sq - Shreetesh
 - [x] Binary Arithmetic Floats
 - [x] Binary Arithmetic Floats with arrays
-- [ ] Type Casting Assignment - fail - Aashrith
+- [x] Type Casting Assignment - Aashrith (Working)
 - [ ] Function calls - Aashrith - FAIL (for char)
 - [ ] Function calls without return - Aashrith
 - [ ] Recursion - Aashrith - FAIL (Infinite loop)

@@ -1,12 +1,10 @@
 .data
 
-__t0:
-	.asciiz "\n"
 __t1:
 	.asciiz "\n"
-__t4:
+__t6:
 	.asciiz "\n"
-__t11:
+__t9:
 	.asciiz "\n"
 .text
 .globl main
@@ -15,77 +13,53 @@ main:
 
 move $s8, $sp
 
-li.s $f3, 2.5
-cvt.w.s $f1, $f3
-mfc1 $t0, $f1
-move $a0, $t0
-li $v0, 1
+li $t0, 97
+mtc1 $t0, $f1
+cvt.s.w $f3, $f1
+mov.s $f12, $f3
+li $v0, 2
 syscall
-la $t1, __t0
-li $v0, 4
-la $a0, __t0
-syscall
-li.s $f4, 110.345
-cvt.w.s $f1, $f4
-mfc1 $t2, $f1
-move $a0, $t2
-li $v0, 11
-syscall
-la $t3, __t1
+la $t1, __t1
 li $v0, 4
 la $a0, __t1
 syscall
-li.s $f5, 32.21
-cvt.w.s $f1, $f5
-mfc1 $t4, $f1
-li $t5, 0
-li $t6, 1
-sub $t7, $t4, $t5
-beq $t7, $zero, _L24
+li $t2, 97
+addi $t3, $t2, 0
+li $t4, 0
+addi $t5, $t4, 0
+li $t6, 0
+li $t7, 1
+sub $s0, $t3, $t6
+beq $s0, $zero, _L20
+move $a0, $t7
+li $v0, 1
+syscall
+j _L21
+_L20:
 move $a0, $t6
 li $v0, 1
 syscall
-j _L25
-_L24:
-move $a0, $t5
-li $v0, 1
-syscall
-_L25:
-la $t7, __t4
+_L21:
+la $s0, __t6
 li $v0, 4
-la $a0, __t4
+la $a0, __t6
 syscall
-li $s0, 0
-sub $s1, $t4, $s0
-bne $s1, $zero, _L27
-j _L28
-_L27:
-li $s1, 1
-addi $s2, $t2, 0
-add $s3, $s1, $s2
-addi $s4, $s3, 0
-move $a0, $s4
-li $v0, 11
-syscall
-j _L26
-_L28:
-li $s5, 0
-li $s6, 1
-sub $s7, $t4, $s5
-beq $s7, $zero, _L35
-move $a0, $s6
+li $s1, 0
+li $s2, 1
+sub $s3, $t5, $s1
+beq $s3, $zero, _L22
+move $a0, $s2
 li $v0, 1
 syscall
-j _L36
-_L35:
-move $a0, $s5
+j _L23
+_L22:
+move $a0, $s1
 li $v0, 1
 syscall
-_L36:
-_L26:
-la $s7, __t11
+_L23:
+la $s3, __t9
 li $v0, 4
-la $a0, __t11
+la $a0, __t9
 syscall
 move $sp, $s8
 jr $ra
