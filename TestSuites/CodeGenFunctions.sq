@@ -1,14 +1,16 @@
-
-void @pp(char c1,char c2,char c3){
-    output(c1);
-    output(c2);
-    output(c3);
+int @sum(int a, int b){
+    return a+b;
 }
-
 
 void @start(){
 
-    char cc[3] = {'a', 'b', 'c'};
-    pp(cc[0], cc[1], cc[2]);
+    int a = 1;
+    int b = 12;
+    int c = 133;
+
+    c = c + sum(a, b);
+
+    output(c);
+
 
 }

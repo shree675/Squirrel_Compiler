@@ -1,6 +1,6 @@
 .data
 
-__t13:
+__t16:
 	.asciiz "\n"
 .text
 .globl main
@@ -111,8 +111,14 @@ main:
 
 move $s8, $sp
 
-li $t0, 3
+li $t0, 0
 addi $t1, $t0, 0
+_L25:
+li $t2, 10
+sub $t3, $t1, $t2
+blt $t3, $zero, _L26
+j _L23
+_L26:
 
 # -------------------------------- 
 addi $sp, $sp, -4
@@ -120,24 +126,32 @@ sw $t0, 4($sp)
 addi $sp, $sp, -4
 sw $t1, 4($sp)
 addi $sp, $sp, -4
+sw $t2, 4($sp)
+addi $sp, $sp, -4
 sw $ra, 4($sp)
 addi $sp, $sp, -4
 sw $s8, 4($sp)
 move $a0, $t1
 jal fibonacci
-move $t2, $v0
+move $t3, $v0
 lw $s8, 4($sp)
 lw $ra, 8($sp)
 lw $t0, 0($s8)
 lw $t1, -4($s8)
-addi $t3, $t2, 0
-move $a0, $t3
+lw $t2, -8($s8)
+addi $t4, $t3, 0
+move $a0, $t4
 li $v0, 1
 syscall
-la $t4, __t13
+la $t5, __t16
 li $v0, 4
-la $a0, __t13
+la $a0, __t16
 syscall
+li $t6, 1
+add $t7, $t1, $t6
+addi $t1, $t7, 0
+j _L25
+_L23:
 move $sp, $s8
 jr $ra
 

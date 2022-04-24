@@ -1,60 +1,53 @@
-pp:
-params 3
-param char c1`2
-param char c2`2
-param char c3`2
+sum:
+params 2
+param int a`2
+param int b`2
 
-output char, c1`2
 
-#L8:
-output char, c2`2
 
-#L6:
-output char, c3`2
+~t0 = a`2 + b`2
 
+return ~t0
 #L4:
-return 
+return 0
 
 start:
 params 0
 
-char cc`3[3]
-cc`3[0] = 'a'
-cc`3[1] = 'b'
-cc`3[2] = 'c'
+~t1 = 1
+
+a`3 = (int) ~t1
+
+#L15:
+~t2 = 12
+
+b`3 = (int) ~t2
 
 #L13:
-~t0 = 0
+~t3 = 133
 
-~t1 = ~t0 * 1
-
-~t2 = ~t1 * 1
-~t3 = cc`3[~t2]
-
-~t4 = 1
-
-~t5 = ~t4 * 1
-
-~t6 = ~t5 * 1
-~t7 = cc`3[~t6]
-
-~t8 = 2
-
-~t9 = ~t8 * 1
-
-~t10 = ~t9 * 1
-~t11 = cc`3[~t10]
-
-#L17:
-#L15:
-param ~t3
-param ~t7
-param ~t11
-call pp, 3
+c`3 = (int) ~t3
 
 #L11:
+
+
+
+
+#L17:
+param a`3
+param b`3
+~t4 = call sum, 2
+
+~t5 = c`3 + ~t4
+
+c`3 = ~t5
+
+#L9:
+output int, c`3
+
+#L7:
 return 
 
-#L10:
+#L6:
 
 #L2:
