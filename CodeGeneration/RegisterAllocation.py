@@ -4,6 +4,7 @@ from ctypes import addressof
 import re
 from collections import defaultdict
 import os
+import random
 
 default_reg_des = {
     '$t0': None,
@@ -159,11 +160,11 @@ class RegisterAllocation:
                 return 'int'
         # In case of temporary variable, we directly use the naming convention to infer type
         # In case of user defined variable, we use the symbol table passed form the parser to infer the datatype
-        print('VARIABLE in get_DT: ' + variable)
+        # print('VARIABLE in get_DT: ' + variable)
         variable_type = None
         if variable.startswith("__"):
             # temp variable
-            print("TEMP VARIABLE")
+            # print("TEMP VARIABLE")
             if 'f' in variable:
                 variable_type = "float"
             else:
@@ -171,7 +172,7 @@ class RegisterAllocation:
         else:
             # user variable
             variable_name = variable.split('__')[0]
-            print("foooo", variable_name)
+            # print("foooo", variable_name)
             variable_scope = variable.split('__')[1]
             variable_type = list(filter(
                 lambda var: var["identifier_name"] == variable_name +
@@ -456,6 +457,7 @@ class RegisterAllocation:
                         # register_descriptor[reg].remove(
                         #     temp_with_farthest_next_use)
                         return (reg, 1, 1)
+        # return ('$t9', 1, 1) if not is_float else ('$f31', 1, 1)
         else:
             for record in live_and_next_use_blocks[index]:
                 for var in record:
@@ -472,6 +474,35 @@ class RegisterAllocation:
                                     return (reg, 1, 1)
 
         return ('$t9', 1, 1) if not is_float else ('$f31', 1, 1)
+
+    # def get_reg(self, is_float, live_and_next_use_blocks, index, variable):
+
+
+    # def get_reg(self, is_float, live_and_next_use_blocks, index, variable):
+    #     if is_float:
+    #         for k in self.float_register_descriptor:
+    #             if self.float_register_descriptor[k] is not None and self.register_descriptor[k]==variable:
+    #                 return (k,0,1)
+    #         r=random.choice(list(default_float_reg_des.keys()))
+
+    #         # if len(self.float_register_descriptor[r])==1 and self.float_register_descriptor[r][0]==variable:
+    #         #     return (r,0,1)
+
+    #         if self.float_register_descriptor[r] is not None and len(self.float_register_descriptor[r])>0:
+    #             return (r,1,0)
+    #         return (r,0,0)
+    #     else:
+    #         if variable == '__t0':
+    #             print('hello',self.register_descriptor)
+    #         for k in self.register_descriptor:
+    #             if self.register_descriptor[k] is not None and self.register_descriptor[k]==variable:
+    #                 return (k,0,1)
+    #         r=random.choice(list(default_reg_des.keys()))
+    #         # if self.register_descriptor[r] is None or len(self.register_descriptor[r])==0 or len(self.register_descriptor[r])==1 and self.register_descriptor[r][0]==variable:
+    #         #     return (r,0,1)  
+    #         if self.register_descriptor[r] is not None and len(self.register_descriptor[r])>0:
+    #             return (r,1,0)
+    #         return (r,0,0)
 
     def spill_reg(self,  register):
 
@@ -494,13 +525,19 @@ class RegisterAllocation:
             if self.address_descriptor[var]['offset'] != None:
                 # if the memory space is already allocated
                 offset = self.address_descriptor[var]['offset']
-                self.text_segment += f"sw {register}, {offset}($s8)\n"
+                if 'f' in register:
+                    self.text_segment += f"s.s {register}, {offset}($s8)\n"
+                else:
+                    self.text_segment += f"sw {register}, {offset}($s8)\n"
                 # self.address_descriptor[var]['registers'].remove(register)
             else:
                 # Allocate stack space and push the variable to the stack
                 self.offset -= 4
                 self.text_segment += f"addi $sp, $sp, -4\n"
-                self.text_segment += f"sw {register}, 4($sp)\n"
+                if 'f' in register:
+                    self.text_segment += f"s.s {register}, 4($sp)\n"
+                else:
+                    self.text_segment += f"sw {register}, 4($sp)\n"
                 # self.address_descriptor.push({
                 #     var: {
                 #         'offset': self.offset,
@@ -642,7 +679,7 @@ class RegisterAllocation:
                     'registers': [register]
                 }
 
-        print('end of update : ', protocol)
+        # print('end of update : ', protocol)
         self.print_descriptors()
 
     def allocate_registers(self, blocks, live_and_next_use_blocks, data_segment, array_addresses, symbol_table, data_segment_dict):
@@ -900,7 +937,7 @@ class RegisterAllocation:
                 elif self.is_assignment_instruction_with_typecast(line):
                     subject, operand, cast_type, subject_type, operand_type = [
                         None]*5
-                    print("foo", line.split("="))
+                    # print("foo", line.split("="))
                     subject, cast_type, operand = line.split("=")[0], line.split("=")[
                         1].split()[0], line.split(")")[1]
 
@@ -908,7 +945,7 @@ class RegisterAllocation:
                     operand = operand.strip()
 
                     cast_type = cast_type.strip()[1:-1]
-                    print("bar,", subject, cast_type, operand)
+                    # print("bar,", subject, cast_type, operand)
 
                     # Extracting subject_type
                     if '[' in subject:
@@ -1053,7 +1090,7 @@ class RegisterAllocation:
                         # get register for subject
                         reg0, spill0, update0 = self.get_reg(subject_type == 'float',
                                                              live_and_next_use_blocks, blocks.index(block), subject)
-
+                        print('spillline',line,spill0, 'reg',reg0, reg1)
                         if spill0 == 1:
                             self.spill_reg(reg0)
                             self.update_descriptors('spill', [reg0])
@@ -1289,6 +1326,7 @@ class RegisterAllocation:
                             # then use the register
                             # else load the value into reg0 directly from the
                             # memory (handled below)
+                            
                             if register_descriptor[reg1] == None:
                                 # if the reg1 is empty
                                 # load the value into reg0 directly from the memory
@@ -1323,15 +1361,27 @@ class RegisterAllocation:
 
                     reg[0], spill[0], _ = self.get_reg(subject_type == 'float',
                                                        live_and_next_use_blocks, blocks.index(block), subject)
+                    
+
+                    if reg[0]=='$f6':
+                        print('hellohello',self.float_register_descriptor)
+
                     if spill[0] == 1:
                         self.spill_reg(reg[0])
                         self.update_descriptors('spill', [reg[0]])
+
+                    self.update_descriptors("nospill", [reg[0], subject])
+
+                    if reg[0]=='$f6':
+                        print()
+                        print('hello2',self.float_register_descriptor)
 
                     operand1_type = self.get_data_type(operand1, symbol_table)
 
                     if reg[1] is None:
                         reg[1], spill[1], _ = self.get_reg(operand1_type == 'float',
                                                            live_and_next_use_blocks, blocks.index(block), operand1)
+
                         if spill[1] == 1:
                             self.spill_reg(reg[1])
                             self.update_descriptors('spill', [reg[1]])
@@ -1342,8 +1392,11 @@ class RegisterAllocation:
                                     self.text_segment += f"li.s {reg[1]}, {operand1}\n"
                             else:
                                 offset = self.address_descriptor[operand1]['offset']
-                                self.text_segment += f"lw {reg[1]}, {offset}($s8)\n"
-                        self.update_descriptors("load", [reg[1], operand1])
+                                print('##',line)
+                                if operand1_type == "float":
+                                    self.text_segment += f"l.s {reg[1]}, {offset}($s8)\n"
+                                else:
+                                    self.text_segment += f"lw {reg[1]}, {offset}($s8)\n"
 
                         if self.is_constant(operand1):
                             if not self.isfloat(operand1):
@@ -1366,8 +1419,12 @@ class RegisterAllocation:
                                     self.text_segment += f"li.s {reg[2]}, {operand2}\n"
                             else:
                                 offset = self.address_descriptor[operand2]['offset']
-                                self.text_segment += f"lw {reg[2]}, {offset}($s8)\n"
-                        self.update_descriptors("load", [reg[2], operand2])
+                                print('##',line)
+                                if operand2_type == "float":
+                                    self.text_segment += f"l.s {reg[2]}, {offset}($s8)\n"
+                                else:
+                                    self.text_segment += f"lw {reg[2]}, {offset}($s8)\n"
+                            self.update_descriptors("load", [reg[2], operand2])
 
                         if self.is_constant(operand2):
                             if not self.isfloat(operand2):
@@ -1377,6 +1434,8 @@ class RegisterAllocation:
 
                     operand_type = self.get_data_type(
                         operand1, symbol_table)
+                    
+                    
 
                     if operand_type == 'float':
                         if operator == '+':
@@ -1429,7 +1488,10 @@ class RegisterAllocation:
                         self.update_descriptors('spill', [reg[0]])
 
                         offset = self.address_descriptor[left]['offset']
-                        self.text_segment += f"lw {reg[0]}, {offset}($s8)\n"
+                        if operand_type == "float":
+                            self.text_segment += f"l.s {reg[0]}, {offset}($s8)\n"
+                        else:
+                            self.text_segment += f"lw {reg[0]}, {offset}($s8)\n"
                         self.update_descriptors("load", [reg[0], left])
 
                     if spill[1] == 1:
@@ -1437,7 +1499,10 @@ class RegisterAllocation:
                         self.update_descriptors('spill', [reg[1]])
 
                         offset = self.address_descriptor[right]['offset']
-                        self.text_segment += f"lw {reg[1]}, {offset}($s8)\n"
+                        if operand_type == "float":
+                            self.text_segment += f"l.s {reg[1]}, {offset}($s8)\n"
+                        else:
+                            self.text_segment += f"lw {reg[1]}, {offset}($s8)\n"
                         self.update_descriptors("load", [reg[1], right])
 
                     if spill[2] == 1:
@@ -1776,9 +1841,9 @@ class RegisterAllocation:
 
                     else:
                         # For regular variables
-                        print("OUTPUT Variable", variable)
-                        print(self.address_descriptor)
-                        print(self.register_descriptor)
+                        # print("OUTPUT Variable", variable)
+                        # print(self.address_descriptor)
+                        # print(self.register_descriptor)
 
                         reg0, spill0, _ = self.get_reg(
                             data_type == 'float', live_and_next_use_blocks, blocks.index(block), variable)

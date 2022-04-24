@@ -13,7 +13,7 @@ class Node:
         self.leading_label = None
         if ':' in code_block.split('\n')[0]:
             self.leading_label = code_block.split('\n')[0].split(':')[0]
-        self.function_next = None
+        self.function_next = None # In case the block contains a 
 
 
 class CodeGen:
@@ -82,11 +82,15 @@ class CodeGen:
             # print("leading label: ", new_node.leading_label)
             # print(new_node.index, len(new_node.code_block), new_node.code_block)
 
+        # Find all the function calls and 
         for i in range(1, len(CFG)):
             block = CFG[i-1].code_block
+            # print('before call check')
             last_line = block.split('\n')[-1]
-            if len(last_line.split(' ')) > 3 and last_line.split(' ')[2] == 'call':
-                funct = last_line.split(' ')[3].split(',')[0]
+            # print(last_line)
+            if len(last_line.split(' ')) >= 3 and last_line.split(' ')[-3] == 'call':
+                # print("Enter call check")
+                funct = last_line.split(' ')[-2].split(',')[0]
                 CFG[i].function_next = funct
 
         # print("================================================")
@@ -97,13 +101,15 @@ class CodeGen:
             # last_line = node.code_block.rstrip('\n').split('\n')[-1]
             words = last_line.split(' ')
             # print(last_line)
-            if len(words) > 1 and (words[0] == 'goto' or words[0] == 'return'):
+            if (len(words) >= 1 and (words[0] == 'goto' or words[0] == 'return')) or 'call' in words:
                 # The direct goto statements (without condition)
-                label = words[1]
-                for search_node in CFG:
-                    if search_node.leading_label is not None and search_node.leading_label == label:
-                        node.next.add(search_node.index)
+                if words[0] == 'goto':
+                    label = words[1]
+                    for search_node in CFG:
+                        if search_node.leading_label is not None and search_node.leading_label == label:
+                            node.next.add(search_node.index)
             else:
+                # Add a connection from current block to the next block in sequence as there is no break of control flow
                 if node.index < (len(blocks_current)-1):
                     node.next.add(node.index+1)
 
@@ -114,8 +120,11 @@ class CodeGen:
                     if search_node.leading_label is not None and search_node.leading_label == label:
                         node.next.add(search_node.index)
             # Identify the return statements and connect them to the points where they are called
-            if len(words) > 1 and words[0] == 'return':
+            if len(words) >= 1 and words[0] == 'return':
                 index = return_map[return_pointer]
+                # Returns the location of the current return statement in the list of all code lines
+                # we go upwards and search for the first functin label -> This is the function that this return statement belongs to
+                # Hence we need to find all calls to this functin and make a connection going from this return statement to the next line after the specific function call
                 while index >= 0:
                     words = all_lines[index].split(' ')
                     word = None
@@ -144,8 +153,11 @@ class CodeGen:
                     if search_node.leading_label is not None and search_node.leading_label == funct:
                         node.next.add(search_node.index)
 
-            # print('Next blocks', node.next)
-            # print("$$$$$$$$$$$$$$$$$$$$")
+            """ print("Current node index", node.index)
+            print('Current node code\n', node.code_block)
+            print('in case of a call -> Function next stores: ', node.function_next)
+            print('Next blocks', node.next)
+            print("================================================") """
 
         # The CFG is now completed - we now perform a depth first search to identify the dead code blocks
         # And block unfreachable from the start block is dead code
@@ -439,7 +451,10 @@ class CodeGen:
         reserved_words = set(reserved_operators.split())
         live_and_next_use_blocks = []
 
-        # print("Printing all the blocks")
+        print("Printing all the blocks")
+        for block in blocks:
+            print(block)
+            print('-----------------------------------------------------------------')
 
         if optimization_level >= 3:
             blocks = self.eliminate_dead_code(
