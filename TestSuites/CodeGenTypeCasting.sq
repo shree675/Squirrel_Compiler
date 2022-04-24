@@ -4,7 +4,7 @@ void @start() {
     int z;
     z = (int) 3.4; ``
 
-    int a = 2.5;
+    ``int a = 2.5;
     output(a);
     output("\n");
 
@@ -12,7 +12,7 @@ void @start() {
     output(c);
     output("\n");
 
-    bool b = 32.21;
+    bool b = 0.0;
     output(b);
     output("\n");
 
@@ -20,8 +20,22 @@ void @start() {
         char c = 1+c;
         output(c);
     }else{
-        output(b);
+        float f = b;
+        output(f);
     }
+    output("\n");``
+
+    float f = 'a';
+    output(f);
     output("\n");
+
+    bool b1 = 'a';
+    bool b2 = '\0';
+
+    output(b1);
+    output("\n");
+    output(b2);
+    output("\n");
+
 
 }

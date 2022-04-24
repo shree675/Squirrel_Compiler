@@ -62,25 +62,45 @@ return 0
 start:
 params 0
 
-~t11 = 3
+~t11 = 0
 
-n`6 = (int) ~t11
+i`7 = (int) ~t11
+
+#L25:
+
+~t12 = 10
+
+if i`7 < ~t12 goto #L26
+goto #L23
 
 #L26:
 
-param n`6
-~t12 = call fibonacci, 1
 
-a`6 = (int) ~t12
+param i`7
+~t15 = call fibonacci, 1
 
-#L24:
-output int, a`6
+a`7 = (int) ~t15
+
+#L31:
+output int, a`7
+
+#L29:
+~t16 = (string) "\n"
+output string, ~t16
+
+#L27:
+
+
+~t13 = 1
+
+~t14 = i`7 + ~t13
+
+i`7 = ~t14
+
+goto #L25
+#L23:
 
 #L22:
-~t13 = (string) "\n"
-output string, ~t13
-
-#L20:
 return 
 
 #L19:
