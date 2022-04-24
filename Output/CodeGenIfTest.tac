@@ -1,4 +1,5 @@
 start:
+params 0
 
 float abc`2[16]
 abc`2[0] = 1.1
@@ -13,43 +14,47 @@ abc`2[12] = 4.4
 
 ~t2 = ~t1 * 4
 ~tf0 = abc`2[~t2]
+~t3 = (bool) ~tf0
 
-~tf1 = 3.3
 
-if ~tf0 == ~tf1 goto #L7
+~t4 = (int) ~t3
+~t5 = (int) true
+if ~t4 == ~t5 goto #L7
 goto #L8
 
 #L7:
 
-~t3 = (int) 9
-output int, ~t3
+~t6 = (int) 9
+output int, ~t6
 
 #L9:
 goto #L6
 #L8:
-~t4 = 2
+~t7 = 2
 
-~t5 = ~t4 * 1
+~t8 = ~t7 * 1
 
-~t6 = ~t5 * 4
-~tf2 = abc`2[~t6]
+~t9 = ~t8 * 4
+~tf1 = abc`2[~t9]
+~t10 = (int) ~tf1
 
-~tf3 = 4.4
+~t11 = 3
 
-if ~tf2 == ~tf3 goto #L11
+~t12 = (int) ~t10
+if ~t12 == ~t11 goto #L11
 goto #L12
 
 #L11:
 
-~t7 = (int) 10
-output int, ~t7
+~t13 = (int) 10
+output int, ~t13
 
 #L13:
 goto #L6
 #L12:
 
-~t8 = (int) 11
-output int, ~t8
+~t14 = (int) 11
+output int, ~t14
 
 #L15:
 
