@@ -827,11 +827,13 @@ class AstNode:
 
             # int_temp = parser.get_new_temp("int")
 
+            t0=parser.get_new_temp("int")
+            head.code=f"{t0} = {str(size)}\n"
             head.value = array_variable.value["varname"] + "[" + temp + "]"
-            head.code = array_variable.code + "\n" + \
+            head.code += array_variable.code + "\n" + \
                 temp + " = " + \
                 array_variable.value["val"] + " * " + \
-                str(size) + '\n'
+                t0 + '\n'
 
             if not head.mid:
                 temp2 = parser.get_new_temp(
@@ -869,7 +871,10 @@ class AstNode:
                 for j in range(i, len(variable[0]["dimension"])):
                     dimension *= variable[0]["dimension"][j]
 
-                head.code = array_var_use.code + expr.code + temp + " = " + expr.value + " * " + str(dimension) + "\n" + \
+                t0=parser.get_new_temp("int")
+                head.code = f"{t0} = {str(dimension)}\n"
+
+                head.code += array_var_use.code + expr.code + temp + " = " + expr.value + " * " + t0 + "\n" + \
                     head.value["val"] + " = " + \
                     array_var_use.value["val"] + " + " + temp + "\n"
 
@@ -891,10 +896,12 @@ class AstNode:
                     dimension *= variable[0]["dimension"][j]
 
                 # head.value["val"] = parser.get_new_temp(head.data_type)
+                t0=parser.get_new_temp("int")
+                head.code=f"{t0} = {str(dimension)}\n"
                 head.value["val"] = parser.get_new_temp("int")
-                head.code = expr.code + "\n" + \
+                head.code += expr.code + "\n" + \
                     head.value["val"] + " = " + \
-                    expr.value + " * " + str(dimension) + "\n"
+                    expr.value + " * " + t0 + "\n"
 
         # --------------------------------------------------------------------
 

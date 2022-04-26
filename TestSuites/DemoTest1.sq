@@ -1,15 +1,27 @@
 void @start() {
 
     int b = 5;
+    output(b);
+    output("\n");
     int c;              ``implicit initialization``
     bool b2 = true;
+    output(b2);
+    output("\n");
     string s = "this is a test";
+    output(s);
+    output("\n");
     int a = b-c;
     float d = a*5;      ``implicit type conversion``
     char e = (char) 10; ``explicit type conversion``
-    
-    a = -a/(b+c)%6;     ``complex combination of operators``
+    output(a);
+    output("\n");
+    output(b);
+    output(c);
+    a = a/(b+c)%6;     ``complex combination of operators``
+    output(a);
+    output("\n");
 
     bool f = a && b;
+    output(f);
 
 }

@@ -1,9 +1,5 @@
 .data
 
-__t1:
-	.asciiz "\n"
-__t2:
-	.asciiz "\n"
 __t3:
 	.asciiz "\n"
 .text

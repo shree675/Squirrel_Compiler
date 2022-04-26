@@ -14,7 +14,7 @@ void @start(){
     bool x=(bool) a;
     output(x);``
 
-    float abc[4]={1.1,2.2,3.3,4.4};
+    ``float abc[4]={1.1,2.2,3.3,4.4};``
     ``bool a=(bool) abc[2];
     output(a);``
 
