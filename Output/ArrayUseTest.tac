@@ -5,62 +5,73 @@ params 0
 
 i`2 = (float) ~tf0
 
-#L10:
+#L16:
 ~tf1 = 0.0
 
 j`2 = (float) ~tf1
 
-#L8:
+#L14:
 ~tf2 = 0.0
 
 k`2 = (float) ~tf2
 
-#L6:
+#L12:
 ~tf3 = 0.0
 
 l`2 = (float) ~tf3
 
-#L4:
-#L12:
+# --------------
+
+#L10:
+~t0 = 0
+
+count`2 = (int) ~t0
+
+#L8:
+#L18:
 
 ~tf4 = 2.0
 
-if j`2 < ~tf4 goto #L13
-goto #L2
+# ------------------- 3
 
-#L13:
+if j`2 < ~tf4 goto #L19
+goto #L6
+
+#L19:
 
 
 ~tf5 = 0.0
 
 i`2 = ~tf5
 
-#L20:
-#L22:
+#L24:
+#L26:
 
 ~tf6 = 2.0
 
-if i`2 < ~tf6 goto #L23
-goto #L18
+# ----------------- 4
 
-#L23:
+if i`2 < ~tf6 goto #L27
+goto #L22
+
+#L27:
 
 
 ~tf7 = 0.0
 
 k`2 = ~tf7
 
-#L30:
 #L32:
+#L34:
 
 ~tf8 = 10.0
 
-if k`2 < ~tf8 goto #L33
-goto #L28
+if k`2 < ~tf8 goto #L35
+goto #L30
 
-#L33:
+#L35:
 
-
+# ------------------ 5
 ~tf9 = 0.0
 
 l`2 = ~tf9
@@ -75,12 +86,20 @@ goto #L38
 
 #L43:
 
-~t0 = (int) l`2
 
-x`6 = (int) ~t0
+
+~t1 = 1
+
+~t2 = count`2 + ~t1
+
+count`2 = ~t2
+
+#L50:
+output int, count`2
 
 #L48:
-output int, x`6
+~t3 = (string) "\n"
+output string, ~t3
 
 #L46:
 
@@ -94,10 +113,6 @@ l`2 = ~tf12
 #L44:
 goto #L42
 #L38:
-~t1 = (string) "\n"
-output string, ~t1
-
-#L36:
 
 
 ~tf13 = 1.0
@@ -106,13 +121,9 @@ output string, ~t1
 
 k`2 = ~tf14
 
-#L34:
-goto #L32
-#L28:
-~t2 = (string) "\n"
-output string, ~t2
-
-#L26:
+#L36:
+goto #L34
+#L30:
 
 
 ~tf15 = 1.0
@@ -121,13 +132,9 @@ output string, ~t2
 
 i`2 = ~tf16
 
-#L24:
-goto #L22
-#L18:
-~t3 = (string) "\n"
-output string, ~t3
-
-#L16:
+#L28:
+goto #L26
+#L22:
 
 
 ~tf17 = 1.0
@@ -136,8 +143,18 @@ output string, ~t3
 
 j`2 = ~tf18
 
-#L14:
-goto #L12
+#L20:
+goto #L18
+#L6:
+~t4 = 3
+
+a`2 = (int) ~t4
+
+#L4:
+~tf19 = 0.2
+
+f`2 = (float) ~tf19
+
 #L2:
 return 
 

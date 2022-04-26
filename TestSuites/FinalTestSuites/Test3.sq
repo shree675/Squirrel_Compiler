@@ -1,0 +1,30 @@
+void @start(){
+    char trial1;
+    char trial2;
+
+    output("H for head, T for tail\n");
+    output("Enter the first outcome: ");
+    input(trial1);
+    output("Enter the second outcome: ");
+    input(trial2);
+
+    switch(trial1){
+        case ('H'):
+            switch(trial2){
+                case ('H'):
+                    output("2 Heads\n");
+                    break;
+                default:
+                    output("Head and Tail\n");
+            }
+            break;
+        default:
+            switch(trial2){
+                case ('H'):
+                    output("Tail and Head\n");
+                    break;
+                default:
+                    output("2 Tails\n");
+            }
+    }
+}

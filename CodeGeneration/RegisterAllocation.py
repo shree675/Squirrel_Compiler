@@ -11,20 +11,20 @@ default_reg_des = {
     '$t1': None,
     '$t2': None,
     '$t3': None,
-    '$t4': None,
-    '$t5': None,
-    '$t6': None,
-    '$t7': None,
-    '$s0': None,
-    '$s1': None,
-    '$s2': None,
-    '$s3': None,
-    '$s4': None,
-    '$s5': None,
-    '$s6': None,
-    '$s7': None,
-    '$t8': None,
-    '$t9': None,
+    # '$t4': None,
+    # '$t5': None,
+    # '$t6': None,
+    # '$t7': None,
+    # '$t8': None,
+    # '$t9': None,
+    # '$s0': None,
+    # '$s1': None,
+    # '$s2': None,
+    # '$s3': None,
+    # '$s4': None,
+    # '$s5': None,
+    # '$s6': None,
+    # '$s7': None,
 }
 default_float_reg_des = {
     # cannot use $f0, $f2 -> reserved
@@ -137,6 +137,7 @@ class RegisterAllocation:
         self.text_segment = ''
         self.num_input_strings = 0
         self.label_count = 0
+        self.reg_index=0
 
     def isfloat(self, num):
         if num.isdigit():
@@ -333,150 +334,183 @@ class RegisterAllocation:
         }
         self.offset = 4
 
-    def get_reg(self, is_float, live_and_next_use_blocks, index, variable):
-        """
-        The get_reg function takes the live analysis information of the relevant block in live_and_next_use_blocks
-        index is used to identify the block from this list
-        variable identifies for which variable we are looking for a register
-        returns a tuple (reg,0) or (reg,1) where reg is the name of the returned register that can be used
-        and 0 indicates that the register was not spilled
-        and 1 indicates that the register was spilled
-        Note: The spill is not handled within this function but needs to be handled in the generated code
-        Note: The address descriptor and register descriptors are modified after returning the
-        """
-
-        # return  -> (reg, spill?, update_des?)
-        # Depending on whether an integer or float register is required, we choose the register descriptor map accordingly
-        register_descriptor = None
-        if is_float:
-            register_descriptor = self.float_register_descriptor
-        else:
-            register_descriptor = self.register_descriptor
-
-        print('variable', variable, is_float)
-        # if the variable is already contained in some register
-        # No need to spill. Just return that register
-        if is_float:
-            for reg in register_descriptor:
-                if 'f' in reg and self.address_descriptor.get(variable) != None and reg in self.address_descriptor[variable]['registers']:
-                    return (reg, 0, 0)
-        else:
-            for reg in register_descriptor:
-                if variable in self.address_descriptor and reg in self.address_descriptor[variable]['registers']:
-                    return (reg, 0, 0)
-
-        # if there is an empty register available
-        # No need to spill, just return that register
-
-        if is_float:
-            for reg in default_float_reg_des:
-                if reg in register_descriptor and register_descriptor[reg] == None:
-                    return (reg, 0, 1)
-        else:
-            for reg in default_reg_des:
-                if reg in register_descriptor and register_descriptor[reg] == None:
-                    return (reg, 0, 1)
-
-        """ The Remaining cases are the ones that involves SPILL"""
-        # otherwise choose the register occupied by a temporary variable with no next use
-        for record in live_and_next_use_blocks[index]:
-            for var in record:
-                if (var[0] == '~' or var[0] == '_') and record[var]['next_use'] == -1:
-                    # -1 indicates no next use
-                    temp_var = var
-                    for reg in register_descriptor:
-                        if is_float and 'f' in reg:
-                            if temp_var == register_descriptor[reg]:
-                                # register_descriptor[reg].remove(temp_var)
-                                return (reg, 1, 1)
-                        else:
-                            if temp_var == register_descriptor[reg]:
-                                # register_descriptor[reg].remove(temp_var)
-                                return (reg, 1, 1)
-                    # return (reg,1,1) # Not sure if I need to return temp_ var
-
-        # else choose the register occupied by a non-temporary variable with no next use
-        # spill the register
-        for record in live_and_next_use_blocks[index]:
-            for var in record:
-                if record[var]['next_use'] == -1:
-                    temp_var = var
-                    # TODO: Check the naming convention - inconsistent for variable in register_descriptor
-                    for reg in register_descriptor:
-                        if is_float and 'f' in reg:
-                            if reg in register_descriptor and temp_var == register_descriptor[reg]:
-                                # register_descriptor[reg].remove(temp_var)
-                                # self.address_descriptor[temp_var]['registers'].append(reg)
-                                return (reg, 1, 1)
-                        else:
-                            if reg in register_descriptor and temp_var == register_descriptor[reg]:
-                                # register_descriptor[reg].remove(temp_var)
-                                return (reg, 1, 1)
-
-        # else choose the register occupied by a temporary variable with the farthest nextuse
-        # spill the register
-        temp_with_farthest_next_use = ''
-        farthest_next_use = -1
-        for record in live_and_next_use_blocks[index]:
-            for var in record:
-                if (var[0] == '~' or var[0] == '_') and record[var]['next_use'] > farthest_next_use:
-                    farthest_next_use = record[var]['next_use']
-                    temp_with_farthest_next_use = var
-        if farthest_next_use != -1:
-            for reg in register_descriptor:
-                if is_float and 'f' in reg:
-                    if temp_with_farthest_next_use == register_descriptor[reg]:
-                        # register_descriptor[reg].remove(
-                        #     temp_with_farthest_next_use)
-                        return (reg, 1, 1)
-                else:
-                    if temp_with_farthest_next_use == register_descriptor[reg]:
-                        # register_descriptor[reg].remove(
-                        #     temp_with_farthest_next_use)
-                        return (reg, 1, 1)
-
-        # else choose the register occupied by a non-temporary variable with the farthest nextuse
-        # spill the register
-        temp_with_farthest_next_use = ''
-        farthest_next_use = -1
-        float_temp_with_farthest_next_use = ''
-        for record in live_and_next_use_blocks[index]:
-            for var in record:
-                if record[var]['next_use'] > farthest_next_use:
-                    farthest_next_use = record[var]['next_use']
-                    temp_with_farthest_next_use = var
-        if farthest_next_use != -1:
-            for reg in register_descriptor:
-                if is_float and 'f' in reg:
-                    if temp_with_farthest_next_use == register_descriptor[reg]:
-                        # register_descriptor[reg].remove(
-                        #     temp_with_farthest_next_use)
-                        return (reg, 1, 1)
-                else:
-                    if temp_with_farthest_next_use == register_descriptor[reg]:
-                        # register_descriptor[reg].remove(
-                        #     temp_with_farthest_next_use)
-                        return (reg, 1, 1)
-        # return ('$t9', 1, 1) if not is_float else ('$f31', 1, 1)
-        else:
-            for record in live_and_next_use_blocks[index]:
-                for var in record:
-                    if record[var]['next_use'] == -1 and not (var[0] == '~' or var[0] == '_'):
-                        temp_var = var
-                        for reg in register_descriptor:
-                            if is_float and 'f' in reg:
-                                if temp_var == register_descriptor[reg]:
-                                    # register_descriptor[reg].remove(temp_var)
-                                    return (reg, 1, 1)
-                            else:
-                                if temp_var == register_descriptor[reg]:
-                                    # register_descriptor[reg].remove(temp_var)
-                                    return (reg, 1, 1)
-
-        return ('$t9', 1, 1) if not is_float else ('$f31', 1, 1)
-
     # def get_reg(self, is_float, live_and_next_use_blocks, index, variable):
+    #     """
+    #     The get_reg function takes the live analysis information of the relevant block in live_and_next_use_blocks
+    #     index is used to identify the block from this list
+    #     variable identifies for which variable we are looking for a register
+    #     returns a tuple (reg,0) or (reg,1) where reg is the name of the returned register that can be used
+    #     and 0 indicates that the register was not spilled
+    #     and 1 indicates that the register was spilled
+    #     Note: The spill is not handled within this function but needs to be handled in the generated code
+    #     Note: The address descriptor and register descriptors are modified after returning the
+    #     """
 
+    #     # return  -> (reg, spill?, update_des?)
+    #     # Depending on whether an integer or float register is required, we choose the register descriptor map accordingly
+    #     register_descriptor = None
+    #     if is_float:
+    #         register_descriptor = self.float_register_descriptor
+    #     else:
+    #         register_descriptor = self.register_descriptor
+
+    #     print('variable', variable, is_float)
+    #     # if the variable is already contained in some register
+    #     # No need to spill. Just return that register
+    #     if is_float:
+    #         for reg in register_descriptor:
+    #             if 'f' in reg and self.address_descriptor.get(variable) != None and reg in self.address_descriptor[variable]['registers']:
+    #                 return (reg, 0, 0)
+    #     else:
+    #         for reg in register_descriptor:
+    #             if variable in self.address_descriptor and reg in self.address_descriptor[variable]['registers']:
+    #                 return (reg, 0, 0)
+
+    #     # if there is an empty register available
+    #     # No need to spill, just return that register
+
+    #     if is_float:
+    #         for reg in default_float_reg_des:
+    #             if reg in register_descriptor and register_descriptor[reg] == None:
+    #                 return (reg, 0, 1)
+    #     else:
+    #         for reg in default_reg_des:
+    #             if reg in register_descriptor and register_descriptor[reg] == None:
+    #                 return (reg, 0, 1)
+
+    #     """ The Remaining cases are the ones that involves SPILL"""
+    #     # otherwise choose the register occupied by a temporary variable with no next use
+    #     for record in live_and_next_use_blocks[index]:
+    #         for var in record:
+    #             if (var[0] == '~' or var[0] == '_') and record[var]['next_use'] == -1:
+    #                 # -1 indicates no next use
+    #                 temp_var = var
+    #                 for reg in register_descriptor:
+    #                     if is_float and 'f' in reg:
+    #                         if temp_var == register_descriptor[reg]:
+    #                             return (reg, 1, 1)
+    #                     else:
+    #                         if temp_var == register_descriptor[reg]:
+    #                             return (reg, 1, 1)
+
+    #     # else choose the register occupied by a non-temporary variable with no next use
+    #     # spill the register
+    #     for record in live_and_next_use_blocks[index]:
+    #         for var in record:
+    #             if record[var]['next_use'] == -1:
+    #                 temp_var = var
+    #                 # TODO: Check the naming convention - inconsistent for variable in register_descriptor
+    #                 for reg in register_descriptor:
+    #                     if is_float and 'f' in reg:
+    #                         if reg in register_descriptor and temp_var == register_descriptor[reg]:
+    #                             # register_descriptor[reg].remove(temp_var)
+    #                             # self.address_descriptor[temp_var]['registers'].append(reg)
+    #                             return (reg, 1, 1)
+    #                     else:
+    #                         if reg in register_descriptor and temp_var == register_descriptor[reg]:
+    #                             # register_descriptor[reg].remove(temp_var)
+    #                             return (reg, 1, 1)
+
+    #     # else choose the register occupied by a temporary variable with the farthest nextuse
+    #     # spill the register
+    #     temp_with_farthest_next_use = ''
+    #     farthest_next_use = -1
+    #     for record in live_and_next_use_blocks[index]:
+    #         for var in record:
+    #             if (var[0] == '~' or var[0] == '_') and record[var]['next_use'] > farthest_next_use:
+    #                 farthest_next_use = record[var]['next_use']
+    #                 temp_with_farthest_next_use = var
+    #     if farthest_next_use != -1:
+    #         for reg in register_descriptor:
+    #             if is_float and 'f' in reg:
+    #                 if temp_with_farthest_next_use == register_descriptor[reg]:
+    #                     # register_descriptor[reg].remove(
+    #                     #     temp_with_farthest_next_use)
+    #                     return (reg, 1, 1)
+    #             else:
+    #                 if temp_with_farthest_next_use == register_descriptor[reg]:
+    #                     # register_descriptor[reg].remove(
+    #                     #     temp_with_farthest_next_use)
+    #                     return (reg, 1, 1)
+
+    #     # else choose the register occupied by a non-temporary variable with the farthest nextuse
+    #     # spill the register
+    #     temp_with_farthest_next_use = ''
+    #     farthest_next_use = -1
+    #     float_temp_with_farthest_next_use = ''
+    #     for record in live_and_next_use_blocks[index]:
+    #         for var in record:
+    #             if record[var]['next_use'] > farthest_next_use:
+    #                 farthest_next_use = record[var]['next_use']
+    #                 temp_with_farthest_next_use = var
+    #     if farthest_next_use != -1:
+    #         for reg in register_descriptor:
+    #             if is_float and 'f' in reg:
+    #                 if temp_with_farthest_next_use == register_descriptor[reg]:
+    #                     # register_descriptor[reg].remove(
+    #                     #     temp_with_farthest_next_use)
+    #                     return (reg, 1, 1)
+    #             else:
+    #                 if temp_with_farthest_next_use == register_descriptor[reg]:
+    #                     # register_descriptor[reg].remove(
+    #                     #     temp_with_farthest_next_use)
+    #                     return (reg, 1, 1)
+    #     # return ('$t9', 1, 1) if not is_float else ('$f31', 1, 1)
+    #     else:
+    #         for record in live_and_next_use_blocks[index]:
+    #             for var in record:
+    #                 if record[var]['next_use'] == -1 and not (var[0] == '~' or var[0] == '_'):
+    #                     temp_var = var
+    #                     for reg in register_descriptor:
+    #                         if is_float and 'f' in reg:
+    #                             if temp_var == register_descriptor[reg]:
+    #                                 # register_descriptor[reg].remove(temp_var)
+    #                                 return (reg, 1, 1)
+    #                         else:
+    #                             if temp_var == register_descriptor[reg]:
+    #                                 # register_descriptor[reg].remove(temp_var)
+    #                                 return (reg, 1, 1)
+
+    #     # return ('$t9', 1, 1) if not is_float else ('$f31', 1, 1)
+    #     # return ('$t3', 1, 1) if not is_float else ('$f31', 1, 1)
+    #     return self.random_get_reg(is_float, live_and_next_use_blocks, index, variable)
+
+    def get_reg(self, is_float, live_and_next_use_blocks, index, variable):
+        if is_float:
+            for freg in self.float_register_descriptor:
+                if self.float_register_descriptor[freg] == variable:
+                    print('aaaaaaaa',freg,variable)
+                    return (freg, 0, 1)
+            else:
+                # r=random.choice(list(default_float_reg_des.keys()))
+                r=list(default_float_reg_des.keys())[self.reg_index%len(default_float_reg_des)]
+                self.reg_index+=1
+                if r in self.reserved_registers:
+                    r=list(default_float_reg_des.keys())[self.reg_index%len(default_float_reg_des)]
+                    self.reg_index+=1
+                if self.float_register_descriptor[r] is not None:
+                    print('aaaaaaaa',r,variable)
+                    return (r,1,1)
+                else:
+                    print('aaaaaaaa',r,variable)
+                    return (r, 0, 1)
+        else:
+            for reg in self.register_descriptor:
+                if self.register_descriptor[reg] == variable:
+                    print('aaaaaaaa',reg,variable)
+                    return (reg, 0, 1)
+            else:
+                r=list(default_reg_des.keys())[self.reg_index%len(default_reg_des)]
+                self.reg_index+=1
+                if r in self.reserved_registers:
+                    r=list(default_reg_des.keys())[self.reg_index%len(default_reg_des)]
+                    self.reg_index+=1
+                if self.register_descriptor[r] is not None:
+                    print('aaaaaaaa',r,variable)
+                    return (r,1,1)
+                else:
+                    print('aaaaaaaa',r,variable)
+                    return (r, 0, 1)
 
     # def get_reg(self, is_float, live_and_next_use_blocks, index, variable):
     #     if is_float:
@@ -719,8 +753,15 @@ class RegisterAllocation:
 
                 # A label is a line that contains a colon
                 # Start of a function
-                elif ':' in line:
+                elif ':' in line and line[-1]==':':
                     if line[0] == '_':
+                        # SPILL every non-empty register before LABEL
+                        for reg in self.register_descriptor:
+                            if self.register_descriptor[reg] != None:
+                                self.spill_reg(reg)
+                                self.update_descriptors('spill', [reg, self.register_descriptor[reg]])
+                        
+                        self.register_descriptor = default_reg_des
                         pass
                     else:
                         # Function call
@@ -743,6 +784,13 @@ class RegisterAllocation:
                         self.update_descriptors("nospill", [f"$t{i}", varname])
 # --------------------------------------------------------------------------------------------------
                 elif line.startswith('goto'):
+                    # SPILL every non-empty register before GOTO
+                    for reg in self.register_descriptor:
+                        if self.register_descriptor[reg] != None:
+                            self.spill_reg(reg)
+                            self.update_descriptors('spill', [reg, self.register_descriptor[reg]])
+
+                        self.text_segment += f"move {reg}, $zero\n"
                     self.text_segment += f'j {line.split()[1]}\n'
 # -------------------------------------------------------------------------------------------------
                 elif self.is_array_assignment(line):
@@ -1090,7 +1138,7 @@ class RegisterAllocation:
                         # get register for subject
                         reg0, spill0, update0 = self.get_reg(subject_type == 'float',
                                                              live_and_next_use_blocks, blocks.index(block), subject)
-                        print('spillline',line,spill0, 'reg',reg0, reg1)
+                        # print('spillline',line,spill0, 'reg',reg0, reg1)
                         if spill0 == 1:
                             self.spill_reg(reg0)
                             self.update_descriptors('spill', [reg0])
@@ -1359,22 +1407,13 @@ class RegisterAllocation:
 
                     subject_type = self.get_data_type(subject, symbol_table)
 
-                    reg[0], spill[0], _ = self.get_reg(subject_type == 'float',
-                                                       live_and_next_use_blocks, blocks.index(block), subject)
                     
 
-                    if reg[0]=='$f6':
-                        print('hellohello',self.float_register_descriptor)
+                    # self.update_descriptors("nospill", [reg[0], subject])
 
-                    if spill[0] == 1:
-                        self.spill_reg(reg[0])
-                        self.update_descriptors('spill', [reg[0]])
-
-                    self.update_descriptors("nospill", [reg[0], subject])
-
-                    if reg[0]=='$f6':
-                        print()
-                        print('hello2',self.float_register_descriptor)
+                    # if reg[0]=='$f6':
+                    #     print()
+                    #     print('hello2',self.float_register_descriptor)
 
                     operand1_type = self.get_data_type(operand1, symbol_table)
 
@@ -1397,6 +1436,13 @@ class RegisterAllocation:
                                     self.text_segment += f"l.s {reg[1]}, {offset}($s8)\n"
                                 else:
                                     self.text_segment += f"lw {reg[1]}, {offset}($s8)\n"
+                        else:
+                            offset = self.address_descriptor[operand1]['offset']
+                            if operand1_type == "float" and self.float_register_descriptor[reg[1]] is None:
+                                self.text_segment += f"l.s {reg[1]}, {offset}($s8)\n"
+                            elif operand1_type!='float' and self.register_descriptor[reg[1]] is None:
+                                self.text_segment += f"lw {reg[1]}, {offset}($s8)\n"
+                            self.update_descriptors("load", [reg[1], operand1])
 
                         if self.is_constant(operand1):
                             if not self.isfloat(operand1):
@@ -1409,6 +1455,7 @@ class RegisterAllocation:
                     if reg[2] is None:
                         reg[2], spill[2], _ = self.get_reg(operand2_type == 'float',
                                                            live_and_next_use_blocks, blocks.index(block), operand2)
+
                         if spill[2] == 1:
                             self.spill_reg(reg[2])
                             self.update_descriptors('spill', [reg[2]])
@@ -1425,6 +1472,14 @@ class RegisterAllocation:
                                 else:
                                     self.text_segment += f"lw {reg[2]}, {offset}($s8)\n"
                             self.update_descriptors("load", [reg[2], operand2])
+                        
+                        else:
+                            offset = self.address_descriptor[operand2]['offset']
+                            if operand2_type == "float" and self.float_register_descriptor[reg[2]] is None:
+                                self.text_segment += f"l.s {reg[2]}, {offset}($s8)\n"
+                            elif operand2_type!='float' and self.register_descriptor[reg[2]] is None:
+                                self.text_segment += f"lw {reg[2]}, {offset}($s8)\n"
+                            self.update_descriptors("load", [reg[2], operand2])
 
                         if self.is_constant(operand2):
                             if not self.isfloat(operand2):
@@ -1435,7 +1490,17 @@ class RegisterAllocation:
                     operand_type = self.get_data_type(
                         operand1, symbol_table)
                     
+                    reg[0], spill[0], _ = self.get_reg(subject_type == 'float',
+                                                       live_and_next_use_blocks, blocks.index(block), subject)
                     
+
+                    # if reg[0]=='$f6':
+                    #     # print('hellohello',self.float_register_descriptor)
+                    #     print('hellohello',live_and_next_use_blocks[blocks.index(block)])
+
+                    if spill[0] == 1:
+                        self.spill_reg(reg[0])
+                        self.update_descriptors('spill', [reg[0]])
 
                     if operand_type == 'float':
                         if operator == '+':
@@ -1469,7 +1534,7 @@ class RegisterAllocation:
                 elif self.is_if_statement(line):
                     # the operands are never constants
                     if_stmt, left, operator, right, label = line.split()[0], line.split(
-                    )[1], line.split()[2], line.split()[3], line.split()[-1]
+                        )[1], line.split()[2], line.split()[3], line.split()[-1]
 
                     reg = [i for i in range(3)]
                     spill = [0, 0, 0]
@@ -1482,6 +1547,8 @@ class RegisterAllocation:
                                                        live_and_next_use_blocks, blocks.index(block), right)
                     reg[2], spill[2], _ = self.get_reg(operand_type=='float',
                                                        live_and_next_use_blocks, blocks.index(block), "~")
+                    
+                    # reg[2]="$t4" if operand_type!='float' else "$f1"
 
                     if spill[0] == 1:
                         self.spill_reg(reg[0])
@@ -1491,6 +1558,14 @@ class RegisterAllocation:
                         if operand_type == "float":
                             self.text_segment += f"l.s {reg[0]}, {offset}($s8)\n"
                         else:
+                            self.text_segment += f"lw {reg[0]}, {offset}($s8)\n"
+                        self.update_descriptors("load", [reg[0], left])
+                    
+                    else:
+                        offset = self.address_descriptor[left]['offset']
+                        if operand_type == "float" and self.float_register_descriptor[reg[0]] is None:
+                            self.text_segment += f"l.s {reg[0]}, {offset}($s8)\n"
+                        elif operand_type!='float' and self.register_descriptor[reg[0]] is None:
                             self.text_segment += f"lw {reg[0]}, {offset}($s8)\n"
                         self.update_descriptors("load", [reg[0], left])
 
@@ -1505,9 +1580,17 @@ class RegisterAllocation:
                             self.text_segment += f"lw {reg[1]}, {offset}($s8)\n"
                         self.update_descriptors("load", [reg[1], right])
 
-                    if spill[2] == 1:
-                        self.spill_reg(reg[2])
-                        self.update_descriptors('spill', [reg[2]])
+                    else:
+                        offset = self.address_descriptor[left]['offset']
+                        if operand_type == "float" and self.float_register_descriptor[reg[0]] is None:
+                            self.text_segment += f"l.s {reg[0]}, {offset}($s8)\n"
+                        elif operand_type!='float' and self.register_descriptor[reg[0]] is None:
+                            self.text_segment += f"lw {reg[0]}, {offset}($s8)\n"
+                        self.update_descriptors("load", [reg[0], left])
+
+                    # if spill[2] == 1:
+                    #     self.spill_reg(reg[2])
+                    #     self.update_descriptors('spill', [reg[2]])
 
                     # TODO !!!: Check nop for floats while testing
 
@@ -1595,6 +1678,52 @@ class RegisterAllocation:
                         elif operator == '==':
                             self.text_segment += f"sub {reg[2]}, {reg[0]}, {reg[1]}\n"
                             self.text_segment += f"bne {reg[2]}, $zero, {label}\n"
+
+
+                # ----
+
+                # elif self.is_if_statement(line):
+                #     # if self.register_descriptor['$t4'] is not None:
+                #     #     self.spill_reg('$t4')
+                #     #     self.update_descriptors('spill',['$t4',self.register_descriptor['$t4']])
+                #     # if self.register_descriptor['$t5'] is not None:
+                #     #     self.spill_reg('$t5')
+                #     #     self.update_descriptors('spill',['$t5',self.register_descriptor['$t5']])
+                #     # if self.register_descriptor['$t6'] is not None:
+                #     #     self.spill_reg('$t6')
+                #     #     self.update_descriptors('spill',['$t6',self.register_descriptor['$t6']])
+
+                    
+
+                #     if_stmt, left, operator, right, label = line.split()[0], line.split(
+                #         )[1], line.split()[2], line.split()[3], line.split()[-1]
+
+                #     for reg in self.register_descriptor:
+                #         if self.register_descriptor[reg] == left:
+                #             self.text_segment+=f'move $t4, {reg}\n'
+                #             break
+                #     else:
+                #         offset=self.address_descriptor[left]['offset']
+                #         self.text_segment+=f'lw $t4, {offset}($s8)\n'
+
+                #     for reg in self.register_descriptor:
+                #         if self.register_descriptor[reg] == right:
+                #             self.text_segment+=f'move $t5, {reg}\n'
+                #             break
+                #     else:
+                #         offset=self.address_descriptor[right]['offset']
+                #         self.text_segment+=f'lw $t5, {offset}($s8)\n'
+                    
+                    
+
+                    
+
+                #     if if_stmt == 'if':
+                #         if operator == '<':
+                #             self.text_segment += f"sub $t6, $t4, $t5\n"
+                #             self.text_segment += f"blt $t6, $zero, {label}\n"
+                    
+
 # -------------------------------------------------------------------------------------------------
                 elif self.is_return_statement(line):
                     num_words = len(line.split())
@@ -1790,6 +1919,10 @@ class RegisterAllocation:
                         self.text_segment += f"move {reg0}, $v0\n"
                     self.update_descriptors("nospill", [reg0, variable])
 
+                    if data_type == 'char':
+                        self.text_segment += f"li $v0, {syscall_number[data_type]}\n"
+                        self.text_segment += f"syscall\n"
+
                     if '[' in variable:
                         array_name = variable.split('[')[0]
                         var_index = variable.split('[')[1].split(']')[0]
@@ -1882,6 +2015,14 @@ class RegisterAllocation:
                                     self.text_segment += f"lw {reg0}, {offset}($s8)\n"
                             self.update_descriptors(
                                 'load', [reg0, variable])
+                        
+                        elif spill0==0:
+                            offset = self.address_descriptor[variable]['offset']
+                            if data_type == "float" and self.float_register_descriptor[reg0] is None:
+                                self.text_segment += f"l.s {reg0}, {offset}($s8)\n"
+                            elif data_type!='float' and self.register_descriptor[reg0] is None:
+                                self.text_segment += f"lw {reg0}, {offset}($s8)\n"
+                            self.update_descriptors("load", [reg0, variable])
 
                         if data_type == 'float':
                             self.text_segment += f"mov.s $f12, {reg0}\n"

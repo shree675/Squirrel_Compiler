@@ -105,5 +105,6 @@ def main(*argv):
 
 
 if __name__ == "__main__":
-    #print("printing sys.argv", sys.argv)
-    main(sys.argv)
+    # print("printing sys.argv", sys.argv)
+    # main(sys.argv)
+    main(['main.py', '-i', 'TestSuites/SimpleForTest.sq'])

@@ -1,0 +1,15 @@
+void @start() {
+    int a = 42;
+    int b;
+    int c = 51;
+    int d = 100;
+
+    if (a < b) {
+        output("Yes");
+    } elif (c < d) {
+        output("Maybe");
+    } else {
+        output("No");
+    }
+    output("\n");
+}

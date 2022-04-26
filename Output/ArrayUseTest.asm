@@ -1,9 +1,5 @@
 .data
 
-__t1:
-	.asciiz "\n"
-__t2:
-	.asciiz "\n"
 __t3:
 	.asciiz "\n"
 .text
@@ -13,92 +9,111 @@ main:
 
 move $s8, $sp
 
-li.s $f3, 0.0
-mov.s $f4, $f3
-li.s $f5, 0.0
-mov.s $f6, $f5
-li.s $f7, 0.0
-mov.s $f8, $f7
-li.s $f9, 0.0
-mov.s $f10, $f9
-_L12:
+li.s $f10, 0.0
+mov.s $f7, $f10
+li.s $f27, 0.0
+mov.s $f9, $f27
+li.s $f28, 0.0
+mov.s $f3, $f28
+li.s $f21, 0.0
+mov.s $f6, $f21
+li $t6, 0
+addi $sp, $sp, -4
+sw $t6, 4($sp)
+addi $t6, $t6, 0
+_L18:
+li.s $f24, 2.0
+addi $sp, $sp, -4
+s.s $f6, 4($sp)
+c.lt.s $f9, $f24
+bc1t _L19
+j _L6
+_L19:
+li.s $f23, 0.0
+mov.s $f7, $f23
+_L26:
 li.s $f11, 2.0
-c.lt.s $f6, $f11
-bc1t _L13
-j _L2
-_L13:
-li.s $f20, 0.0
-mov.s $f4, $f20
-_L22:
-li.s $f21, 2.0
-c.lt.s $f4, $f21
-bc1t _L23
-j _L18
-_L23:
-li.s $f22, 0.0
-mov.s $f8, $f22
-_L32:
-li.s $f23, 10.0
-c.lt.s $f8, $f23
-bc1t _L33
-j _L28
-_L33:
-li.s $f24, 0.0
-mov.s $f10, $f24
+c.lt.s $f7, $f11
+bc1t _L27
+j _L22
+_L27:
+li.s $f8, 0.0
+mov.s $f3, $f8
+_L34:
+addi $sp, $sp, -4
+s.s $f7, 4($sp)
+li.s $f7, 10.0
+addi $sp, $sp, -4
+s.s $f7, 4($sp)
+c.lt.s $f3, $f7
+bc1t _L35
+j _L30
+_L35:
+li.s $f25, 0.0
+mov.s $f6, $f25
 _L42:
-li.s $f25, 3.0
-c.lt.s $f10, $f25
+addi $sp, $sp, -4
+s.s $f10, 4($sp)
+li.s $f10, 3.0
+c.lt.s $f6, $f10
 bc1t _L43
 j _L38
 _L43:
-cvt.w.s $f1, $f10
-mfc1 $t0, $f1
-addi $t1, $t0, 0
-move $a0, $t1
+li $t5, 1
+addi $sp, $sp, -4
+sw $t6, 4($sp)
+add $t6, $t6, $t5
+addi $t3, $t6, 0
+move $a0, $t3
 li $v0, 1
 syscall
-li.s $f26, 1.0
-add.s $f27, $f10, $f26
-mov.s $f10, $f27
-j _L42
-_L38:
-la $t2, __t1
-li $v0, 4
-la $a0, __t1
-syscall
-li.s $f28, 1.0
-add.s $f29, $f8, $f28
-mov.s $f8, $f29
-j _L32
-_L28:
-la $t3, __t2
-li $v0, 4
-la $a0, __t2
-syscall
-li.s $f30, 1.0
-add.s $f31, $f4, $f30
-mov.s $f4, $f31
-j _L22
-_L18:
-la $t4, __t3
+addi $sp, $sp, -4
+sw $t5, 4($sp)
+la $t5, __t3
 li $v0, 4
 la $a0, __t3
 syscall
+li.s $f5, 1.0
+add.s $f20, $f6, $f5
+mov.s $f6, $f20
+j _L42
+_L38:
 addi $sp, $sp, -4
-s.s $f6, 4($sp)
-li.s $f6, 1.0
+s.s $f25, 4($sp)
+li.s $f25, 1.0
+s.s $f7, -12($s8)
+add.s $f7, $f3, $f25
+mov.s $f3, $f7
+j _L34
+_L30:
 addi $sp, $sp, -4
-s.s $f6, 4($sp)
+s.s $f10, 4($sp)
+li.s $f10, 1.0
 addi $sp, $sp, -4
-s.s $f6, 4($sp)
-l.s $f6, 0($s8)
-s.s $f6, -8($s8)
-l.s $f6, -4($s8)
-add.s $f6, $f6, $f6
-s.s $f6, -8($s8)
-mov.s $f6, $f6
-j _L12
-_L2:
+s.s $f28, 4($sp)
+l.s $f28, -8($s8)
+add.s $f4, $f28, $f10
+addi $sp, $sp, -4
+s.s $f8, 4($sp)
+mov.s $f8, $f4
+j _L26
+_L22:
+li.s $f29, 1.0
+addi $sp, $sp, -4
+s.s $f11, 4($sp)
+add.s $f11, $f9, $f29
+mov.s $f9, $f11
+j _L18
+_L6:
+li $t4, 3
+sw $t3, -20($s8)
+addi $t3, $t4, 0
+addi $sp, $sp, -4
+s.s $f9, 4($sp)
+li.s $f9, 0.2
+addi $sp, $sp, -4
+s.s $f11, 4($sp)
+mov.s $f11, $f9
 move $sp, $s8
 jr $ra
 
