@@ -1,4 +1,5 @@
 start:
+params 0
 
 ~t0 = 0
 

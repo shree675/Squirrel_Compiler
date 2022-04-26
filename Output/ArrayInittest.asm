@@ -48,51 +48,43 @@ mult $t8, $t9
 mflo $t9
 lw $t9, arr__2($t9)
 addi $sp, $sp, -4
-sw $t1, 4($sp)
-sw $t1, 0($s8)
-lw $t1, 4($s8)
+sw $t0, 4($sp)
+add $t0, $s3, $t9
 addi $sp, $sp, -4
-sw $t3, 4($sp)
-lw $t3, 4($s8)
-add $t1, $t1, $t3
+sw $t2, 4($sp)
+addi $t2, $t0, 0
+sw $t2, arr__2($t5)
 addi $sp, $sp, -4
-sw $t5, 4($sp)
-addi $t5, $t1, 0
+sw $t4, 4($sp)
+li $t4, 0
 addi $sp, $sp, -4
-sw $t7, 4($sp)
-lw $t7, -8($s8)
-sw $t5, arr__2($t7)
-sw $t7, -8($s8)
-li $t7, 0
+sw $t6, 4($sp)
+sw $t6, -12($s8)
+li $t6, 2
+li $t6, 2
+mult $t4, $t6
+mflo $t6
 addi $sp, $sp, -4
-sw $s1, 4($sp)
-sw $s1, -16($s8)
-li $s1, 2
-li $s1, 2
-mult $t7, $s1
-mflo $s1
+sw $s0, 4($sp)
+li $s0, 1
 addi $sp, $sp, -4
-sw $s3, 4($sp)
-li $s3, 1
+sw $s2, 4($sp)
+sw $s2, -20($s8)
+li $s2, 1
+li $s2, 1
+mult $s0, $s2
+mflo $s2
+sw $s3, 4($s8)
+add $s3, $t6, $s2
 addi $sp, $sp, -4
-sw $s4, 4($sp)
-sw $s4, -24($s8)
-li $s4, 1
-li $s4, 1
-mult $s3, $s4
-mflo $s4
-addi $sp, $sp, -4
-sw $s6, 4($sp)
-add $s6, $s1, $s4
-addi $sp, $sp, -4
-sw $t8, 4($sp)
-sw $t8, -32($s8)
-li $t8, 4
-li $t8, 4
-mult $s6, $t8
-mflo $t8
-lw $t3, arr__2($t8)
-move $a0, $t3
+sw $s5, 4($sp)
+sw $s5, -24($s8)
+li $s5, 4
+li $s5, 4
+mult $s3, $s5
+mflo $s5
+lw $s7, arr__2($s5)
+move $a0, $s7
 li $v0, 1
 syscall
 move $sp, $s8

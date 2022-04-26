@@ -1,4 +1,5 @@
 start:
+params 0
 
 int arr`2[24]
 arr`2[0] = 1

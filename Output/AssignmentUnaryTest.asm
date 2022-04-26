@@ -6,7 +6,7 @@
 foo:
 move $s8, $sp
 
-move $t0, $a0
+addi $t0, $a0, 0
 move $a0, $t0
 li $v0, 1
 syscall

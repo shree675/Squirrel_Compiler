@@ -573,4 +573,28 @@ class CodeGen:
 
         code_segment = RegisterAllocation.RegisterAllocation().allocate_registers(
             blocks, live_and_next_use_blocks, data_segment, self.array_addresses, symbol_table, self.data_segment_dict)
-        return code_segment
+
+        print("Printing the final Code segment")
+        # Final Machine Dependent Optimization -> Removing redundant loads and stores
+
+        final_code_segment = ''
+        code_segment_lines = code_segment.split('\n')
+        i = 0
+        while i < len(code_segment_lines)-1:
+        # for i in range(0, len(code_segment_lines)-1):
+            if code_segment_lines[i].startswith('lw') and code_segment_lines[i+1].startswith('sw') or code_segment_lines[i].startswith('sw') and code_segment_lines[i+1].startswith('lw'):
+                register1 = code_segment_lines[i].split(' ')[1]
+                memory1 = code_segment_lines[i].split(' ')[2]
+                register2 = code_segment_lines[i+1].split(' ')[1]
+                memory2 = code_segment_lines[i+1].split(' ')[2]
+
+                if register1 == register2 and memory1 == memory2:
+                    # print(register1, memory1, register2, memory2)
+                    i = i + 1
+                else: 
+                    final_code_segment += code_segment_lines[i] + '\n'
+            else:
+                final_code_segment += code_segment_lines[i] + '\n'
+            i = i + 1
+        final_code_segment = final_code_segment + code_segment_lines[i]
+        return final_code_segment
