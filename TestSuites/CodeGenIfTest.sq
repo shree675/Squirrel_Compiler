@@ -9,11 +9,19 @@ void @start(){
     else{
         output(8);
     }``
+
+    ``float a=2.5;
+    bool x=(bool) a;
+    output(x);``
+
     float abc[4]={1.1,2.2,3.3,4.4};
-    if(abc[2]==3.3){
+    ``bool a=(bool) abc[2];
+    output(a);``
+
+    if((bool) abc[2]==true){
         output(9);
     }
-    elif(abc[2]==4.4){
+    elif((int) abc[2]==3){
         output(10);
     }
     else{

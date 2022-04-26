@@ -194,14 +194,6 @@ class CodeGen:
         string_constants = ''
         data_types = "int float char bool string"
 
-        # for line in intermediate_code_final:
-        # if ":" in line:
-        # break
-        # line = line.split('=')
-        # if line.index('=') == 2:
-        # data_type = line[0]
-        # variable = line[1]
-
         intermediate_code_generator = (
             i for i in intermediate_code_final.splitlines())
 
@@ -271,7 +263,7 @@ class CodeGen:
         intermediate_code = re.sub(r'\bfalse\b', '0', intermediate_code)
         intermediate_code = re.sub(r'`', '__', intermediate_code)
         intermediate_code = re.sub(r'~', '__', intermediate_code)
-        intermediate_code = re.sub(r'\bbool\b', 'int', intermediate_code)
+        # intermediate_code = re.sub(r'\bbool\b', 'int', intermediate_code)
 
         global_vars = re.findall(
             r"@[^@]*@", intermediate_code)

@@ -16,7 +16,12 @@ void @start(){
     floatArray[2] = floatArray[1] + floatArray[0];
     output(floatArray[2]);``
 
-    arr[0][1] = arr[2][1] + arr[0][0];
+    ``arr[0][1] = arr[2][1] + arr[0][0];
+    output(arr[0][1]);``
+
+    int i=2;
+    int j=0;
+    arr[0][1] = arr[i][j]*2;
     output(arr[0][1]);
 
 }

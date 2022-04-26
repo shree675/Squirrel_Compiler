@@ -9,38 +9,35 @@ main:
 
 move $s8, $sp
 
-li $t0, 0
-li $t1, 2
-mult $t0, $t1
-mflo $t1
-li $t2, 1
-li $t3, 1
-mult $t2, $t3
-mflo $t3
-add $t4, $t1, $t3
-li $t5, 4
+li $t0, 2
+addi $t1, $t0, 0
+li $t2, 0
+addi $t3, $t2, 0
+li $t4, 0
+li $t5, 2
 mult $t4, $t5
 mflo $t5
-li $t6, 2
-li $t7, 2
+li $t6, 1
+li $t7, 1
 mult $t6, $t7
 mflo $t7
-li $s0, 1
-li $s1, 1
+add $s0, $t5, $t7
+li $s1, 4
 mult $s0, $s1
 mflo $s1
-add $s2, $t7, $s1
-li $s3, 4
-mult $s2, $s3
+li $s2, 2
+mult $t1, $s2
+mflo $s2
+li $s3, 1
+mult $t3, $s3
 mflo $s3
-lw $s3, arr__2($s3)
-li $s4, 0
-li $s5, 2
+add $s4, $s2, $s3
+li $s5, 4
 mult $s4, $s5
 mflo $s5
-li $s6, 0
-li $s7, 1
-mult $s6, $s7
+lw $s5, arr__2($s5)
+li $s6, 2
+mult $s5, $s6
 mflo $s7
 add $t8, $s5, $s7
 li $t9, 4
