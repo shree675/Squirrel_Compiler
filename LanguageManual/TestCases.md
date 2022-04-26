@@ -17,7 +17,7 @@
 - [x] If statement with type casting - Shreetesh
 - [x] Switch statements
 - [x] Boolean assignment statements
-- [ ] Check get_reg thoroughly in all cases - Aashrith
+- [ ] Check get_reg thoroughly in all cases - Aashrith - Problem: when we are choosing the next register occupied by a temporary variable, for the same line, we might get the same registers
 - [ ] Global variables - Shreetesh
 
 Accidental Problems found during testing :
