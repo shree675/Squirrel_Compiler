@@ -9,111 +9,275 @@ main:
 
 move $s8, $sp
 
-li.s $f10, 0.0
-mov.s $f7, $f10
-li.s $f27, 0.0
-mov.s $f9, $f27
-li.s $f28, 0.0
-mov.s $f3, $f28
-li.s $f21, 0.0
-mov.s $f6, $f21
+li $t0, 0
+addi $t1, $t0, 0
+li $t2, 0
+addi $t3, $t2, 0
+li $t4, 0
+addi $t5, $t4, 0
 li $t6, 0
+addi $t7, $t6, 0
+li $s0, 12
+mult $t1, $s0
+mflo $s0
+li $s1, 6
+mult $t3, $s1
+mflo $s1
+add $s2, $s0, $s1
+li $s3, 3
+mult $t5, $s3
+mflo $s3
+add $s4, $s2, $s3
+li $s5, 1
+mult $t7, $s5
+mflo $s5
+add $s6, $s4, $s5
+li $s7, 4
+mult $s6, $s7
+mflo $s7
+li $t8, 10
+addi $t9, $t8, 0
+sw $t9, arr__2($s7)
 addi $sp, $sp, -4
-sw $t6, 4($sp)
-addi $t6, $t6, 0
-_L18:
-li.s $f24, 2.0
+sw $s0, 4($sp)
+sw $s0, 0($s8)
+li $s0, 6
+li $s0, 6
+mult $t1, $s0
+mflo $s0
 addi $sp, $sp, -4
-s.s $f6, 4($sp)
-c.lt.s $f9, $f24
-bc1t _L19
-j _L6
-_L19:
-li.s $f23, 0.0
-mov.s $f7, $f23
-_L26:
-li.s $f11, 2.0
-c.lt.s $f7, $f11
-bc1t _L27
-j _L22
-_L27:
-li.s $f8, 0.0
-mov.s $f3, $f8
-_L34:
+sw $s2, 4($sp)
+sw $s2, -4($s8)
+li $s2, 2
+li $s2, 2
+mult $t3, $s2
+mflo $s2
 addi $sp, $sp, -4
-s.s $f7, 4($sp)
-li.s $f7, 10.0
+sw $s4, 4($sp)
+add $s4, $s0, $s2
 addi $sp, $sp, -4
-s.s $f7, 4($sp)
-c.lt.s $f3, $f7
-bc1t _L35
-j _L30
+sw $s6, 4($sp)
+sw $s6, -12($s8)
+li $s6, 1
+li $s6, 1
+mult $t5, $s6
+mflo $s6
+addi $sp, $sp, -4
+sw $t8, 4($sp)
+add $t8, $s4, $s6
+addi $sp, $sp, -4
+sw $s7, 4($sp)
+sw $s7, -20($s8)
+li $s7, 4
+li $s7, 4
+mult $t8, $s7
+mflo $s7
+addi $sp, $sp, -4
+sw $s0, 4($sp)
+li $s0, 12
+addi $sp, $sp, -4
+sw $s4, 4($sp)
+addi $s4, $s0, 0
+sw $s4, arrx__2($s7)
+addi $sp, $sp, -4
+sw $t8, 4($sp)
+sw $t8, -32($s8)
+li $t8, 1
+li $t8, 1
+mult $t1, $t8
+mflo $t8
+addi $sp, $sp, -4
+sw $s0, 4($sp)
+sw $s0, -36($s8)
+li $s0, 1
+li $s0, 1
+mult $t8, $s0
+mflo $s0
+addi $sp, $sp, -4
+sw $s7, 4($sp)
+li $s7, 102
+addi $sp, $sp, -4
+sw $s0, 4($sp)
+addi $s0, $s7, 0
+addi $sp, $sp, -4
+sw $s0, 4($sp)
+lw $s0, -44($s8)
+sw $s0, charArray__2($s0)
+sw $s0, -44($s8)
+li $s0, 0
+addi $sp, $sp, -4
+sw $s7, 4($sp)
+li $s7, 0
+addi $sp, $sp, -4
+sw $t8, 4($sp)
+li $t8, 18
+addi $sp, $sp, -4
+sw $t8, 4($sp)
+addi $t8, $t8, 0
+addi $sp, $sp, -4
+sw $s4, 4($sp)
+li $s4, 0
+addi $sp, $sp, -4
+sw $s4, 4($sp)
+addi $s4, $s4, 0
 _L35:
-li.s $f25, 0.0
-mov.s $f6, $f25
+addi $sp, $sp, -4
+sw $s4, 4($sp)
+li $s4, 3
+addi $sp, $sp, -4
+sw $s4, 4($sp)
+sub $s4, $s4, $s4
+blt $s4, $zero, _L36
+j _L33
+_L36:
+addi $sp, $sp, -4
+sw $t9, 4($sp)
+li $t9, 0
+addi $sp, $sp, -4
+sw $t9, 4($sp)
+addi $t9, $t9, 0
 _L42:
 addi $sp, $sp, -4
-s.s $f10, 4($sp)
-li.s $f10, 3.0
-c.lt.s $f6, $f10
-bc1t _L43
-j _L38
-_L43:
-li $t5, 1
+sw $t9, 4($sp)
+li $t9, 2
 addi $sp, $sp, -4
-sw $t6, 4($sp)
-add $t6, $t6, $t5
-addi $t3, $t6, 0
-move $a0, $t3
+sw $t9, 4($sp)
+sub $t9, $t9, $t9
+blt $t9, $zero, _L43
+j _L40
+_L43:
+sw $t9, -88($s8)
+li $t9, 0
+addi $sp, $sp, -4
+sw $t9, 4($sp)
+addi $t9, $t9, 0
+_L49:
+addi $sp, $sp, -4
+sw $t9, 4($sp)
+li $t9, 2
+addi $sp, $sp, -4
+sw $t9, 4($sp)
+sub $t9, $t9, $t9
+blt $t9, $zero, _L50
+j _L47
+_L50:
+sw $t9, -100($s8)
+li $t9, 0
+addi $sp, $sp, -4
+sw $t9, 4($sp)
+addi $t9, $t9, 0
+_L56:
+addi $sp, $sp, -4
+sw $t9, 4($sp)
+li $t9, 3
+addi $sp, $sp, -4
+sw $t9, 4($sp)
+sub $t9, $t9, $t9
+blt $t9, $zero, _L57
+j _L54
+_L57:
+sw $t9, -112($s8)
+sw $t9, -112($s8)
+li $t9, 12
+li $t9, 12
+mult $s4, $t9
+mflo $t9
+addi $sp, $sp, -4
+sw $t9, 4($sp)
+sw $t9, -120($s8)
+li $t9, 6
+li $t9, 6
+mult $t9, $t9
+mflo $t9
+addi $sp, $sp, -4
+sw $t9, 4($sp)
+sw $t9, -124($s8)
+lw $t9, -124($s8)
+add $t9, $t9, $t9
+addi $sp, $sp, -4
+sw $t9, 4($sp)
+sw $t9, -128($s8)
+li $t9, 3
+li $t9, 3
+mult $t9, $t9
+mflo $t9
+addi $sp, $sp, -4
+sw $t9, 4($sp)
+sw $t9, -132($s8)
+lw $t9, -132($s8)
+add $t9, $t9, $t9
+addi $sp, $sp, -4
+sw $t9, 4($sp)
+sw $t9, -136($s8)
+li $t9, 1
+li $t9, 1
+mult $t9, $t9
+mflo $t9
+addi $sp, $sp, -4
+sw $t9, 4($sp)
+sw $t9, -140($s8)
+lw $t9, -140($s8)
+add $t9, $t9, $t9
+addi $sp, $sp, -4
+sw $t9, 4($sp)
+sw $t9, -144($s8)
+li $t9, 4
+li $t9, 4
+mult $t9, $t9
+mflo $t9
+lw $t9, arr__2($t9)
+move $a0, $t9
 li $v0, 1
 syscall
 addi $sp, $sp, -4
-sw $t5, 4($sp)
-la $t5, __t3
-li $v0, 4
-la $a0, __t3
-syscall
-li.s $f5, 1.0
-add.s $f20, $f6, $f5
-mov.s $f6, $f20
+sw $t9, 4($sp)
+li $t9, 1
+addi $sp, $sp, -4
+sw $t9, 4($sp)
+sw $t9, -152($s8)
+lw $t9, -152($s8)
+add $t9, $t9, $t9
+addi $sp, $sp, -4
+sw $t9, 4($sp)
+addi $t9, $t9, 0
+j _L56
+_L54:
+sw $t9, -112($s8)
+li $t9, 1
+addi $sp, $sp, -4
+sw $t9, 4($sp)
+sw $t9, -160($s8)
+lw $t9, -160($s8)
+add $t9, $t9, $t9
+addi $sp, $sp, -4
+sw $t9, 4($sp)
+addi $t9, $t9, 0
+j _L49
+_L47:
+sw $t9, -100($s8)
+li $t9, 1
+addi $sp, $sp, -4
+sw $t9, 4($sp)
+sw $t9, -168($s8)
+lw $t9, -168($s8)
+add $t9, $t9, $t9
+addi $sp, $sp, -4
+sw $t9, 4($sp)
+addi $t9, $t9, 0
 j _L42
-_L38:
+_L40:
+sw $s4, -72($s8)
+li $s4, 1
 addi $sp, $sp, -4
-s.s $f25, 4($sp)
-li.s $f25, 1.0
-s.s $f7, -12($s8)
-add.s $f7, $f3, $f25
-mov.s $f3, $f7
-j _L34
-_L30:
+sw $s4, 4($sp)
+sw $s4, -176($s8)
+lw $s4, -176($s8)
+add $s4, $s4, $s4
 addi $sp, $sp, -4
-s.s $f10, 4($sp)
-li.s $f10, 1.0
-addi $sp, $sp, -4
-s.s $f28, 4($sp)
-l.s $f28, -8($s8)
-add.s $f4, $f28, $f10
-addi $sp, $sp, -4
-s.s $f8, 4($sp)
-mov.s $f8, $f4
-j _L26
-_L22:
-li.s $f29, 1.0
-addi $sp, $sp, -4
-s.s $f11, 4($sp)
-add.s $f11, $f9, $f29
-mov.s $f9, $f11
-j _L18
-_L6:
-li $t4, 3
-sw $t3, -20($s8)
-addi $t3, $t4, 0
-addi $sp, $sp, -4
-s.s $f9, 4($sp)
-li.s $f9, 0.2
-addi $sp, $sp, -4
-s.s $f11, 4($sp)
-mov.s $f11, $f9
+sw $s4, 4($sp)
+addi $s4, $s4, 0
+j _L35
+_L33:
 move $sp, $s8
 jr $ra
 

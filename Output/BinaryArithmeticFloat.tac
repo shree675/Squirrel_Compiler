@@ -1,4 +1,5 @@
 start:
+params 0
 
 ~tf0 = 2.7
 
