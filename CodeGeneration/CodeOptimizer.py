@@ -1,8 +1,7 @@
-from operator import indexOf
 import re
-from collections import defaultdict
 import os
-from CodeGeneration import RegisterAllocation
+from collections import defaultdict
+from CodeGeneration import CodeGenerator
 
 
 class Node:
@@ -563,7 +562,7 @@ class CodeGen:
 
         data_segment = self.preamble(intermediate_code_final)
 
-        code_segment = RegisterAllocation.RegisterAllocation().allocate_registers(
+        code_segment = CodeGenerator.CodeGenerator().generate_mips_code(
             blocks, live_and_next_use_blocks, data_segment, self.array_addresses, symbol_table, self.data_segment_dict)
 
         print("Printing the final Code segment")

@@ -62,7 +62,11 @@ return 0
 start:
 params 0
 
+<<<<<<< HEAD
 ~t11 = 0
+=======
+~t11 = 12
+>>>>>>> final
 
 i`7 = (int) ~t11
 

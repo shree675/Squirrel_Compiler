@@ -5,7 +5,11 @@ trial1`2 = (char) '0'
 #L16:
 trial2`2 = (char) '0'
 #L14:
+<<<<<<< HEAD
 ~t0 = (string) "H/h for head, T/t for tail\n"
+=======
+~t0 = (string) "H for head, T for tail\n"
+>>>>>>> final
 output string, ~t0
 
 #L12:

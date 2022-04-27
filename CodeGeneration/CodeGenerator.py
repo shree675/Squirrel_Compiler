@@ -1,10 +1,4 @@
-
-from atexit import register
-from ctypes import addressof
 import re
-from collections import defaultdict
-import os
-import random
 
 default_reg_des = {
     '$t0': None,
@@ -53,7 +47,7 @@ default_float_reg_des = {
 }
 
 
-class RegisterAllocation:
+class CodeGenerator:
 
     # registers_map = {
     #     '$t0': 'r0',
@@ -716,7 +710,7 @@ class RegisterAllocation:
         # print('end of update : ', protocol)
         self.print_descriptors()
 
-    def allocate_registers(self, blocks, live_and_next_use_blocks, data_segment, array_addresses, symbol_table, data_segment_dict):
+    def generate_mips_code(self, blocks, live_and_next_use_blocks, data_segment, array_addresses, symbol_table, data_segment_dict):
         """
         allocate_registers function allocates registers and generates the MIPS code that is stored in the text_segment
         Note: The cases, i.e., the different types of statements are identified as using elifs in this function,
@@ -753,7 +747,7 @@ class RegisterAllocation:
 
                 # A label is a line that contains a colon
                 # Start of a function
-                elif ':' in line and line[-1]==':':
+                elif ':' in line and line[-1] == ":":
                     if line[0] == '_':
                         # SPILL every non-empty register before LABEL
                         for reg in self.register_descriptor:
@@ -1917,6 +1911,11 @@ class RegisterAllocation:
                         self.text_segment += f"mov.s {reg0}, $f0\n"
                     else:
                         self.text_segment += f"move {reg0}, $v0\n"
+                    
+                    if data_type == 'char':
+                        self.text_segment += f"li $v0, {syscall_number[data_type]}\n"
+                        self.text_segment += f"syscall\n"
+                        
                     self.update_descriptors("nospill", [reg0, variable])
 
                     if data_type == 'char':

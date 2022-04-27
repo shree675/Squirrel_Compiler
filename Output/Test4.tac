@@ -51,6 +51,7 @@ goto #L20
 
 #L23:
 
+<<<<<<< HEAD
 ~t14 = 4
 ~t12 = 1
 ~t8 = 3
@@ -74,6 +75,25 @@ goto #L20
 
 ~t23 = (int) ~t22
 transpose`2[~t13] = ~t23
+=======
+
+~t8 = j`4 * 3
+~t9 = i`3 * 1
+~t10 = ~t8 + ~t9
+
+~t11 = ~t10 * 4
+
+
+~t12 = i`3 * 3
+~t13 = j`4 * 1
+~t14 = ~t12 + ~t13
+
+~t15 = ~t14 * 4
+~t16 = a`2[~t15]
+
+~t17 = (int) ~t16
+transpose`2[~t11] = ~t17
+>>>>>>> final
 
 #L24:
 
@@ -100,6 +120,7 @@ goto #L15
 #L13:
 
 #L12:
+<<<<<<< HEAD
 ~t24 = (string) "\nTranspose of the matrix:\n"
 output string, ~t24
 
@@ -113,10 +134,26 @@ i`5 = (int) ~t25
 ~t26 = 3
 
 if i`5 < ~t26 goto #L30
+=======
+~t18 = (string) "\nTranspose of the matrix:\n"
+output string, ~t18
+
+#L4:
+~t19 = 0
+
+i`5 = (int) ~t19
+
+#L29:
+
+~t20 = 3
+
+if i`5 < ~t20 goto #L30
+>>>>>>> final
 goto #L27
 
 #L30:
 
+<<<<<<< HEAD
 ~t29 = 0
 
 j`6 = (int) ~t29
@@ -126,10 +163,22 @@ j`6 = (int) ~t29
 ~t30 = 3
 
 if j`6 < ~t30 goto #L39
+=======
+~t23 = 0
+
+j`6 = (int) ~t23
+
+#L38:
+
+~t24 = 3
+
+if j`6 < ~t24 goto #L39
+>>>>>>> final
 goto #L36
 
 #L39:
 
+<<<<<<< HEAD
 ~t39 = 4
 ~t37 = 1
 ~t33 = 3
@@ -144,31 +193,65 @@ output int, transpose`2[~t38]
 #L42:
 ~t40 = (string) " "
 output string, ~t40
+=======
+
+~t27 = i`5 * 3
+~t28 = j`6 * 1
+~t29 = ~t27 + ~t28
+
+~t30 = ~t29 * 4
+output int, transpose`2[~t30]
+
+#L42:
+~t31 = (string) " "
+output string, ~t31
+>>>>>>> final
 
 #L40:
 
 
+<<<<<<< HEAD
 ~t31 = 1
 
 ~t32 = j`6 + ~t31
 
 j`6 = ~t32
+=======
+~t25 = 1
+
+~t26 = j`6 + ~t25
+
+j`6 = ~t26
+>>>>>>> final
 
 goto #L38
 #L36:
 
 #L35:
+<<<<<<< HEAD
 ~t41 = (string) "\n"
 output string, ~t41
+=======
+~t32 = (string) "\n"
+output string, ~t32
+>>>>>>> final
 
 #L31:
 
 
+<<<<<<< HEAD
 ~t27 = 1
 
 ~t28 = i`5 + ~t27
 
 i`5 = ~t28
+=======
+~t21 = 1
+
+~t22 = i`5 + ~t21
+
+i`5 = ~t22
+>>>>>>> final
 
 goto #L29
 #L27:

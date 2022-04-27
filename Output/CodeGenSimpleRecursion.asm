@@ -111,7 +111,11 @@ main:
 
 move $s8, $sp
 
+<<<<<<< HEAD
 li $t0, 0
+=======
+li $t0, 12
+>>>>>>> final
 addi $t1, $t0, 0
 _L25:
 li $t2, 10

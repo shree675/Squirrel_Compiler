@@ -26,7 +26,7 @@ import subprocess
 from Preprocessing import preprocessor
 from LexicalAnalysis import lexer
 from SyntaxAnalysis import parser as Parser
-from CodeGeneration import CodeGen
+from CodeGeneration import CodeOptimizer
 def compile(filename, optimization_level, save_preprocessed_file, save_intermediate_code):
     print(
         f"Compiling {filename} (with optimization level: {optimization_level})")
@@ -60,7 +60,7 @@ def compile(filename, optimization_level, save_preprocessed_file, save_intermedi
             f.write(intermediate_code)
 
     symbol_table = parser.symbol_table
-    code_generator = CodeGen.CodeGen()
+    code_generator = CodeOptimizer.CodeGen()
     target_code = code_generator.generate_target_code(
         intermediate_code, symbol_table, optimization_level)
 

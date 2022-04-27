@@ -1,0 +1,17 @@
+`` Multi dimensional arrays with 2 for-loops``
+
+void @start() {
+    float arr[3][3] = {1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0};
+
+   `` for(int i = 0; i < 3; i = i + 1) {
+        for (int j = 0; j < 3; j = j + 1) {
+            output(arr[i][j]);
+            output(" ");
+        }
+        output("\n");
+    }``
+
+
+    arr[0][0] = arr[1][1] + arr[2][2];
+    output(arr[0][0]);
+}
