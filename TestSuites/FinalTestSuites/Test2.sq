@@ -1,0 +1,19 @@
+void @start(){
+    int n;
+    output("Enter a number: ");
+    input(n);
+
+    int i=1;
+    while(i<=n){
+        int c=1;
+        int j=1;
+        while(j<=i){
+            output(c);
+            output(" ");
+            c = c*(i-j)/j;
+            j = j+1;
+        }
+        output("\n");
+        i = i+1;
+    }
+}

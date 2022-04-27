@@ -1,0 +1,20 @@
+void @start(){
+    int n;
+    output("Enter a number: ");
+    input(n);
+
+    int factorial = 1;
+    output("The factorial of ");
+    output(n);
+    output(" is ");
+    if(n==0){
+        output(1);
+    }
+    else{
+        for(int i=1; i<=n; i=i+1){
+            factorial = factorial * i;
+        }
+        output(factorial);
+    }
+    output("\n");
+}

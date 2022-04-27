@@ -15,7 +15,7 @@ int @fibonacci (int n)
         
 }
 void @start() {
-	int n = 3;
+	int n = 12;
 	int a = fibonacci(n);
     output(a);
     output("\n");

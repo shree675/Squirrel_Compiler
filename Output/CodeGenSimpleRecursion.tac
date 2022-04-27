@@ -62,7 +62,7 @@ return 0
 start:
 params 0
 
-~t11 = 3
+~t11 = 12
 
 n`6 = (int) ~t11
 
