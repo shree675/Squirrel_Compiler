@@ -36,3 +36,4 @@ Lexical Analysis, Syntax and Semantic Analysis
    ```
    $ pip install -e .
    ```
+7. Install SPIM for your operating system to run the output produced. 
