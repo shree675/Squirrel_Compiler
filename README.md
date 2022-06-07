@@ -1,5 +1,8 @@
 # Squirrel_Compiler
 
+## About
+A modern compiler written in python for the Squirrel language created by us. Check [Language Manual](https://github.com/shree675/Squirrel_Compiler/tree/primary/LanguageManual) for more information.
+
 ### Project Structure
 
 The project is organized into various folders:
@@ -36,4 +39,10 @@ Lexical Analysis, Syntax and Semantic Analysis
    ```
    $ pip install -e .
    ```
-7. Install SPIM for your operating system to run the output produced. 
+7. Install SPIM for your operating system to run the output produced
+
+## Contributors
+* Debeshee
+* Aashrith
+* Kranthi
+* Shreetesh
